@@ -122,6 +122,26 @@
     #boids-bg{ opacity:0.5; }
   }
 
+  /* ---------------- Corner flower ----------------
+     A small ornament built entirely from layered sine waves, fixed with its
+     own center pinned exactly to the top-right corner of the viewport, so
+     only a quarter of it ever shows — spinning there permanently, through
+     every section, at every scroll position. */
+  #corner-flower{
+    position:fixed;
+    top:0; right:0;
+    width:300px; height:300px;
+    transform:translate(50%, -50%);
+    z-index:1;
+    pointer-events:none;
+  }
+  @media (max-width: 700px){
+    #corner-flower{ width:190px; height:190px; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    #corner-flower{ opacity:0.7; }
+  }
+
   /* ---------------- Section headings ---------------- */
   .section-head{margin-bottom:36px;}
   .section-head .num{
@@ -288,7 +308,7 @@
 
   /* ---------------- Print / PDF ---------------- */
   @media print{
-    #boids-bg, header.site{display:none !important;}
+    #boids-bg, #corner-flower, header.site{display:none !important;}
     body{background:#fff;}
     section.block, section.block.alt{background:none; backdrop-filter:none; border:none;}
     .hero{padding-top:20px;}
@@ -300,6 +320,7 @@
 
 <!-- Fixed, full-page ambient boids animation — always moving, everywhere on the page -->
 <canvas id="boids-bg" aria-hidden="true"></canvas>
+<canvas id="corner-flower" aria-hidden="true"></canvas>
 
 <header class="site">
   <div class="wrap">
@@ -648,6 +669,80 @@
     }
     function loop(){
       if(running){ step(); draw(); }
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+  })();
+
+  // Corner flower: a small ornament made purely of layered sine waves —
+  // each "petal ring" is radius = base + amplitude*sin(k*angle + phase),
+  // several of these stacked with translucent fills and independent
+  // rotation speeds. The canvas is pinned via CSS so its own center sits
+  // exactly on the viewport's top-right corner; it spins there forever.
+  (function(){
+    var canvas = document.getElementById('corner-flower');
+    if(!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var W, H, DPR;
+
+    function resize(){
+      DPR = Math.min(window.devicePixelRatio || 1, 2);
+      var rect = canvas.getBoundingClientRect();
+      W = rect.width; H = rect.height;
+      canvas.width = Math.round(W * DPR);
+      canvas.height = Math.round(H * DPR);
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    var layers = [
+      { baseR: 0.23, harmonics: [{k:5, amp:0.10}],                          color: 'rgba(201,154,75,0.4)',  speed: 0.12, rot: 0 },
+      { baseR: 0.33, harmonics: [{k:7, amp:0.075}],                         color: 'rgba(11,37,64,0.22)',   speed: -0.16, rot: 0.5 },
+      { baseR: 0.44, harmonics: [{k:3, amp:0.12}],                          color: 'rgba(20,84,122,0.3)',   speed: 0.09, rot: 1.2 },
+      { baseR: 0.15, harmonics: [{k:4, amp:0.06},{k:11, amp:0.02}],         color: 'rgba(201,154,75,0.55)', speed: 0.22, rot: 2.1 }
+    ];
+    var N = 90;
+    var t = 0;
+
+    function drawLayer(layer, cx, cy, scale){
+      var pts = [];
+      for(var i = 0; i <= N; i++){
+        var angle = (i / N) * Math.PI * 2;
+        var r = layer.baseR;
+        for(var h = 0; h < layer.harmonics.length; h++){
+          var hh = layer.harmonics[h];
+          r += hh.amp * Math.sin(hh.k * angle + t * layer.speed * 6.283);
+        }
+        r *= scale;
+        var a = angle + layer.rot + t * layer.speed * 0.6;
+        pts.push({ x: cx + Math.cos(a) * r, y: cy + Math.sin(a) * r });
+      }
+      ctx.beginPath();
+      ctx.moveTo(pts[0].x, pts[0].y);
+      for(var j = 1; j < pts.length; j++) ctx.lineTo(pts[j].x, pts[j].y);
+      ctx.closePath();
+      ctx.fillStyle = layer.color;
+      ctx.fill();
+    }
+
+    function draw(){
+      ctx.clearRect(0, 0, W, H);
+      var cx = W / 2, cy = H / 2;
+      var scale = Math.min(W, H);
+      for(var i = 0; i < layers.length; i++) drawLayer(layers[i], cx, cy, scale);
+    }
+
+    var running = !document.hidden;
+    document.addEventListener('visibilitychange', function(){ running = !document.hidden; });
+
+    if(reduce){
+      draw();
+      return;
+    }
+    function loop(){
+      if(running){ t += 0.016; draw(); }
       requestAnimationFrame(loop);
     }
     requestAnimationFrame(loop);
