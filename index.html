@@ -123,8 +123,6 @@
     background-repeat:repeat-x;
     background-position:0 bottom;
   }
-  /* Each tile's left & right edge match exactly, so repeat-x + a translate of
-     exactly one tile-width loops with zero seam / zero clipping. */
   .wave-back{
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 300'%3E%3Cpath d='M0,150 C200,220 400,80 600,150 L600,300 L0,300 Z' fill='%2314547a'/%3E%3C/svg%3E");
     background-size:600px 100%;
@@ -148,13 +146,10 @@
   @keyframes driftMid  { from{background-position-x:0;}   to{background-position-x:-700px;} }
   @keyframes driftFront{ from{background-position-x:0;}   to{background-position-x:-800px;} }
 
-  /* The ship's bottom offset and tilt are driven by JS every frame, computed
-     straight from the same period/size numbers as .wave-front above, so it
-     always sits exactly on that wave's crest instead of an approximation. */
   .ship{
     position:fixed;
     left:50%;
-    bottom:calc(var(--sea-h) * 0.34); /* fallback for no-JS / reduced motion */
+    bottom:calc(var(--sea-h) * 0.34);
     width:70px;
     transform:translateX(-50%);
     z-index:1;
@@ -166,28 +161,15 @@
     .wave-back,.wave-mid,.wave-front{animation:none !important;}
   }
 
-  /* ---------------- Legibility halo ----------------
-     The sea is fixed behind the whole page, so any text that has no solid
-     box of its own (headings, timeline text, nav, footer) gets a soft
-     cream glow behind it. On light backgrounds it's invisible; over the
-     dark wave it keeps the text readable. */
-  h1, h2, h3,
-  .hero .eyebrow, .hero p.lead,
-  .section-head .num,
-  .titem .role, .titem .org, .titem .period, .titem .content p,
-  nav.main a, .brand, footer{
-    text-shadow:0 0 10px var(--cream), 0 0 22px var(--cream);
-  }
-
   /* ---------------- Section headings ---------------- */
   .section-head{margin-bottom:36px;}
   .section-head .num{
     font-size:0.8rem; color:var(--gold); font-weight:600; letter-spacing:0.06em;
   }
   .section-head h2{font-size:clamp(1.6rem, 3vw, 2.1rem); margin-top:8px;}
-  section.block{padding:64px 0;}
+  section.block{padding:64px 0; background:var(--cream);}
   section.block.alt{
-    background:rgba(11,37,64,0.035);
+    background:#f1ede2;
     border-top:1px solid var(--line);
     border-bottom:1px solid var(--line);
   }
@@ -223,7 +205,6 @@
   .card p{color:var(--ink-soft); font-size:0.95rem; margin-top:10px;}
   .card .period{margin-top:14px; font-size:0.82rem; color:var(--gold); font-weight:600;}
 
-  /* Feature card (publication) reuses the same living-border treatment */
   .feature-card{
     position:relative;
     background:var(--cream);
@@ -319,7 +300,6 @@
 </head>
 <body>
 
-<!-- Fixed, infinitely-tiling wave + ship background animation -->
 <div class="sea" aria-hidden="true">
   <div class="wave-layer wave-back"></div>
   <div class="wave-layer wave-mid"></div>
@@ -348,7 +328,6 @@
 
 <main id="top">
 
-  <!-- HERO -->
   <section class="hero">
     <div class="wrap">
       <span class="eyebrow">Student 2026 · STX Mat/Fys &amp; Bioteknologi</span>
@@ -366,7 +345,6 @@
     </div>
   </section>
 
-  <!-- AKTUELT -->
   <section class="block alt" id="om">
     <div class="wrap">
       <div class="section-head">
@@ -390,7 +368,6 @@
     </div>
   </section>
 
-  <!-- ERFARING -->
   <section class="block" id="erfaring">
     <div class="wrap">
       <div class="section-head">
@@ -440,7 +417,6 @@
     </div>
   </section>
 
-  <!-- PRAKTIK -->
   <section class="block alt" id="praktik">
     <div class="wrap">
       <div class="section-head">
@@ -470,7 +446,6 @@
     </div>
   </section>
 
-  <!-- UDDANNELSE -->
   <section class="block" id="uddannelse">
     <div class="wrap">
       <div class="section-head">
@@ -491,7 +466,6 @@
     </div>
   </section>
 
-  <!-- KOMPETENCER -->
   <section class="block alt" id="kompetencer">
     <div class="wrap">
       <div class="section-head">
@@ -512,7 +486,6 @@
     </div>
   </section>
 
-  <!-- KONTAKT -->
   <section class="block" id="kontakt">
     <div class="wrap">
       <div class="contact-box">
@@ -537,7 +510,6 @@
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
 
-  // Living gradient border: track cursor position per card for the spotlight effect.
   document.querySelectorAll('.card, .feature-card').forEach(function(el){
     el.addEventListener('mousemove', function(e){
       var r = el.getBoundingClientRect();
@@ -546,29 +518,25 @@
     });
   });
 
-  // Ship-on-wave: compute the ship's vertical offset and tilt directly from
-  // the exact same numbers driving .wave-front's CSS animation (period,
-  // tile width, curve shape), so the boat always rides that wave's crest
-  // instead of bobbing on a guess.
   (function(){
     var ship = document.querySelector('.ship');
     var sea = document.querySelector('.sea');
     var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if(!ship || !sea || reduce) return;
 
-    var PERIOD = 11;         // seconds — matches .wave-front animation-duration
-    var PX_PERIOD = 800;     // px — matches .wave-front background-size width
-    var PHASE_OFFSET = 100;  // px — aligns the sine approximation with the Bezier crest
-    var AMPLITUDE = 50;      // viewBox units — matches the front path's crest/trough swing
-    var BASELINE = 200;      // viewBox units — matches the front path's mid-line
-    var VB_H = 300;          // front tile viewBox height
-    var HULL_INSET = 6;      // px nudge so the hull sits on the line, not the svg's own margin
+    var PERIOD = 11;
+    var PX_PERIOD = 800;
+    var PHASE_OFFSET = 100;
+    var AMPLITUDE = 50;
+    var BASELINE = 200;
+    var VB_H = 300;
+    var HULL_INSET = 6;
 
     function frame(now){
       var t = (now / 1000) % PERIOD;
       var localX = (t / PERIOD) * PX_PERIOD;
       var angle = 2 * Math.PI * (((localX - PHASE_OFFSET) % PX_PERIOD + PX_PERIOD) % PX_PERIOD) / PX_PERIOD;
-      var waveY = BASELINE - AMPLITUDE * Math.sin(angle);            // viewBox units, y grows downward
+      var waveY = BASELINE - AMPLITUDE * Math.sin(angle);
       var slope = -AMPLITUDE * (2 * Math.PI / PX_PERIOD) * Math.cos(angle);
 
       var seaH = sea.getBoundingClientRect().height;
