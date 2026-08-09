@@ -51,20 +51,12 @@
     position:sticky; top:0; z-index:50;
     backdrop-filter:blur(10px);
     background:rgba(250,246,238,0.78);
+    border-bottom:1px solid var(--line);
   }
   header.site .wrap{
     display:flex; align-items:center; justify-content:space-between;
     padding:18px 28px;
   }
-  /* The nav's straight border is replaced by the header's own colour
-     dripping down in soft, animated blobs over the hero — see .goo-divider
-     below for the shared technique. */
-  .goo-header-line{
-    position:absolute; left:0; right:0; bottom:-25px; width:100%; height:26px;
-    overflow:visible; pointer-events:none;
-  }
-  .goo-header-line path.fill{fill:rgba(250,246,238,0.92); stroke:none;}
-  .goo-header-line path.line{fill:none; stroke:var(--gold); stroke-width:1.2; opacity:0.45;}
   .brand{font-family:'Fraunces', serif; font-weight:600; font-size:1.05rem; text-decoration:none; letter-spacing:-0.01em;}
   nav.main{display:flex; gap:26px;}
   nav.main a{
@@ -149,27 +141,9 @@
     background:rgba(241,237,226,0.42);
     backdrop-filter:blur(2px);
     -webkit-backdrop-filter:blur(2px);
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
   }
-
-  /* ---------------- Goo dividers ----------------
-     Same technique as the hellomonday.com "wove" edge: a handful of points
-     along the seam, each nudged by its own sine wave, smoothed into one
-     continuous curve every frame (Catmull-Rom to Bezier). Unlike a plain
-     border, the curve is filled — one section's tone actually pours into
-     the next, split by the wavy line, with a thin gold thread tracing the
-     seam on top. It also swells locally wherever the cursor passes nearby
-     — see the script at the bottom. --c-bg/--c-fill are set per divider
-     inline, matching the two sections it sits between. */
-  .goo-divider{
-    position:relative;
-    height:76px;
-    background:var(--c-bg, var(--cream));
-    pointer-events:none;
-    overflow:hidden;
-  }
-  .goo-divider svg{position:absolute; inset:0; width:100%; height:100%; display:block;}
-  .goo-divider path.fill{fill:var(--c-fill, var(--cream)); stroke:none;}
-  .goo-divider path.line{fill:none; stroke:var(--gold); stroke-width:1.5; opacity:0.6;}
 
   /* ---------------- Cards: a living gradient border + magnetic tilt/deform on hover ---------------- */
   .cards{display:grid; grid-template-columns:repeat(auto-fit, minmax(260px,1fr)); gap:20px;}
@@ -314,7 +288,7 @@
 
   /* ---------------- Print / PDF ---------------- */
   @media print{
-    #boids-bg, header.site, .goo-divider{display:none !important;}
+    #boids-bg, header.site{display:none !important;}
     body{background:#fff;}
     section.block, section.block.alt{background:none; backdrop-filter:none; border:none;}
     .hero{padding-top:20px;}
@@ -339,7 +313,6 @@
       <a href="#kontakt">Kontakt</a>
     </nav>
   </div>
-  <svg class="goo-header-line" aria-hidden="true"><path class="fill"></path><path class="line"></path></svg>
 </header>
 
 <main id="top">
@@ -361,8 +334,6 @@
       </div>
     </div>
   </section>
-
-  <div class="goo-divider" style="--c-bg:var(--cream); --c-fill:#f1ede2;" aria-hidden="true"><svg><path class="fill"></path><path class="line"></path></svg></div>
 
   <!-- AKTUELT -->
   <section class="block alt" id="om">
@@ -387,8 +358,6 @@
       </div>
     </div>
   </section>
-
-  <div class="goo-divider" style="--c-bg:#f1ede2; --c-fill:var(--cream);" aria-hidden="true"><svg><path class="fill"></path><path class="line"></path></svg></div>
 
   <!-- ERFARING -->
   <section class="block" id="erfaring">
@@ -440,8 +409,6 @@
     </div>
   </section>
 
-  <div class="goo-divider" style="--c-bg:var(--cream); --c-fill:#f1ede2;" aria-hidden="true"><svg><path class="fill"></path><path class="line"></path></svg></div>
-
   <!-- PRAKTIK -->
   <section class="block alt" id="praktik">
     <div class="wrap">
@@ -472,8 +439,6 @@
     </div>
   </section>
 
-  <div class="goo-divider" style="--c-bg:#f1ede2; --c-fill:var(--cream);" aria-hidden="true"><svg><path class="fill"></path><path class="line"></path></svg></div>
-
   <!-- UDDANNELSE -->
   <section class="block" id="uddannelse">
     <div class="wrap">
@@ -495,8 +460,6 @@
     </div>
   </section>
 
-  <div class="goo-divider" style="--c-bg:var(--cream); --c-fill:#f1ede2;" aria-hidden="true"><svg><path class="fill"></path><path class="line"></path></svg></div>
-
   <!-- KOMPETENCER -->
   <section class="block alt" id="kompetencer">
     <div class="wrap">
@@ -517,8 +480,6 @@
       </div>
     </div>
   </section>
-
-  <div class="goo-divider" style="--c-bg:#f1ede2; --c-fill:var(--cream);" aria-hidden="true"><svg><path class="fill"></path><path class="line"></path></svg></div>
 
   <!-- KONTAKT -->
   <section class="block" id="kontakt">
@@ -690,87 +651,6 @@
       requestAnimationFrame(loop);
     }
     requestAnimationFrame(loop);
-  })();
-
-  // Goo dividers: same technique as hellomonday.com's wove edge — a handful
-  // of points along the seam, each drifting on its own sine wave, smoothed
-  // into one continuous curve every frame with a Catmull-Rom-to-Bezier
-  // conversion. Unlike a plain border, the curve is filled: one section's
-  // colour actually pours across the seam into the next (a "fill" path),
-  // with a thin gold "line" path tracing the same curve on top as a
-  // highlight. The curve also swells locally wherever the cursor is nearby,
-  // tracked via a single shared mousemove.
-  (function(){
-    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var mouseX = -9999;
-    window.addEventListener('mousemove', function(e){ mouseX = e.clientX; });
-
-    var lines = [];
-    document.querySelectorAll('.goo-divider svg, .goo-header-line').forEach(function(svg){
-      var isHeader = svg.classList.contains('goo-header-line');
-      var N = 10;
-      var pts = [];
-      for(var i = 0; i < N; i++){
-        pts.push({
-          t: i / (N - 1),
-          freq: 0.1 + Math.random() * 0.14,
-          phase: Math.random() * Math.PI * 2
-        });
-      }
-      lines.push({
-        svg: svg,
-        fillPath: svg.querySelector('path.fill'),
-        linePath: svg.querySelector('path.line'),
-        pts: pts,
-        // Header colour drips down from the top edge; section seams fill
-        // upward from the bottom edge into the section above.
-        attach: isHeader ? 'top' : 'bottom',
-        amp: isHeader ? 3 : 13,
-        boost: isHeader ? 6 : 24,
-        radius: 280
-      });
-    });
-    if(!lines.length) return;
-
-    function curvePoints(coords){
-      var d = 'M ' + coords[0].x.toFixed(1) + ',' + coords[0].y.toFixed(1) + ' ';
-      for(var i = 0; i < coords.length - 1; i++){
-        var p0 = coords[i], p1 = coords[i + 1];
-        var pm1 = coords[i - 1] || p0;
-        var p2 = coords[i + 2] || p1;
-        var c1x = p0.x + (p1.x - pm1.x) / 6, c1y = p0.y + (p1.y - pm1.y) / 6;
-        var c2x = p1.x - (p2.x - p0.x) / 6, c2y = p1.y - (p2.y - p0.y) / 6;
-        d += 'C ' + c1x.toFixed(1) + ',' + c1y.toFixed(1) + ' ' + c2x.toFixed(1) + ',' + c2y.toFixed(1) + ' ' + p1.x.toFixed(1) + ',' + p1.y.toFixed(1) + ' ';
-      }
-      return d;
-    }
-
-    function frame(t){
-      var time = t / 1000;
-      lines.forEach(function(line){
-        var rect = line.svg.getBoundingClientRect();
-        var W = rect.width || 1, H = rect.height || 1, baseY = H / 2;
-        var mx = mouseX - rect.left;
-        var coords = line.pts.map(function(p){
-          var x = p.t * W;
-          var dist = Math.abs(x - mx);
-          var f = dist < line.radius ? 1 - dist / line.radius : 0;
-          var boostAmp = line.amp + f * f * line.boost;
-          var y = baseY + Math.sin(time * p.freq * 4 + p.phase) * boostAmp;
-          return { x: x, y: y };
-        });
-        var curve = curvePoints(coords);
-        var W1 = W.toFixed(1);
-        var fillD = line.attach === 'bottom'
-          ? curve + 'L ' + W1 + ',' + H.toFixed(1) + ' L 0,' + H.toFixed(1) + ' Z'
-          : curve + 'L ' + W1 + ',0 L 0,0 Z';
-        line.fillPath.setAttribute('d', fillD);
-        line.linePath.setAttribute('d', curve);
-      });
-      if(!reduce) requestAnimationFrame(frame);
-    }
-
-    if(reduce){ frame(0); } else { requestAnimationFrame(frame); }
   })();
 </script>
 
