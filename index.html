@@ -132,7 +132,7 @@
     top:0; right:0;
     width:300px; height:300px;
     transform:translate(50%, -50%);
-    z-index:1;
+    z-index:60;
     pointer-events:none;
   }
   @media (max-width: 700px){
@@ -703,7 +703,7 @@
       { baseR: 0.44, harmonics: [{k:3, amp:0.12}],                          color: 'rgba(20,84,122,0.3)',   speed: 0.09, rot: 1.2 },
       { baseR: 0.15, harmonics: [{k:4, amp:0.06},{k:11, amp:0.02}],         color: 'rgba(201,154,75,0.55)', speed: 0.22, rot: 2.1 }
     ];
-    var N = 90;
+    var N = 240;
     var t = 0;
 
     function drawLayer(layer, cx, cy, scale){
@@ -730,7 +730,9 @@
     function draw(){
       ctx.clearRect(0, 0, W, H);
       var cx = W / 2, cy = H / 2;
-      var scale = Math.min(W, H);
+      // Leave headroom so the largest layer's base radius plus its harmonic
+      // amplitude never reaches the canvas edge, or the shape gets clipped.
+      var scale = Math.min(W, H) * 0.82;
       for(var i = 0; i < layers.length; i++) drawLayer(layers[i], cx, cy, scale);
     }
 
