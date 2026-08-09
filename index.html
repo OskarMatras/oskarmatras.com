@@ -22,6 +22,7 @@
     --ink-soft: rgba(22,35,47,0.68);
     --line: rgba(11,37,64,0.12);
     --maxw: 880px;
+    --sea-h: 40vh;
   }
 
   *{box-sizing:border-box;}
@@ -34,6 +35,7 @@
     font-weight:400;
     line-height:1.6;
     -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
   }
   h1,h2,h3{
     font-family:'Fraunces', Georgia, serif;
@@ -45,6 +47,7 @@
   section{position:relative; z-index:2;}
   .wrap{max-width:var(--maxw); margin:0 auto; padding:0 28px;}
 
+  /* ---------------- Header / nav ---------------- */
   header.site{
     position:sticky; top:0; z-index:50;
     backdrop-filter:blur(10px);
@@ -53,16 +56,32 @@
   }
   header.site .wrap{
     display:flex; align-items:center; justify-content:space-between;
-    padding:16px 28px;
+    padding:18px 28px;
   }
-  .brand{font-family:'Fraunces', serif; font-weight:600; font-size:1.05rem; text-decoration:none;}
-  nav.main{display:flex; gap:28px;}
+  .brand{font-family:'Fraunces', serif; font-weight:600; font-size:1.05rem; text-decoration:none; letter-spacing:-0.01em;}
+  nav.main{display:flex; gap:26px;}
   nav.main a{
-    text-decoration:none; font-size:0.92rem; color:var(--ink-soft);
-    transition:color .2s ease;
+    position:relative;
+    text-decoration:none;
+    font-size:0.76rem;
+    letter-spacing:0.07em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    padding-bottom:5px;
+    transition:color .25s ease;
+    white-space:nowrap;
+  }
+  nav.main a::after{
+    content:'';
+    position:absolute; left:0; right:0; bottom:0;
+    height:1px; background:var(--navy);
+    transform:scaleX(0); transform-origin:right;
+    transition:transform .3s ease;
   }
   nav.main a:hover{color:var(--navy);}
+  nav.main a:hover::after{transform-origin:left; transform:scaleX(1);}
 
+  /* ---------------- Hero ---------------- */
   .hero{
     padding:104px 0 64px;
     overflow:hidden;
@@ -87,46 +106,71 @@
   .btn.ghost{border:1px solid var(--line); color:var(--navy);}
   .btn.ghost:hover{border-color:var(--navy);}
 
+  /* ---------------- Peaceful, infinitely-tiling sea + ship ---------------- */
   .sea{
     position:fixed;
     left:0; right:0; bottom:0;
-    height:34vh;
-    min-height:220px;
+    height:var(--sea-h);
+    min-height:240px;
     z-index:0;
     pointer-events:none;
     overflow:hidden;
   }
-  .sea svg{position:absolute; bottom:0; left:0; width:200%; height:100%;}
-  .wave-back{ animation:driftBack 26s linear infinite; opacity:0.35; }
-  .wave-mid{  animation:driftMid  18s linear infinite; opacity:0.5; }
-  .wave-front{animation:driftFront 12s linear infinite; opacity:0.9; }
+  .wave-layer{
+    position:absolute;
+    left:0; right:0; bottom:0;
+    height:100%;
+    background-repeat:repeat-x;
+    background-position:0 bottom;
+  }
+  .wave-back{
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 300'%3E%3Cpath d='M0,150 C200,220 400,80 600,150 L600,300 L0,300 Z' fill='%2314547a'/%3E%3C/svg%3E");
+    background-size:600px 100%;
+    opacity:0.32;
+    animation:driftBack 34s linear infinite;
+  }
+  .wave-mid{
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 700 300'%3E%3Cpath d='M0,180 C250,120 450,240 700,180 L700,300 L0,300 Z' fill='%230b2540'/%3E%3C/svg%3E");
+    background-size:700px 100%;
+    opacity:0.55;
+    animation:driftMid 20s linear infinite;
+  }
+  .wave-front{
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 300'%3E%3Cpath d='M0,200 C300,150 500,250 800,200 L800,300 L0,300 Z' fill='%23071a2e'/%3E%3C/svg%3E");
+    background-size:800px 100%;
+    opacity:0.96;
+    animation:driftFront 11s linear infinite;
+  }
 
-  @keyframes driftBack { from{transform:translateX(0);} to{transform:translateX(-50%);} }
-  @keyframes driftMid  { from{transform:translateX(0);} to{transform:translateX(-50%);} }
-  @keyframes driftFront{ from{transform:translateX(0);} to{transform:translateX(-50%);} }
+  @keyframes driftBack { from{background-position-x:0;}   to{background-position-x:-600px;} }
+  @keyframes driftMid  { from{background-position-x:0;}   to{background-position-x:-700px;} }
+  @keyframes driftFront{ from{background-position-x:0;}   to{background-position-x:-800px;} }
 
   .ship{
     position:fixed;
     left:50%;
-    bottom:calc(34vh - 46px);
-    width:92px;
+    bottom:calc(var(--sea-h) * 0.34);
+    width:78px;
     transform:translateX(-50%);
     z-index:1;
     pointer-events:none;
-    animation:bob 6s ease-in-out infinite;
-    transform-origin:50% 90%;
-    filter:drop-shadow(0 6px 8px rgba(7,26,46,0.18));
+    animation:bob 11s ease-in-out infinite;
+    transform-origin:50% 85%;
+    filter:drop-shadow(0 5px 6px rgba(7,26,46,0.2));
   }
   @keyframes bob{
-    0%   { transform:translateX(-50%) translateY(0) rotate(-2.2deg); }
-    50%  { transform:translateX(-50%) translateY(-9px) rotate(2.2deg); }
-    100% { transform:translateX(-50%) translateY(0) rotate(-2.2deg); }
+    0%   { transform:translateX(-50%) translateY(0)     rotate(-1.6deg); }
+    25%  { transform:translateX(-50%) translateY(-7px)  rotate(0.4deg); }
+    50%  { transform:translateX(-50%) translateY(2px)   rotate(1.8deg); }
+    75%  { transform:translateX(-50%) translateY(-5px)  rotate(-0.6deg); }
+    100% { transform:translateX(-50%) translateY(0)     rotate(-1.6deg); }
   }
 
   @media (prefers-reduced-motion: reduce){
     .wave-back,.wave-mid,.wave-front,.ship{animation:none !important;}
   }
 
+  /* ---------------- Section headings ---------------- */
   .section-head{margin-bottom:36px;}
   .section-head .num{
     font-size:0.8rem; color:var(--gold); font-weight:600; letter-spacing:0.06em;
@@ -139,70 +183,136 @@
     border-bottom:1px solid var(--line);
   }
 
+  /* ---------------- Cards, with a living gradient border that follows the cursor ---------------- */
   .cards{display:grid; grid-template-columns:repeat(auto-fit, minmax(260px,1fr)); gap:20px;}
   .card{
+    position:relative;
     background:var(--cream);
     border:1px solid var(--line);
     border-radius:16px;
     padding:26px;
-    transition:transform .2s ease, box-shadow .2s ease;
+    overflow:hidden;
+    transition:transform .25s ease, box-shadow .25s ease;
+  }
+  .card::before{
+    content:'';
+    position:absolute; inset:0;
+    border-radius:inherit;
+    padding:1px;
+    background:radial-gradient(220px circle at var(--mx,50%) var(--my,50%), var(--gold), rgba(201,154,75,0) 70%);
+    -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite:xor;
+            mask-composite:exclude;
+    opacity:0;
+    transition:opacity .35s ease;
+    pointer-events:none;
   }
   .card:hover{transform:translateY(-4px); box-shadow:0 16px 30px rgba(11,37,64,0.10);}
+  .card:hover::before{opacity:1;}
   .card .tag{font-size:0.78rem; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.05em;}
   .card h3{font-size:1.2rem; margin-top:10px;}
   .card p{color:var(--ink-soft); font-size:0.95rem; margin-top:10px;}
   .card .period{margin-top:14px; font-size:0.82rem; color:var(--gold); font-weight:600;}
 
-  .timeline{position:relative; padding-left:28px; border-left:2px solid var(--line);}
-  .titem{position:relative; padding-bottom:38px;}
+  .feature-card{
+    position:relative;
+    background:var(--cream);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:34px;
+    overflow:hidden;
+    max-width:640px;
+  }
+  .feature-card::before{
+    content:'';
+    position:absolute; inset:0;
+    border-radius:inherit;
+    padding:1px;
+    background:radial-gradient(260px circle at var(--mx,50%) var(--my,50%), var(--gold), rgba(201,154,75,0) 70%);
+    -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite:xor;
+            mask-composite:exclude;
+    opacity:0;
+    transition:opacity .35s ease;
+    pointer-events:none;
+  }
+  .feature-card:hover::before{opacity:1;}
+  .feature-card .tag{font-size:0.78rem; color:var(--gold); text-transform:uppercase; letter-spacing:0.06em; font-weight:600;}
+  .feature-card h3{font-size:1.25rem; margin-top:12px; line-height:1.35;}
+  .feature-card p{color:var(--ink-soft); font-size:0.95rem; margin-top:12px;}
+  .feature-card .period{margin-top:16px; font-size:0.82rem; color:var(--ink-soft);}
+
+  /* ---------------- Timeline (grid based, so dot/line/content always align) ---------------- */
+  .timeline{position:relative;}
+  .timeline::before{
+    content:'';
+    position:absolute; left:11px; top:6px; bottom:6px;
+    width:2px; background:var(--line);
+  }
+  .titem{
+    position:relative;
+    display:grid;
+    grid-template-columns:24px 1fr;
+    column-gap:22px;
+    padding-bottom:36px;
+  }
   .titem:last-child{padding-bottom:0;}
-  .titem::before{
-    content:''; position:absolute; left:-34px; top:4px;
+  .titem .dot{
+    grid-column:1; grid-row:1;
     width:11px; height:11px; border-radius:50%;
     background:var(--navy); border:3px solid var(--foam);
     box-shadow:0 0 0 1px var(--line);
+    margin-top:5px;
+    justify-self:center;
+    position:relative; z-index:1;
   }
+  .titem .content{grid-column:2; min-width:0;}
   .titem .role{font-size:1.08rem; font-weight:600; font-family:'Fraunces',serif;}
   .titem .org{color:var(--gold); font-weight:600; font-size:0.9rem; margin-top:2px;}
   .titem .period{font-size:0.82rem; color:var(--ink-soft); margin-top:4px;}
   .titem p{margin-top:10px; color:var(--ink-soft); max-width:58ch;}
 
+  /* ---------------- Skills ---------------- */
   .chips{display:flex; flex-wrap:wrap; gap:10px; margin-top:8px;}
   .chip{
     padding:9px 16px; border-radius:100px; border:1px solid var(--line);
     font-size:0.88rem; background:var(--cream);
   }
 
+  /* ---------------- Contact ---------------- */
   .contact-box{
     background:var(--navy); color:var(--cream);
     border-radius:20px; padding:48px; text-align:center;
   }
   .contact-box h2{color:var(--cream); font-size:clamp(1.6rem,3vw,2.2rem);}
   .contact-box p{color:rgba(250,246,238,0.75); margin-top:12px;}
-  .contact-box .btn.primary{background:var(--gold); color:var(--navy-deep); margin-top:24px;}
+  .contact-box .cta-row{display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin-top:24px;}
+  .contact-box .btn.primary{background:var(--gold); color:var(--navy-deep);}
+  .contact-box .btn.ghost{border-color:rgba(250,246,238,0.35); color:var(--cream);}
+  .contact-box .btn.ghost:hover{border-color:var(--cream);}
 
-  footer{padding:36px 0 60px; text-align:center; font-size:0.85rem; color:var(--ink-soft);}
+  footer{
+    position:relative; z-index:2;
+    padding:36px 0 60px; text-align:center;
+    font-size:0.85rem; color:rgba(250,246,238,0.85);
+  }
 
+  /* ---------------- Print / PDF ---------------- */
   @media print{
     .sea, .ship, header.site{display:none !important;}
     body{background:#fff;}
     section.block.alt{background:none; border:none;}
     .hero{padding-top:20px;}
+    footer{color:var(--ink-soft);}
   }
 </style>
 </head>
 <body>
 
 <div class="sea" aria-hidden="true">
-  <svg class="wave-back" viewBox="0 0 2400 300" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-    <path fill="#14547a" d="M0,150 C200,220 400,80 600,150 C800,220 1000,80 1200,150 C1400,220 1600,80 1800,150 C2000,220 2200,80 2400,150 L2400,300 L0,300 Z"/>
-  </svg>
-  <svg class="wave-mid" viewBox="0 0 2400 300" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-    <path fill="#0b2540" d="M0,180 C250,120 450,240 700,180 C950,120 1150,240 1400,180 C1650,120 1850,240 2100,180 C2250,140 2350,160 2400,180 L2400,300 L0,300 Z"/>
-  </svg>
-  <svg class="wave-front" viewBox="0 0 2400 300" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-    <path fill="#071a2e" d="M0,200 C300,150 500,250 800,200 C1100,150 1300,250 1600,200 C1900,150 2100,250 2400,200 L2400,300 L0,300 Z"/>
-  </svg>
+  <div class="wave-layer wave-back"></div>
+  <div class="wave-layer wave-mid"></div>
+  <div class="wave-layer wave-front"></div>
 </div>
 <svg class="ship" viewBox="0 0 120 90" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
   <path d="M18 58 L102 58 L90 78 L30 78 Z" fill="#faf6ee"/>
@@ -217,6 +327,7 @@
     <nav class="main">
       <a href="#om">Om</a>
       <a href="#erfaring">Erfaring</a>
+      <a href="#praktik">Praktik</a>
       <a href="#uddannelse">Uddannelse</a>
       <a href="#kompetencer">Kompetencer</a>
       <a href="#kontakt">Kontakt</a>
@@ -231,9 +342,10 @@
       <span class="eyebrow">Student 2026 · STX Mat/Fys &amp; Bioteknologi</span>
       <h1>Oskar Matras</h1>
       <p class="lead">
-        Jeg er student fra Vordingborg Gymnasium med en naturvidenskabelig linje, og arbejder i dag som
-        lead server-tekniker og AI-specialist hos startuppet FoodVoice. Jeg trives med kundekontakt,
-        teknisk problemløsning og at være ansigtet udadtil for et projekt.
+        Jeg er student fra Vordingborg Gymnasium (STX, Mat/Fys &amp; Bioteknologi) og arbejder i dag som
+        lead server-tekniker og AI-specialist hos startuppet FoodVoice. Jeg har stiftet fysikforeningen
+        FysFolk og skrevet en artikel til Aktuel Naturvidenskab i samarbejde med Aarhus Universitet.
+        Jeg trives med kundekontakt, teknisk problemløsning og at formidle naturvidenskab videre.
       </p>
       <div class="cta-row">
         <a class="btn primary" href="#kontakt">Kontakt mig</a>
@@ -256,9 +368,9 @@
           <div class="period">2026 — nu</div>
         </div>
         <div class="card">
-          <span class="tag">Forening · Hobby</span>
+          <span class="tag">Forening · Stifter</span>
           <h3>FysFolk</h3>
-          <p>Forening for fysik-interesserede unge.</p>
+          <p>Stiftet forening for fysik-interesserede unge. Stadig et lille hobbyprojekt ved siden af.</p>
           <div class="period">2026 — nu</div>
         </div>
       </div>
@@ -273,28 +385,77 @@
       </div>
       <div class="timeline">
         <div class="titem">
-          <div class="role">Lead server-tekniker &amp; AI-specialist</div>
-          <div class="org">FoodVoice (Startup)</div>
-          <div class="period">2026 — nu</div>
-          <p>Ansvarlig for kundekontakt og fungerer som firmaets udadvendte ansigt, samtidig med teknisk drift og AI-relateret arbejde.</p>
+          <div class="dot"></div>
+          <div class="content">
+            <div class="role">Lead server-tekniker &amp; AI-specialist</div>
+            <div class="org">FoodVoice (Startup)</div>
+            <div class="period">2026 — nu</div>
+            <p>Ansvarlig for kundekontakt og fungerer som firmaets udadvendte ansigt, samtidig med teknisk drift og AI-relateret arbejde.</p>
+          </div>
         </div>
         <div class="titem">
-          <div class="role">Tjener, take away &amp; lagerorganisering</div>
-          <div class="org">Dhaba</div>
-          <div class="period">2024 (sommerferiejob)</div>
-          <p>Betjening af gæster, take away-ekspedition og organisering af lager.</p>
+          <div class="dot"></div>
+          <div class="content">
+            <div class="role">Tjener, take away &amp; lagerorganisering</div>
+            <div class="org">Dhaba</div>
+            <div class="period">2024 (sommerferiejob)</div>
+            <p>Betjening af gæster, take away-ekspedition og organisering af lager.</p>
+          </div>
         </div>
         <div class="titem">
-          <div class="role">Sælger → salgsoplæring</div>
-          <div class="org">LeadDoubler</div>
-          <div class="period">2023 — 2024</div>
-          <p>Startede som sælger og gik videre til at stå for oplæring af nye sælgere.</p>
+          <div class="dot"></div>
+          <div class="content">
+            <div class="role">Sælger → salgsoplæring</div>
+            <div class="org">LeadDoubler</div>
+            <div class="period">2023 — 2024</div>
+            <p>Startede som sælger og gik videre til at stå for oplæring af nye sælgere.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-head" style="margin-top:56px;">
+        <span class="num">Skriftligt arbejde</span>
+        <h2>Publikation</h2>
+      </div>
+      <div class="feature-card">
+        <span class="tag">Aktuel Naturvidenskab</span>
+        <h3>"Europas Vigtigste Maskine Laver 50.000 Supernovaer I Sekundet"</h3>
+        <p>Forfatter af artiklen, udgivet i samarbejde med Aarhus Universitet.</p>
+        <div class="period">Efterår 2026</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block alt" id="praktik">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="num">Praktik</span>
+        <h2>Praktikforløb</h2>
+      </div>
+      <div class="timeline">
+        <div class="titem">
+          <div class="dot"></div>
+          <div class="content">
+            <div class="role">Borgmesterpraktik</div>
+            <div class="org">Vordingborg Kommune</div>
+            <div class="period">1 uge</div>
+            <p>Fulgtes med borgmesteren til møder og arrangementer. Modtog en anbefaling fra borgmesteren efter forløbet.</p>
+          </div>
+        </div>
+        <div class="titem">
+          <div class="dot"></div>
+          <div class="content">
+            <div class="role">Børnehavepraktik</div>
+            <div class="org">Pædagogisk praktik</div>
+            <div class="period">1 uge</div>
+            <p>Arbejdede som pædagog i en uge — en af de hyggeligste oplevelser jeg har haft. Fik en hjemmemalet kop af et af børnene.</p>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="block alt" id="uddannelse">
+  <section class="block" id="uddannelse">
     <div class="wrap">
       <div class="section-head">
         <span class="num">Uddannelse</span>
@@ -302,16 +463,19 @@
       </div>
       <div class="timeline">
         <div class="titem">
-          <div class="role">STX — Mat/Fys og Bioteknologi-linje</div>
-          <div class="org">Vordingborg Gymnasium og HF</div>
-          <div class="period">2023 — 2026</div>
-          <p>Startede årgang 2023/2024, blev student i 2026.</p>
+          <div class="dot"></div>
+          <div class="content">
+            <div class="role">STX — Mat/Fys og Bioteknologi-linje</div>
+            <div class="org">Vordingborg Gymnasium og HF</div>
+            <div class="period">2023 — 2026</div>
+            <p>Startede årgang 2023/2024, blev student i 2026.</p>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="block" id="kompetencer">
+  <section class="block alt" id="kompetencer">
     <div class="wrap">
       <div class="section-head">
         <span class="num">Kompetencer</span>
@@ -323,6 +487,9 @@
         <span class="chip">AI &amp; teknologi</span>
         <span class="chip">Server-drift/teknik</span>
         <span class="chip">Naturvidenskab (mat/fys/bioteknologi)</span>
+        <span class="chip">Skriftlig formidling</span>
+        <span class="chip">Foreningsarbejde &amp; stiftelse</span>
+        <span class="chip">Pædagogik</span>
         <span class="chip">Serviceorienteret</span>
       </div>
     </div>
@@ -332,8 +499,11 @@
     <div class="wrap">
       <div class="contact-box">
         <h2>Lad os tale sammen</h2>
-        <p>Har du en opgave, et job eller bare lyst til at sige hej? Skriv til mig.</p>
-        <a class="btn primary" href="mailto:din@email.dk">Send mig en mail</a>
+        <p>Har du en opgave, et job eller bare lyst til at sige hej? Skriv eller ring til mig — telefon foretrækkes.</p>
+        <div class="cta-row">
+          <a class="btn primary" href="tel:+4561607471">Ring: 61 60 74 71</a>
+          <a class="btn ghost" href="mailto:Oskarstanislav@gmail.com">Oskarstanislav@gmail.com</a>
+        </div>
       </div>
     </div>
   </section>
@@ -348,6 +518,14 @@
 
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
+
+  document.querySelectorAll('.card, .feature-card').forEach(function(el){
+    el.addEventListener('mousemove', function(e){
+      var r = el.getBoundingClientRect();
+      el.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+      el.style.setProperty('--my', (e.clientY - r.top) + 'px');
+    });
+  });
 </script>
 
 </body>
