@@ -22,7 +22,6 @@
     --ink-soft: rgba(22,35,47,0.68);
     --line: rgba(11,37,64,0.12);
     --maxw: 880px;
-    --sea-h: 26vh;
   }
 
   *{box-sizing:border-box;}
@@ -106,59 +105,21 @@
   .btn.ghost{border:1px solid var(--line); color:var(--navy);}
   .btn.ghost:hover{border-color:var(--navy);}
 
-  /* ---------------- Peaceful, infinitely-tiling sea + ship ---------------- */
-  .sea{
+  /* ---------------- Ambient boids background ----------------
+     A full-viewport, fixed canvas runs a small flocking simulation behind
+     everything, all the time — so no matter how far down the page you've
+     scrolled, something is quietly moving back there. Content sections sit
+     above it with a translucent, blurred background so text stays legible
+     while the motion still reads through faintly. */
+  #boids-bg{
     position:fixed;
-    left:0; right:0; bottom:0;
-    height:var(--sea-h);
-    min-height:240px;
+    inset:0;
     z-index:0;
     pointer-events:none;
-    overflow:hidden;
+    background:var(--cream);
   }
-  .wave-layer{
-    position:absolute;
-    left:0; right:0; bottom:0;
-    height:100%;
-    background-repeat:repeat-x;
-    background-position:0 bottom;
-  }
-  .wave-back{
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 300'%3E%3Cpath d='M0,150 C200,220 400,80 600,150 L600,300 L0,300 Z' fill='%2314547a'/%3E%3C/svg%3E");
-    background-size:600px 100%;
-    opacity:0.32;
-    animation:driftBack 34s linear infinite;
-  }
-  .wave-mid{
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 700 300'%3E%3Cpath d='M0,180 C250,120 450,240 700,180 L700,300 L0,300 Z' fill='%230b2540'/%3E%3C/svg%3E");
-    background-size:700px 100%;
-    opacity:0.55;
-    animation:driftMid 20s linear infinite;
-  }
-  .wave-front{
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 300'%3E%3Cpath d='M0,200 C300,150 500,250 800,200 L800,300 L0,300 Z' fill='%23071a2e'/%3E%3C/svg%3E");
-    background-size:800px 100%;
-    opacity:0.9;
-    animation:driftFront 11s linear infinite;
-  }
-
-  @keyframes driftBack { from{background-position-x:0;}   to{background-position-x:-600px;} }
-  @keyframes driftMid  { from{background-position-x:0;}   to{background-position-x:-700px;} }
-  @keyframes driftFront{ from{background-position-x:0;}   to{background-position-x:-800px;} }
-
-  .ship{
-    position:fixed;
-    left:50%;
-    bottom:calc(var(--sea-h) * 0.34);
-    width:70px;
-    transform:translateX(-50%);
-    z-index:1;
-    pointer-events:none;
-    filter:drop-shadow(0 5px 6px rgba(7,26,46,0.2));
-  }
-
   @media (prefers-reduced-motion: reduce){
-    .wave-back,.wave-mid,.wave-front{animation:none !important;}
+    #boids-bg{ opacity:0.5; }
   }
 
   /* ---------------- Section headings ---------------- */
@@ -167,14 +128,24 @@
     font-size:0.8rem; color:var(--gold); font-weight:600; letter-spacing:0.06em;
   }
   .section-head h2{font-size:clamp(1.6rem, 3vw, 2.1rem); margin-top:8px;}
-  section.block{padding:64px 0; background:var(--cream);}
+  /* Content sections sit above the boids canvas on a translucent, blurred
+     panel — frosted glass over the flock, so the background stays legible
+     everywhere on the page instead of only near the hero. */
+  section.block{
+    padding:64px 0;
+    background:rgba(250,246,238,0.76);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+  }
   section.block.alt{
-    background:#f1ede2;
+    background:rgba(241,237,226,0.78);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
     border-top:1px solid var(--line);
     border-bottom:1px solid var(--line);
   }
 
-  /* ---------------- Cards, with a living gradient border that follows the cursor ---------------- */
+  /* ---------------- Cards: a living gradient border + magnetic tilt/deform on hover ---------------- */
   .cards{display:grid; grid-template-columns:repeat(auto-fit, minmax(260px,1fr)); gap:20px;}
   .card{
     position:relative;
@@ -183,14 +154,16 @@
     border-radius:16px;
     padding:26px;
     overflow:hidden;
-    transition:transform .25s ease, box-shadow .25s ease;
+    transform:perspective(900px);
+    transition:transform .15s ease-out, box-shadow .3s ease, border-radius .35s ease;
+    will-change:transform;
   }
   .card::before{
     content:'';
     position:absolute; inset:0;
     border-radius:inherit;
-    padding:1px;
-    background:radial-gradient(220px circle at var(--mx,50%) var(--my,50%), var(--gold), rgba(201,154,75,0) 70%);
+    padding:2.5px;
+    background:radial-gradient(320px circle at var(--mx,50%) var(--my,50%), var(--gold) 0%, rgba(201,154,75,0.55) 38%, rgba(201,154,75,0) 74%);
     -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite:xor;
             mask-composite:exclude;
@@ -198,13 +171,14 @@
     transition:opacity .35s ease;
     pointer-events:none;
   }
-  .card:hover{transform:translateY(-4px); box-shadow:0 16px 30px rgba(11,37,64,0.10);}
+  .card:hover{box-shadow:0 26px 50px rgba(11,37,64,0.18), 0 0 50px rgba(201,154,75,0.4);}
   .card:hover::before{opacity:1;}
   .card .tag{font-size:0.78rem; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.05em;}
   .card h3{font-size:1.2rem; margin-top:10px;}
   .card p{color:var(--ink-soft); font-size:0.95rem; margin-top:10px;}
   .card .period{margin-top:14px; font-size:0.82rem; color:var(--gold); font-weight:600;}
 
+  /* Feature card (publication) reuses the same living-border + deform treatment */
   .feature-card{
     position:relative;
     background:var(--cream);
@@ -213,13 +187,16 @@
     padding:34px;
     overflow:hidden;
     max-width:640px;
+    transform:perspective(900px);
+    transition:transform .15s ease-out, box-shadow .3s ease, border-radius .35s ease;
+    will-change:transform;
   }
   .feature-card::before{
     content:'';
     position:absolute; inset:0;
     border-radius:inherit;
-    padding:1px;
-    background:radial-gradient(260px circle at var(--mx,50%) var(--my,50%), var(--gold), rgba(201,154,75,0) 70%);
+    padding:2.5px;
+    background:radial-gradient(360px circle at var(--mx,50%) var(--my,50%), var(--gold) 0%, rgba(201,154,75,0.55) 38%, rgba(201,154,75,0) 74%);
     -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite:xor;
             mask-composite:exclude;
@@ -227,6 +204,7 @@
     transition:opacity .35s ease;
     pointer-events:none;
   }
+  .feature-card:hover{box-shadow:0 26px 50px rgba(11,37,64,0.18), 0 0 56px rgba(201,154,75,0.4);}
   .feature-card:hover::before{opacity:1;}
   .feature-card .tag{font-size:0.78rem; color:var(--gold); text-transform:uppercase; letter-spacing:0.06em; font-weight:600;}
   .feature-card h3{font-size:1.25rem; margin-top:12px; line-height:1.35;}
@@ -285,14 +263,14 @@
   footer{
     position:relative; z-index:2;
     padding:36px 0 60px; text-align:center;
-    font-size:0.85rem; color:rgba(250,246,238,0.85);
+    font-size:0.85rem; color:var(--ink-soft);
   }
 
   /* ---------------- Print / PDF ---------------- */
   @media print{
-    .sea, .ship, header.site{display:none !important;}
+    #boids-bg, header.site{display:none !important;}
     body{background:#fff;}
-    section.block.alt{background:none; border:none;}
+    section.block, section.block.alt{background:none; backdrop-filter:none; border:none;}
     .hero{padding-top:20px;}
     footer{color:var(--ink-soft);}
   }
@@ -300,17 +278,8 @@
 </head>
 <body>
 
-<div class="sea" aria-hidden="true">
-  <div class="wave-layer wave-back"></div>
-  <div class="wave-layer wave-mid"></div>
-  <div class="wave-layer wave-front"></div>
-</div>
-<svg class="ship" viewBox="0 0 120 90" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-  <path d="M18 58 L102 58 L90 78 L30 78 Z" fill="#faf6ee"/>
-  <rect x="56" y="18" width="4" height="42" fill="#c99a4b"/>
-  <path d="M60 20 L60 46 L92 46 Z" fill="#f4efe4" opacity="0.92"/>
-  <path d="M60 24 L60 50 L34 50 Z" fill="#faf6ee" opacity="0.75"/>
-</svg>
+<!-- Fixed, full-page ambient boids animation — always moving, everywhere on the page -->
+<canvas id="boids-bg" aria-hidden="true"></canvas>
 
 <header class="site">
   <div class="wrap">
@@ -328,6 +297,7 @@
 
 <main id="top">
 
+  <!-- HERO -->
   <section class="hero">
     <div class="wrap">
       <span class="eyebrow">Student 2026 · STX Mat/Fys &amp; Bioteknologi</span>
@@ -345,6 +315,7 @@
     </div>
   </section>
 
+  <!-- AKTUELT -->
   <section class="block alt" id="om">
     <div class="wrap">
       <div class="section-head">
@@ -368,6 +339,7 @@
     </div>
   </section>
 
+  <!-- ERFARING -->
   <section class="block" id="erfaring">
     <div class="wrap">
       <div class="section-head">
@@ -417,6 +389,7 @@
     </div>
   </section>
 
+  <!-- PRAKTIK -->
   <section class="block alt" id="praktik">
     <div class="wrap">
       <div class="section-head">
@@ -446,6 +419,7 @@
     </div>
   </section>
 
+  <!-- UDDANNELSE -->
   <section class="block" id="uddannelse">
     <div class="wrap">
       <div class="section-head">
@@ -466,6 +440,7 @@
     </div>
   </section>
 
+  <!-- KOMPETENCER -->
   <section class="block alt" id="kompetencer">
     <div class="wrap">
       <div class="section-head">
@@ -486,6 +461,7 @@
     </div>
   </section>
 
+  <!-- KONTAKT -->
   <section class="block" id="kontakt">
     <div class="wrap">
       <div class="contact-box">
@@ -510,46 +486,143 @@
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
 
+  // Living gradient border + magnetic tilt/deform: track cursor position per
+  // card, tilt the card toward the cursor in 3D, and skew each corner's
+  // border-radius toward the cursor so the box itself feels like it's
+  // warping, not just glowing.
   document.querySelectorAll('.card, .feature-card').forEach(function(el){
+    var isFeature = el.classList.contains('feature-card');
+    var base = isFeature ? 18 : 16;
     el.addEventListener('mousemove', function(e){
       var r = el.getBoundingClientRect();
-      el.style.setProperty('--mx', (e.clientX - r.left) + 'px');
-      el.style.setProperty('--my', (e.clientY - r.top) + 'px');
+      var px = e.clientX - r.left, py = e.clientY - r.top;
+      var relX = Math.min(1, Math.max(0, px / r.width));
+      var relY = Math.min(1, Math.max(0, py / r.height));
+
+      el.style.setProperty('--mx', px + 'px');
+      el.style.setProperty('--my', py + 'px');
+
+      var rx = (0.5 - relY) * 18;
+      var ry = (relX - 0.5) * 18;
+      el.style.transform =
+        'perspective(900px) rotateX(' + rx.toFixed(2) + 'deg) rotateY(' + ry.toFixed(2) + 'deg) ' +
+        'translateY(-8px) scale(1.035)';
+
+      var tl = base + (1 - relX) * (1 - relY) * 26;
+      var tr = base + relX * (1 - relY) * 26;
+      var br = base + relX * relY * 26;
+      var bl = base + (1 - relX) * relY * 26;
+      el.style.borderRadius =
+        tl.toFixed(1) + 'px ' + tr.toFixed(1) + 'px ' + br.toFixed(1) + 'px ' + bl.toFixed(1) + 'px';
+    });
+    el.addEventListener('mouseleave', function(){
+      el.style.transform = 'perspective(900px)';
+      el.style.borderRadius = '';
     });
   });
 
+  // Ambient boids: a small flock drifts across a fixed, full-viewport canvas
+  // behind the whole page, all the time — independent of scroll position —
+  // using a standard alignment/cohesion/separation flocking model.
   (function(){
-    var ship = document.querySelector('.ship');
-    var sea = document.querySelector('.sea');
+    var canvas = document.getElementById('boids-bg');
+    if(!canvas) return;
+    var ctx = canvas.getContext('2d');
     var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if(!ship || !sea || reduce) return;
+    var W, H, DPR;
 
-    var PERIOD = 11;
-    var PX_PERIOD = 800;
-    var PHASE_OFFSET = 100;
-    var AMPLITUDE = 50;
-    var BASELINE = 200;
-    var VB_H = 300;
-    var HULL_INSET = 6;
-
-    function frame(now){
-      var t = (now / 1000) % PERIOD;
-      var localX = (t / PERIOD) * PX_PERIOD;
-      var angle = 2 * Math.PI * (((localX - PHASE_OFFSET) % PX_PERIOD + PX_PERIOD) % PX_PERIOD) / PX_PERIOD;
-      var waveY = BASELINE - AMPLITUDE * Math.sin(angle);
-      var slope = -AMPLITUDE * (2 * Math.PI / PX_PERIOD) * Math.cos(angle);
-
-      var seaH = sea.getBoundingClientRect().height;
-      var surfaceFromTop = (waveY / VB_H) * seaH;
-      var bottomPx = seaH - surfaceFromTop - HULL_INSET;
-      var tiltDeg = Math.max(-6, Math.min(6, slope * 45));
-
-      ship.style.bottom = bottomPx + 'px';
-      ship.style.transform = 'translateX(-50%) rotate(' + tiltDeg.toFixed(2) + 'deg)';
-
-      requestAnimationFrame(frame);
+    function resize(){
+      DPR = Math.min(window.devicePixelRatio || 1, 2);
+      W = window.innerWidth; H = window.innerHeight;
+      canvas.width = Math.round(W * DPR);
+      canvas.height = Math.round(H * DPR);
+      canvas.style.width = W + 'px';
+      canvas.style.height = H + 'px';
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     }
-    requestAnimationFrame(frame);
+    resize();
+    window.addEventListener('resize', resize);
+
+    var PALETTE = ['#0b2540', '#14547a', '#c99a4b'];
+    var COUNT = Math.max(24, Math.min(60, Math.round((window.innerWidth * window.innerHeight) / 26000)));
+    var boids = [];
+    for(var i = 0; i < COUNT; i++){
+      var angle0 = Math.random() * Math.PI * 2;
+      boids.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        vx: Math.cos(angle0) * 0.4,
+        vy: Math.sin(angle0) * 0.4,
+        color: PALETTE[i % PALETTE.length]
+      });
+    }
+
+    var PERCEPTION = 95, SEPARATION = 30, MAX_SPEED = 0.85;
+    var ALIGN_W = 0.02, COHESION_W = 0.0007, SEPARATION_W = 0.045;
+
+    function step(){
+      for(var i = 0; i < boids.length; i++){
+        var b = boids[i];
+        var ax = 0, ay = 0, cx = 0, cy = 0, sx = 0, sy = 0, nA = 0, nC = 0;
+        for(var j = 0; j < boids.length; j++){
+          if(i === j) continue;
+          var o = boids[j];
+          var dx = o.x - b.x, dy = o.y - b.y;
+          var d = Math.sqrt(dx * dx + dy * dy);
+          if(d < PERCEPTION){
+            ax += o.vx; ay += o.vy; nA++;
+            cx += o.x; cy += o.y; nC++;
+            if(d < SEPARATION && d > 0.0001){ sx -= dx / d; sy -= dy / d; }
+          }
+        }
+        if(nA > 0){ ax /= nA; ay /= nA; }
+        if(nC > 0){ cx = cx / nC - b.x; cy = cy / nC - b.y; }
+
+        b.vx += ax * ALIGN_W + cx * COHESION_W + sx * SEPARATION_W;
+        b.vy += ay * ALIGN_W + cy * COHESION_W + sy * SEPARATION_W;
+
+        var speed = Math.sqrt(b.vx * b.vx + b.vy * b.vy);
+        if(speed > MAX_SPEED){ b.vx = (b.vx / speed) * MAX_SPEED; b.vy = (b.vy / speed) * MAX_SPEED; }
+        else if(speed < 0.15){ b.vx += (Math.random() - 0.5) * 0.05; b.vy += (Math.random() - 0.5) * 0.05; }
+
+        b.x += b.vx; b.y += b.vy;
+        if(b.x < -30) b.x = W + 30; if(b.x > W + 30) b.x = -30;
+        if(b.y < -30) b.y = H + 30; if(b.y > H + 30) b.y = -30;
+      }
+    }
+
+    function draw(){
+      ctx.clearRect(0, 0, W, H);
+      for(var i = 0; i < boids.length; i++){
+        var b = boids[i];
+        var angle = Math.atan2(b.vy, b.vx);
+        ctx.save();
+        ctx.translate(b.x, b.y);
+        ctx.rotate(angle);
+        ctx.globalAlpha = 0.24;
+        ctx.fillStyle = b.color;
+        ctx.beginPath();
+        ctx.moveTo(6, 0);
+        ctx.lineTo(-5, 3.4);
+        ctx.lineTo(-5, -3.4);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    var running = !document.hidden;
+    document.addEventListener('visibilitychange', function(){ running = !document.hidden; });
+
+    if(reduce){
+      draw();
+      return;
+    }
+    function loop(){
+      if(running){ step(); draw(); }
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
   })();
 </script>
 
