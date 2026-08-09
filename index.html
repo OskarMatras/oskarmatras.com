@@ -128,19 +128,19 @@
     font-size:0.8rem; color:var(--gold); font-weight:600; letter-spacing:0.06em;
   }
   .section-head h2{font-size:clamp(1.6rem, 3vw, 2.1rem); margin-top:8px;}
-  /* Content sections sit above the boids canvas on a translucent, blurred
-     panel — frosted glass over the flock, so the background stays legible
-     everywhere on the page instead of only near the hero. */
+  /* Content sections sit above the boids canvas on a light, barely-there
+     tint — just enough to keep text contrast solid, while the flock still
+     reads clearly through every section, not just the hero. */
   section.block{
     padding:64px 0;
-    background:rgba(250,246,238,0.76);
-    backdrop-filter:blur(18px);
-    -webkit-backdrop-filter:blur(18px);
+    background:rgba(250,246,238,0.38);
+    backdrop-filter:blur(2px);
+    -webkit-backdrop-filter:blur(2px);
   }
   section.block.alt{
-    background:rgba(241,237,226,0.78);
-    backdrop-filter:blur(18px);
-    -webkit-backdrop-filter:blur(18px);
+    background:rgba(241,237,226,0.42);
+    backdrop-filter:blur(2px);
+    -webkit-backdrop-filter:blur(2px);
     border-top:1px solid var(--line);
     border-bottom:1px solid var(--line);
   }
@@ -248,11 +248,31 @@
     font-size:0.88rem; background:var(--cream);
   }
 
-  /* ---------------- Contact ---------------- */
+  /* ---------------- Contact — same living-border + magnetic tilt/deform as the cards ---------------- */
   .contact-box{
+    position:relative;
     background:var(--navy); color:var(--cream);
     border-radius:20px; padding:48px; text-align:center;
+    overflow:hidden;
+    transform:perspective(900px);
+    transition:transform .15s ease-out, box-shadow .3s ease, border-radius .35s ease;
+    will-change:transform;
   }
+  .contact-box::before{
+    content:'';
+    position:absolute; inset:0;
+    border-radius:inherit;
+    padding:2.5px;
+    background:radial-gradient(420px circle at var(--mx,50%) var(--my,50%), var(--gold) 0%, rgba(201,154,75,0.6) 38%, rgba(201,154,75,0) 74%);
+    -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite:xor;
+            mask-composite:exclude;
+    opacity:0;
+    transition:opacity .35s ease;
+    pointer-events:none;
+  }
+  .contact-box:hover{box-shadow:0 30px 60px rgba(7,26,46,0.4), 0 0 60px rgba(201,154,75,0.4);}
+  .contact-box:hover::before{opacity:1;}
   .contact-box h2{color:var(--cream); font-size:clamp(1.6rem,3vw,2.2rem);}
   .contact-box p{color:rgba(250,246,238,0.75); margin-top:12px;}
   .contact-box .cta-row{display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin-top:24px;}
@@ -490,9 +510,17 @@
   // card, tilt the card toward the cursor in 3D, and skew each corner's
   // border-radius toward the cursor so the box itself feels like it's
   // warping, not just glowing.
-  document.querySelectorAll('.card, .feature-card').forEach(function(el){
+  document.querySelectorAll('.card, .feature-card, .contact-box').forEach(function(el){
     var isFeature = el.classList.contains('feature-card');
-    var base = isFeature ? 18 : 16;
+    var isContact = el.classList.contains('contact-box');
+    var base = isContact ? 20 : (isFeature ? 18 : 16);
+    // The contact box is much larger than a card, so it gets a gentler
+    // tilt/deform intensity — enough to feel alive without looking odd.
+    var tiltAmp = isContact ? 8 : 18;
+    var deformAmp = isContact ? 30 : 26;
+    var lift = isContact ? -4 : -8;
+    var scale = isContact ? 1.012 : 1.035;
+
     el.addEventListener('mousemove', function(e){
       var r = el.getBoundingClientRect();
       var px = e.clientX - r.left, py = e.clientY - r.top;
@@ -502,16 +530,16 @@
       el.style.setProperty('--mx', px + 'px');
       el.style.setProperty('--my', py + 'px');
 
-      var rx = (0.5 - relY) * 18;
-      var ry = (relX - 0.5) * 18;
+      var rx = (0.5 - relY) * tiltAmp;
+      var ry = (relX - 0.5) * tiltAmp;
       el.style.transform =
         'perspective(900px) rotateX(' + rx.toFixed(2) + 'deg) rotateY(' + ry.toFixed(2) + 'deg) ' +
-        'translateY(-8px) scale(1.035)';
+        'translateY(' + lift + 'px) scale(' + scale + ')';
 
-      var tl = base + (1 - relX) * (1 - relY) * 26;
-      var tr = base + relX * (1 - relY) * 26;
-      var br = base + relX * relY * 26;
-      var bl = base + (1 - relX) * relY * 26;
+      var tl = base + (1 - relX) * (1 - relY) * deformAmp;
+      var tr = base + relX * (1 - relY) * deformAmp;
+      var br = base + relX * relY * deformAmp;
+      var bl = base + (1 - relX) * relY * deformAmp;
       el.style.borderRadius =
         tl.toFixed(1) + 'px ' + tr.toFixed(1) + 'px ' + br.toFixed(1) + 'px ' + bl.toFixed(1) + 'px';
     });
