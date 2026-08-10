@@ -58,11 +58,14 @@
     display:flex; align-items:center; justify-content:space-between;
     padding:18px 28px;
     gap:16px;
+    flex-wrap:wrap;
   }
   .brand{font-family:'Fraunces', serif; font-weight:600; font-size:1.05rem; text-decoration:none; letter-spacing:-0.01em; flex-shrink:0;}
   /* Nav scrolls horizontally within its own box instead of ever forcing the
      page itself to grow wider than the viewport — the classic cause of
-     mobile browsers letting you pinch-zoom out into empty space. */
+     mobile browsers letting you pinch-zoom out into empty space. Below
+     640px this is replaced entirely by a dropdown (see .nav-toggle rules),
+     since scrolling a nav bar is easy to miss on a phone. */
   nav.main{
     display:flex; gap:26px;
     overflow-x:auto;
@@ -93,11 +96,39 @@
   nav.main a:hover{color:var(--navy);}
   nav.main a:hover::after{transform-origin:left; transform:scaleX(1);}
 
+  /* Hamburger toggle — hidden on desktop, shown only under the mobile
+     breakpoint where nav.main switches from a horizontal row to a
+     full-width dropdown panel. */
+  .nav-toggle{
+    display:none;
+    align-items:center; justify-content:center;
+    width:38px; height:38px;
+    margin-left:auto;
+    background:none; border:none; padding:0;
+    color:var(--navy);
+    cursor:pointer;
+  }
+  .nav-toggle svg{width:22px; height:22px;}
+
   @media (max-width: 640px){
     header.site .wrap{ padding:14px 18px; gap:12px; }
     .brand{ font-size:0.95rem; }
-    nav.main{ gap:16px; }
-    nav.main a{ font-size:0.68rem; }
+    .nav-toggle{ display:inline-flex; }
+    nav.main{
+      display:none;
+      flex-basis:100%;
+      flex-direction:column;
+      gap:0;
+      overflow-x:visible;
+    }
+    nav.main.open{ display:flex; }
+    nav.main a{
+      width:100%;
+      padding:13px 2px;
+      border-top:1px solid var(--line);
+      font-size:0.8rem;
+    }
+    nav.main a::after{ display:none; }
   }
 
   /* ---------------- Hero ---------------- */
@@ -165,7 +196,12 @@
     pointer-events:none;
   }
   @media (max-width: 700px){
-    #corner-flower{ width:190px; height:190px; }
+    /* On phones, don't also push the canvas above the top edge — between
+       that and the notch/status bar area, the quarter that showed on
+       desktop was getting eaten down to almost nothing. Only offset
+       horizontally, so the inward-facing half of the flower shows in full
+       right from the top of the screen instead of a sliver of a quarter. */
+    #corner-flower{ width:190px; height:190px; transform:translate(50%, 0%); }
   }
   @media (prefers-reduced-motion: reduce){
     #corner-flower{ opacity:0.7; }
@@ -354,7 +390,10 @@
 <header class="site">
   <div class="wrap">
     <a class="brand" href="#top">Oskar Matras</a>
-    <nav class="main">
+    <button class="nav-toggle" id="nav-toggle" aria-label="Åbn menu" aria-expanded="false" aria-controls="main-nav">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    </button>
+    <nav class="main" id="main-nav">
       <a href="#om">Om</a>
       <a href="#erfaring">Erfaring</a>
       <a href="#praktik">Praktik</a>
@@ -454,7 +493,7 @@
         <span class="tag">Aktuel Naturvidenskab</span>
         <h3>"Europas Vigtigste Maskine Laver 50.000 Supernovaer I Sekundet"</h3>
         <p>Forfatter af artiklen, udgivet i samarbejde med Aarhus Universitet.</p>
-        <div class="period">Efterår 2026</div>
+        <div class="period">18. oktober 2026</div>
       </div>
     </div>
   </section>
@@ -555,6 +594,28 @@
 
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
+
+  // Mobile nav dropdown: below 640px the nav becomes a hidden panel toggled
+  // by a hamburger button, so every link is reachable without needing to
+  // notice a horizontally-scrolling bar.
+  (function(){
+    var toggle = document.getElementById('nav-toggle');
+    var nav = document.getElementById('main-nav');
+    if(!toggle || !nav) return;
+    function setOpen(open){
+      nav.classList.toggle('open', open);
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    toggle.addEventListener('click', function(){
+      setOpen(!nav.classList.contains('open'));
+    });
+    nav.querySelectorAll('a').forEach(function(a){
+      a.addEventListener('click', function(){ setOpen(false); });
+    });
+    window.addEventListener('resize', function(){
+      if(window.innerWidth > 640) setOpen(false);
+    });
+  })();
 
   // Living gradient border + magnetic tilt/deform: track cursor position per
   // card, tilt the card toward the cursor in 3D, and skew each corner's
