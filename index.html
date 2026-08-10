@@ -25,7 +25,7 @@
   }
 
   *{box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
+  html{scroll-behavior:smooth; overflow-x:hidden; width:100%;}
   body{
     margin:0;
     background:var(--cream);
@@ -35,6 +35,7 @@
     line-height:1.6;
     -webkit-font-smoothing:antialiased;
     overflow-x:hidden;
+    width:100%;
   }
   h1,h2,h3{
     font-family:'Fraunces', Georgia, serif;
@@ -56,9 +57,20 @@
   header.site .wrap{
     display:flex; align-items:center; justify-content:space-between;
     padding:18px 28px;
+    gap:16px;
   }
-  .brand{font-family:'Fraunces', serif; font-weight:600; font-size:1.05rem; text-decoration:none; letter-spacing:-0.01em;}
-  nav.main{display:flex; gap:26px;}
+  .brand{font-family:'Fraunces', serif; font-weight:600; font-size:1.05rem; text-decoration:none; letter-spacing:-0.01em; flex-shrink:0;}
+  /* Nav scrolls horizontally within its own box instead of ever forcing the
+     page itself to grow wider than the viewport — the classic cause of
+     mobile browsers letting you pinch-zoom out into empty space. */
+  nav.main{
+    display:flex; gap:26px;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    min-width:0;
+  }
+  nav.main::-webkit-scrollbar{display:none;}
   nav.main a{
     position:relative;
     text-decoration:none;
@@ -69,6 +81,7 @@
     padding-bottom:5px;
     transition:color .25s ease;
     white-space:nowrap;
+    flex-shrink:0;
   }
   nav.main a::after{
     content:'';
@@ -79,6 +92,13 @@
   }
   nav.main a:hover{color:var(--navy);}
   nav.main a:hover::after{transform-origin:left; transform:scaleX(1);}
+
+  @media (max-width: 640px){
+    header.site .wrap{ padding:14px 18px; gap:12px; }
+    .brand{ font-size:0.95rem; }
+    nav.main{ gap:16px; }
+    nav.main a{ font-size:0.68rem; }
+  }
 
   /* ---------------- Hero ---------------- */
   .hero{
@@ -126,13 +146,22 @@
      A small ornament built entirely from layered sine waves, fixed with its
      own center pinned exactly to the top-right corner of the viewport, so
      only a quarter of it ever shows — spinning there permanently, through
-     every section, at every scroll position. */
-  #corner-flower{
+     every section, at every scroll position. The canvas itself pokes past
+     the right/top edge on purpose (that's how only a quarter shows); it
+     sits inside a viewport-sized, overflow:hidden clip box so that poking-out
+     part can never widen the page or push mobile pinch-zoom bounds out. */
+  #corner-flower-clip{
     position:fixed;
+    inset:0;
+    overflow:hidden;
+    pointer-events:none;
+    z-index:60;
+  }
+  #corner-flower{
+    position:absolute;
     top:0; right:0;
     width:300px; height:300px;
     transform:translate(50%, -50%);
-    z-index:60;
     pointer-events:none;
   }
   @media (max-width: 700px){
@@ -308,7 +337,7 @@
 
   /* ---------------- Print / PDF ---------------- */
   @media print{
-    #boids-bg, #corner-flower, header.site{display:none !important;}
+    #boids-bg, #corner-flower-clip, header.site{display:none !important;}
     body{background:#fff;}
     section.block, section.block.alt{background:none; backdrop-filter:none; border:none;}
     .hero{padding-top:20px;}
@@ -320,7 +349,7 @@
 
 <!-- Fixed, full-page ambient boids animation — always moving, everywhere on the page -->
 <canvas id="boids-bg" aria-hidden="true"></canvas>
-<canvas id="corner-flower" aria-hidden="true"></canvas>
+<div id="corner-flower-clip"><canvas id="corner-flower" aria-hidden="true"></canvas></div>
 
 <header class="site">
   <div class="wrap">
