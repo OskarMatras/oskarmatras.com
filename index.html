@@ -632,9 +632,12 @@
     var lift = isContact ? -4 : -8;
     var scale = isContact ? 1.012 : 1.035;
 
-    el.addEventListener('mousemove', function(e){
+    // Shared by mouse and touch: given a pointer position, tilt/deform the
+    // box exactly the same way either way, so a finger holding the card on
+    // a phone gets the same living effect as a cursor hovering it on desktop.
+    function applyTilt(clientX, clientY){
       var r = el.getBoundingClientRect();
-      var px = e.clientX - r.left, py = e.clientY - r.top;
+      var px = clientX - r.left, py = clientY - r.top;
       var relX = Math.min(1, Math.max(0, px / r.width));
       var relY = Math.min(1, Math.max(0, py / r.height));
 
@@ -653,11 +656,29 @@
       var bl = base + (1 - relX) * relY * deformAmp;
       el.style.borderRadius =
         tl.toFixed(1) + 'px ' + tr.toFixed(1) + 'px ' + br.toFixed(1) + 'px ' + bl.toFixed(1) + 'px';
-    });
-    el.addEventListener('mouseleave', function(){
+    }
+    function resetTilt(){
       el.style.transform = 'perspective(900px)';
       el.style.borderRadius = '';
+    }
+
+    el.addEventListener('mousemove', function(e){
+      applyTilt(e.clientX, e.clientY);
     });
+    el.addEventListener('mouseleave', resetTilt);
+
+    // Touch: a finger touching or dragging on the card drives the same
+    // tilt live, and lifting the finger resets it, just like mouseleave.
+    el.addEventListener('touchstart', function(e){
+      var t = e.touches[0];
+      applyTilt(t.clientX, t.clientY);
+    }, { passive: true });
+    el.addEventListener('touchmove', function(e){
+      var t = e.touches[0];
+      applyTilt(t.clientX, t.clientY);
+    }, { passive: true });
+    el.addEventListener('touchend', resetTilt);
+    el.addEventListener('touchcancel', resetTilt);
   });
 
   // Ambient boids: a small flock drifts across a fixed, full-viewport canvas
