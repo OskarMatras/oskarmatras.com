@@ -376,16 +376,16 @@
 
     <p>Sixty-four thousand eight hundred columns, one for every degree of latitude and longitude, standing in for the surface of the earth. Switch what they're showing and the whole field reads itself again. Every view is measured data: nothing here is invented to look good.</p>
 
-    <h2>The seven views</h2>
-    <p><strong>Højde</strong> is elevation in real metres, land and sea floor alike, from the same global model that feeds most web maps. <strong>Terræn</strong> measures how sharply the ground changes rather than how high it sits, so mountain chains, coastlines and the mid-ocean ridges stand out while plains and abyssal basins stay flat.</p>
-    <p><strong>Havstrømme</strong> lets twelve thousand drifters go on the surface and has the measured current carry them, each leaving a short trail. Nothing is choreographed: every drifter only ever reads the day's u and v. Where the flow is strong and coherent the trails line up into a stream, which is how the equatorial jets, the Agulhas, the Kuroshio and the Antarctic Circumpolar draw themselves, eddies and all. Speed is exaggerated by a long way, as it is on every current map — real water takes a day and a half to cross a degree.</p>
+    <h2>The nine views</h2>
+    <p><strong>Højde</strong> is elevation in real metres, land and sea floor alike, from the same global model that feeds most web maps. Permanent ice comes from its own layer rather than from the height, so Greenland and Antarctica are drawn as ice instead of as brown upland, and the open sea carries a slow swell. <strong>Terræn</strong> measures how sharply the ground changes rather than how high it sits, so mountain chains, coastlines and the mid-ocean ridges stand out while plains and abyssal basins stay flat.</p>
+    <p><strong>Havstrømme</strong> lets twelve thousand drifters go on the surface and has the measured current carry them, each leaving a short trail. Nothing is choreographed: every drifter only ever reads the day's u and v. Where the flow is strong and coherent the trails line up into a stream, which is how the equatorial jets, the Agulhas, the Kuroshio and the Antarctic Circumpolar draw themselves, eddies and all. Speed is exaggerated by a long way, as it is on every current map: real water takes a day and a half to cross a degree.</p>
     <p>Two honest limits. This is one five-day mean, not a climatology, so eddies show as strongly as the average flow. And it is the <em>surface</em>: the deep overturning that people mean by the Greenland pump is a circulation in the water column, not on top of it, and no surface field can show it. At one degree the narrow western boundary currents are also smeared into the gyre around them, so a drifter released off Hatteras will often turn back into the recirculation rather than run for Europe.</p>
     <p><strong>Befolkning</strong> turns height into headcount from 1800 to today. <strong>Tæthed</strong> divides that by how much ground a cell actually covers, since a one-degree cell near the poles is a fraction of the size of one at the equator. <strong>Vækst</strong> shows the change since the previous decade rather than the total, which is where the demographic transition becomes visible as it moves across the world.</p>
     <p><strong>Riger</strong> runs from 500 BC to 2010. Each cell is coloured by whichever state held it, and stands as tall as that state was large at the time, so empires rise and subside as they gain and lose ground. Rome is worth watching: two cells at 323 BC, forty-nine by 200 BC, then the whole Mediterranean.</p>
 
     <p><strong>Sollys</strong> is the only view that is not a stored grid. The position of the sun is worked out from the clock and the earth's orbit, the same arithmetic behind any sunrise table, and the map is lit accordingly: height is insolation, the share of a sunbeam a patch of ground actually catches, and the colour runs through the real twilight steps down to eighteen degrees below the horizon. It moves in real time. The slider runs the clock forward instead, from a day in a few seconds to a year in a couple of minutes, which is where the tilt of the earth shows itself as the lit band slides north and south.</p>
 
-    <p><strong>Skydække</strong> is the only view that leaves the page to get its data. It asks Open-Meteo what the sky is doing at this moment on a ten degree grid, lays the cloud over the world as a veil rather than replacing it, and keeps the answer for half an hour. Ten degrees is coarse: it is enough for the shape of the weather, the cloud belt along the equator and the clear subtropical highs, and not enough for a particular sky. Pointing at a place asks about that place exactly, and reports cloud, temperature, wind and the sunlight actually reaching the ground.</p>
+    <p><strong>Skydække</strong> is the only view that leaves the page to get its data. It asks Open-Meteo what the sky is doing at this moment on a ten degree grid and hangs the answer as a translucent deck above the world, with the ground darkened where the deck is thick, because a cloud that stops light reaching the sea is the same cloud that is bright from above. Tilt the view and the deck stands off the map. The answer is kept for half an hour. Ten degrees is coarse: it is enough for the shape of the weather, the cloud belt along the equator and the clear subtropical highs, and not enough for a particular sky. Pointing at a place asks about that place exactly, and reports cloud, temperature, wind and the sunlight actually reaching the ground.</p>
 
     <h2>Moving between moments</h2>
     <p>Two kinds of change need two different treatments. Quantities, like population or current speed, are interpolated: any year between two records is a genuine blend of the two, so scrubbing the slider glides. Territory is not a quantity. Who holds a piece of ground is a category, and averaging two categories produces a state that never existed, so instead each cell hands over on its own offset within the interval. A hard switch becomes a border that sweeps across the ground.</p>
@@ -605,6 +605,7 @@ var TERRA_ICE_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
       liveTexture.wrapT = THREE.ClampToEdgeWrapping;
       liveTexture.generateMipmaps = false;
       uniforms.uLiveTexture.value = liveTexture;
+      if (typeof cloudMat !== "undefined") cloudMat.uniforms.uLiveTexture.value = liveTexture;
     }
     liveTexture.needsUpdate = true;
     uniforms.uLiveOn.value = 1;
@@ -917,7 +918,9 @@ var TERRA_ICE_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     uDissolve:{value:0.78},         // fraction of the interval a hand-over spreads across
     uElevMax:{value:ELEV_MAX}, uDepthMax:{value:DEPTH_MAX},
     uSunDecl:{value:0}, uSunLon:{value:0},
-    uLiveTexture:{value:null}, uLiveOn:{value:0}
+    // A 1x1 placeholder so the sampler is always valid; the real grid
+    // replaces it when the fetch lands.
+    uLiveTexture:{value:new THREE.DataTexture(new Uint8Array([0,0,0,255]),1,1,THREE.RGBAFormat,THREE.UnsignedByteType)}, uLiveOn:{value:0}
   };
 
   var vs = [
@@ -1097,23 +1100,16 @@ var TERRA_ICE_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     '  gC[7] = sunC;',
     '  gH[7] = mix(MIN_H*1.4, MAX_H*0.85, pow(insol, 0.75));',
 
-    // 8: live cloud cover. The sampled grid is five degrees, so it is read
-    // with linear filtering and lands on this one as a smooth field. Under
-    // the cloud the land keeps a dim tint, so it still reads as a map.
+    // 8: live cloud. The deck itself is a separate translucent sheet above
+    // the map, so all that happens down here is the ground it falls on:
+    // the ordinary elevation view, in shadow where the deck is thick.
+    // Painting cloud on to the columns instead simply erased the world,
+    // since global mean cover is around two thirds.
     '  vec2 luv = vec2((aGridUV.x + 0.5)/COLS_F, (aGridUV.y + 0.5)/ROWS_F);',
-    '  vec3 live = texture2D(uLiveTexture, luv).rgb;',
-    '  float cloud = live.r;',
-    // Cloud lies over the world; it does not replace it. The columns keep
-    // the shape they have in the elevation view, dimmed, and the cloud is
-    // a white veil laid on top with only a slight lift where it is thick.
-    // Drawn as height it buried the map: global mean cover is around two
-    // thirds, so almost every column stood at the top of the scale.
-    '  vec3 underC = gC[0]*0.55;',
-    '  vec3 veil = vec3(0.898,0.933,0.965);',
-    '  float ct = pow(cloud, 0.9);',
-    '  vec3 cloudC = mix(underC, veil, smoothstep(0.04, 0.92, ct));',
-    '  gC[8] = mix(vec3(0.09,0.11,0.15), cloudC, uLiveOn);',
-    '  gH[8] = mix(gH[0], gH[0] + MAX_H*0.10, ct)*uLiveOn + MIN_H*(1.0-uLiveOn);',
+    '  float cloud = texture2D(uLiveTexture, luv).r * uLiveOn;',
+    '  float shade = 1.0 - 0.42*smoothstep(0.12, 0.95, cloud);',
+    '  gC[8] = gC[0]*shade;',
+    '  gH[8] = gH[0];',
 
     '  float hA,hB; vec3 cA,cB;',
     '  pick(uModeA,hA,cA); pick(uModeB,hB,cB);',
@@ -1177,7 +1173,11 @@ var TERRA_ICE_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
   // Kuroshio and the Antarctic Circumpolar draw themselves. Nothing is
   // choreographed: every drifter is only ever reading OSCAR's u and v.
   // ---------------------------------------------------------------
-  var FLOW_N = 12000, FLOW_TRAIL = 5;          // drifters, points kept per trail
+  // Advecting drifters is the one thing here that costs real CPU each
+  // frame: twelve thousand runs about 4.5 ms, which is comfortable on a
+  // laptop and less so on a phone, so a small screen gets half as many.
+  var FLOW_N = (Math.min(window.innerWidth, window.innerHeight) < 700) ? 6000 : 12000;
+  var FLOW_TRAIL = 5;                         // points kept per trail
   var FLOW_SEGS = FLOW_TRAIL;
   var FLOW_Y = 0.55;                          // rides just above the sea surface
   var flowX = new Float32Array(FLOW_N);       // world x, i.e. longitude
@@ -1273,6 +1273,61 @@ var TERRA_ICE_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
   flowMesh.frustumCulled = false;
   flowMesh.visible = false;
   scene.add(flowMesh);
+
+  // ---------------------------------------------------------------
+  // The cloud deck.
+  //
+  // Drawn as its own translucent sheet floating above the columns rather
+  // than painted on to them. Painted on, it simply replaced the world:
+  // global mean cover is around two thirds, so nearly every column went
+  // white and the earth disappeared underneath. Held up on its own layer
+  // it does what cloud does, which is to hide some of the ground and let
+  // the rest through.
+  //
+  // The ground below is darkened where the deck is thick. That is not
+  // decoration: a cloud that stops light from reaching the sea is the
+  // same cloud that is bright when seen from above.
+  // ---------------------------------------------------------------
+  var CLOUD_Y = 16.5;
+  var cloudGeo = new THREE.PlaneGeometry(COLS*SPACING, ROWS*SPACING, 1, 1);
+  cloudGeo.rotateX(-Math.PI/2);
+  cloudGeo.translate(0, CLOUD_Y, 0);
+  var cloudMat = new THREE.ShaderMaterial({
+    uniforms: {
+      uLiveTexture: uniforms.uLiveTexture,
+      uOpacity: { value: 0 },
+      uReady: { value: 0 },
+      uTint: { value: new THREE.Color(0xf4f8fc) }
+    },
+    vertexShader: [
+      'varying vec2 vUv;',
+      'void main(){',
+      // Straight from world position, so the sheet lines up with the grid
+      // no matter how the plane happens to be wound.
+      '  vUv = vec2((position.x + ' + (COLS*0.5).toFixed(1) + ')/' + COLS.toFixed(1) + ',',
+      '             (position.z + ' + (ROWS*0.5).toFixed(1) + ')/' + ROWS.toFixed(1) + ');',
+      '  gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0);',
+      '}'
+    ].join('\n'),
+    fragmentShader: [
+      'uniform sampler2D uLiveTexture; uniform float uOpacity; uniform float uReady; uniform vec3 uTint;',
+      'varying vec2 vUv;',
+      'void main(){',
+      '  float c = texture2D(uLiveTexture, vUv).r;',
+      // Thin cloud stays genuinely see-through; only a solid deck approaches
+      // opaque, and even then it never quite gets there.
+      '  float a = smoothstep(0.10, 0.95, c)*0.80;',
+      '  gl_FragColor = vec4(uTint, a*uOpacity*uReady);',
+      '}'
+    ].join('\n'),
+    transparent: true,
+    depthWrite: false,
+    side: THREE.DoubleSide
+  });
+  var cloudMesh = new THREE.Mesh(cloudGeo, cloudMat);
+  cloudMesh.frustumCulled = false;
+  cloudMesh.visible = false;
+  scene.add(cloudMesh);
 
   // A metre per second of real current becomes this many degrees a second on
   // the map. Real water would cross a degree in a day and a half, so this is
@@ -1995,6 +2050,13 @@ var TERRA_ICE_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     flowMat.uniforms.uOpacity.value = flowMix;
     flowMesh.visible = flowMix > 0.01;
     if (flowMesh.visible && !reduceMotion) flowStep(dt, uniforms.uCurSpeed.value);
+
+    var cloudMix = 0;
+    if (currentMode.id === 'live') cloudMix = morph;
+    else if (uniforms.uModeA.value === 8) cloudMix = 1 - morph;
+    cloudMat.uniforms.uOpacity.value = cloudMix;
+    cloudMat.uniforms.uReady.value = uniforms.uLiveOn.value;
+    cloudMesh.visible = cloudMix > 0.01;
 
     uniforms.uTime.value=time;
     uniforms.uMorph.value=morph;
