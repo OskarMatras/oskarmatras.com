@@ -384,6 +384,8 @@
 
     <p><strong>Sollys</strong> is the only view that is not a stored grid. The position of the sun is worked out from the clock and the earth's orbit, the same arithmetic behind any sunrise table, and the map is lit accordingly: height is insolation, the share of a sunbeam a patch of ground actually catches, and the colour runs through the real twilight steps down to eighteen degrees below the horizon. It moves in real time. The slider runs the clock forward instead, from a day in a few seconds to a year in a couple of minutes, which is where the tilt of the earth shows itself as the lit band slides north and south.</p>
 
+    <p><strong>Skydække</strong> is the only view that leaves the page to get its data. It asks Open-Meteo what the sky is doing at this moment on a ten degree grid, lays the cloud over the world as a veil rather than replacing it, and keeps the answer for half an hour. Ten degrees is coarse: it is enough for the shape of the weather, the cloud belt along the equator and the clear subtropical highs, and not enough for a particular sky. Pointing at a place asks about that place exactly, and reports cloud, temperature, wind and the sunlight actually reaching the ground.</p>
+
     <h2>Moving between moments</h2>
     <p>Two kinds of change need two different treatments. Quantities, like population or current speed, are interpolated: any year between two records is a genuine blend of the two, so scrubbing the slider glides. Territory is not a quantity. Who holds a piece of ground is a category, and averaging two categories produces a state that never existed, so instead each cell hands over on its own offset within the interval. A hard switch becomes a border that sweeps across the ground.</p>
 
@@ -402,6 +404,7 @@
       Population, and the per-country figures on hover: Our World in Data's long-run population series, which blends Gapminder, HYDE and the UN.<br><br>
       Historical territory: historical-basemaps, after Nüssli's Euratlas and successors, sampled at twenty-one dates between 500 BC and 2010. Borders before the modern era are approximate by nature, and the underlying maps say so.<br><br>
       Modern country boundaries, used for the hover labels: Natural Earth 1:110m.<br><br>
+      Live weather: <a href="https://open-meteo.com/">Open-Meteo</a>, licensed CC BY 4.0. One request of 648 points for the global field, cached for half an hour, and single-point requests for whatever is under the pointer. The limit that shapes this is the length of a URL: a request can carry roughly 650 coordinates, and firing several such requests at once is refused.<br><br>
       Sunlight: computed, not stored. Standard low-precision solar position, good to about a hundredth of a degree of declination for centuries either side of 2000. Checked against published times before it went in: Copenhagen on the June solstice comes out 04:26 and 21:58 local against a published 04:26 and 21:58, Sydney 07:01 and 16:54, and midday altitude at Copenhagen in December lands on 10.89 degrees against a textbook 10.88. It is clear-sky geometry: where the sun is, not what the weather is doing.<br><br>
       Derived here rather than measured separately: Terræn (local spread of elevation), Tæthed (population over cosine-of-latitude cell area) and Vækst (difference between consecutive decades). Country population is spread evenly across that country's land cells, so Tæthed compares countries rather than cities.<br><br>
       One editorial decision: the territory source renames Rome as its constitution changes, so Rome, the Roman Republic and the Roman Empire are given a single colour to keep the expansion readable. Every other state is coloured from its own name.
@@ -568,6 +571,135 @@ var TERRA_ICE_RUNS = [2657,2,1,2,348,1,5,11,16,4,313,34,322,44,312,47,314,45,314
   // so at rate one this is the actual current position of the sun.
   var sunRate = 1, sunOffsetMs = 0;
   function sunNow(){ return Date.now() + sunOffsetMs; }
+
+  // ---------------------------------------------------------------
+  // Live weather, fetched rather than stored.
+  //
+  // Everything else in this file ships with the page. This view goes and
+  // asks Open-Meteo what the sky is doing right now.
+  //
+  // Two limits shape it. A GET can only carry so many coordinates before
+  // the URL is refused, which lands at roughly 650 points, and firing
+  // several such requests at once earns a 429: an early attempt at a
+  // 2,592 point grid across six parallel requests was turned away. So it
+  // is one request, 648 points on a ten degree grid, and the answer is
+  // kept in localStorage for half an hour so a revisit costs nothing.
+  //
+  // Ten degrees is far coarser than the one degree the map draws. It is
+  // enough for the shape of the weather, the cloud belt along the equator
+  // and the storm tracks, and not enough for a particular sky. Pointing
+  // at a place asks about that place exactly, one location at a time.
+  //
+  // Data by Open-Meteo, CC BY 4.0.
+  // ---------------------------------------------------------------
+  var LIVE_LON = 36, LIVE_LAT = 18, LIVE_STEP = 10;
+  var LIVE_CACHE_KEY = 'terra.live.v1', LIVE_GRID_TTL = 30*60*1000;
+  var liveState = 'idle';            // idle | loading | ready | error
+  var liveStamp = null;
+  var liveCloud = new Uint8Array(LIVE_LON*LIVE_LAT);
+  var liveTexData = new Uint8Array(LIVE_LON*LIVE_LAT*4);
+  var liveTexture = null;
+
+  function liveLat(j){ return 85 - j*LIVE_STEP; }
+  function liveLon(i){ return -175 + i*LIVE_STEP; }
+
+  function liveBuildTexture(){
+    for (var k = 0; k < LIVE_LON*LIVE_LAT; k++){
+      var v = Math.round(liveCloud[k]/100*255);
+      liveTexData[k*4] = v; liveTexData[k*4+1] = v; liveTexData[k*4+2] = v; liveTexData[k*4+3] = 255;
+    }
+    if (!liveTexture){
+      // RGBFormat was removed from three.js in r137; this bundle is r149.
+      liveTexture = new THREE.DataTexture(liveTexData, LIVE_LON, LIVE_LAT, THREE.RGBAFormat, THREE.UnsignedByteType);
+      // Linear, so a ten degree sample melts across the one degree grid
+      // rather than showing as a wall of blocks.
+      liveTexture.magFilter = liveTexture.minFilter = THREE.LinearFilter;
+      liveTexture.wrapS = THREE.RepeatWrapping;
+      liveTexture.wrapT = THREE.ClampToEdgeWrapping;
+      liveTexture.generateMipmaps = false;
+      uniforms.uLiveTexture.value = liveTexture;
+    }
+    liveTexture.needsUpdate = true;
+    uniforms.uLiveOn.value = 1;
+    liveState = 'ready';
+    refreshLiveNote();
+  }
+
+  function liveLoadCache(){
+    try {
+      var raw = localStorage.getItem(LIVE_CACHE_KEY);
+      if (!raw) return false;
+      var o = JSON.parse(raw);
+      if (!o || !o.t || Date.now() - o.t > LIVE_GRID_TTL) return false;
+      if (!o.c || o.c.length !== LIVE_LON*LIVE_LAT) return false;
+      for (var k = 0; k < o.c.length; k++) liveCloud[k] = o.c[k];
+      liveStamp = o.stamp || null;
+      return true;
+    } catch (e){ return false; }
+  }
+  function liveSaveCache(){
+    try {
+      localStorage.setItem(LIVE_CACHE_KEY, JSON.stringify({
+        t: Date.now(), stamp: liveStamp, c: Array.prototype.slice.call(liveCloud)
+      }));
+    } catch (e){ /* private mode, quota: not worth failing over */ }
+  }
+
+  function fetchLiveGrid(){
+    if (liveState === 'loading' || liveState === 'ready') return;
+    if (liveLoadCache()){ liveBuildTexture(); return; }
+    liveState = 'loading'; refreshLiveNote();
+
+    var la = [], lo = [];
+    for (var j = 0; j < LIVE_LAT; j++)
+      for (var i = 0; i < LIVE_LON; i++){ la.push(liveLat(j)); lo.push(liveLon(i)); }
+
+    var url = 'https://api.open-meteo.com/v1/forecast?latitude=' + la.join(',') +
+              '&longitude=' + lo.join(',') + '&current=cloud_cover&timezone=UTC';
+    fetch(url)
+      .then(function(r){ if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function(json){
+        var arr = Array.isArray(json) ? json : [json];
+        for (var k = 0; k < liveCloud.length && k < arr.length; k++){
+          var cur = arr[k] && arr[k].current;
+          liveCloud[k] = cur && cur.cloud_cover != null ? Math.max(0, Math.min(100, cur.cloud_cover)) : 0;
+          if (!liveStamp && cur && cur.time) liveStamp = cur.time;
+        }
+        liveSaveCache();
+        liveBuildTexture();
+      })
+      .catch(function(){ liveState = 'error'; refreshLiveNote(); });
+  }
+
+  // Point queries for the tooltip: one location, cached on a two degree
+  // bucket for fifteen minutes, so moving about a region is nearly free.
+  var livePoint = {}, livePointBusy = {};
+  var LIVE_PT_TTL = 15*60*1000, LIVE_PT_BUCKET = 2;
+  function livePointKey(lat, lon){
+    return Math.round(lat/LIVE_PT_BUCKET)*LIVE_PT_BUCKET + ',' + Math.round(lon/LIVE_PT_BUCKET)*LIVE_PT_BUCKET;
+  }
+  function livePointGet(lat, lon){
+    var hit = livePoint[livePointKey(lat, lon)];
+    return (hit && Date.now() - hit.t < LIVE_PT_TTL) ? hit : null;
+  }
+  function livePointRequest(lat, lon){
+    var key = livePointKey(lat, lon);
+    if (livePointBusy[key] || livePointGet(lat, lon)) return;
+    livePointBusy[key] = true;
+    var p = key.split(',');
+    fetch('https://api.open-meteo.com/v1/forecast?latitude=' + p[0] + '&longitude=' + p[1] +
+          '&current=temperature_2m,cloud_cover,shortwave_radiation,wind_speed_10m&timezone=UTC')
+      .then(function(r){ if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function(j){
+        var c = j && j.current;
+        livePoint[key] = c ? { t:Date.now(), cloud:c.cloud_cover, temp:c.temperature_2m,
+                               rad:c.shortwave_radiation, wind:c.wind_speed_10m }
+                           : { t:Date.now(), failed:true };
+      })
+      .catch(function(){ livePoint[key] = { t:Date.now(), failed:true }; })
+      .then(function(){ delete livePointBusy[key]; });
+  }
+
 
   // ---------------------------------------------------------------
   // Historical territory
@@ -793,7 +925,8 @@ var TERRA_ICE_RUNS = [2657,2,1,2,348,1,5,11,16,4,313,34,322,44,312,47,314,45,314
     uCurNorm:{value:CUR_NORM},
     uDissolve:{value:0.78},         // fraction of the interval a hand-over spreads across
     uElevMax:{value:ELEV_MAX}, uDepthMax:{value:DEPTH_MAX},
-    uSunDecl:{value:0}, uSunLon:{value:0}
+    uSunDecl:{value:0}, uSunLon:{value:0},
+    uLiveTexture:{value:null}, uLiveOn:{value:0}
   };
 
   var vs = [
@@ -811,6 +944,7 @@ var TERRA_ICE_RUNS = [2657,2,1,2,348,1,5,11,16,4,313,34,322,44,312,47,314,45,314
     'uniform vec2 uHoverCell; uniform float uCurSpeed; uniform float uDissolve; uniform float uCurNorm;',
     'uniform float uElevMax; uniform float uDepthMax;',
     'uniform float uSunDecl; uniform float uSunLon;',
+    'uniform sampler2D uLiveTexture; uniform float uLiveOn;',
 
     'varying vec3 vColor; varying vec3 vNormal; varying float vViewZ; varying float vLocalY;',
 
@@ -861,12 +995,13 @@ var TERRA_ICE_RUNS = [2657,2,1,2,348,1,5,11,16,4,313,34,322,44,312,47,314,45,314
     '  return texture2D(uEmpTexture, vec2(u,(f*ROWS_F+aGridUV.y+0.5)/(ROWS_F*EMP_F)));',
     '}',
 
-    'float gH[8]; vec3 gC[8];',
+    'float gH[9]; vec3 gC[9];',
     'void pick(int m,out float h,out vec3 c){',
     '  if(m==0){h=gH[0];c=gC[0];} else if(m==1){h=gH[1];c=gC[1];}',
     '  else if(m==2){h=gH[2];c=gC[2];} else if(m==3){h=gH[3];c=gC[3];}',
     '  else if(m==4){h=gH[4];c=gC[4];} else if(m==5){h=gH[5];c=gC[5];}',
-    '  else if(m==6){h=gH[6];c=gC[6];} else {h=gH[7];c=gC[7];}',
+    '  else if(m==6){h=gH[6];c=gC[6];} else if(m==7){h=gH[7];c=gC[7];}',
+    '  else {h=gH[8];c=gC[8];}',
     '}',
 
     'void main(){',
@@ -963,6 +1098,24 @@ var TERRA_ICE_RUNS = [2657,2,1,2,348,1,5,11,16,4,313,34,322,44,312,47,314,45,314
     '  sunC += vec3(0.44,0.20,0.06)*tw;',
     '  gC[7] = sunC;',
     '  gH[7] = mix(MIN_H*1.4, MAX_H*0.85, pow(insol, 0.75));',
+
+    // 8: live cloud cover. The sampled grid is five degrees, so it is read
+    // with linear filtering and lands on this one as a smooth field. Under
+    // the cloud the land keeps a dim tint, so it still reads as a map.
+    '  vec2 luv = vec2((aGridUV.x + 0.5)/COLS_F, (aGridUV.y + 0.5)/ROWS_F);',
+    '  vec3 live = texture2D(uLiveTexture, luv).rgb;',
+    '  float cloud = live.r;',
+    // Cloud lies over the world; it does not replace it. The columns keep
+    // the shape they have in the elevation view, dimmed, and the cloud is
+    // a white veil laid on top with only a slight lift where it is thick.
+    // Drawn as height it buried the map: global mean cover is around two
+    // thirds, so almost every column stood at the top of the scale.
+    '  vec3 underC = gC[0]*0.55;',
+    '  vec3 veil = vec3(0.898,0.933,0.965);',
+    '  float ct = pow(cloud, 0.9);',
+    '  vec3 cloudC = mix(underC, veil, smoothstep(0.04, 0.92, ct));',
+    '  gC[8] = mix(vec3(0.09,0.11,0.15), cloudC, uLiveOn);',
+    '  gH[8] = mix(gH[0], gH[0] + MAX_H*0.10, ct)*uLiveOn + MIN_H*(1.0-uLiveOn);',
 
     '  float hA,hB; vec3 cA,cB;',
     '  pick(uModeA,hA,cA); pick(uModeB,hB,cB);',
@@ -1237,7 +1390,10 @@ var TERRA_ICE_RUNS = [2657,2,1,2,348,1,5,11,16,4,313,34,322,44,312,47,314,45,314
       ends:['lille','','stort rige'], source:'historical-basemaps &middot; Nüssli / Ouředníček' },
     { id:'sun', label:'Sollys', shaderId:7, sun:true,
       rows:[{label:'Solhøjde',ramp:['#080e1d','#251f51','#f28c44','#fff6da']}],
-      ends:['nat','tusmørke','middag'], source:'beregnet &middot; solens position lige nu' }
+      ends:['nat','tusmørke','middag'], source:'beregnet &middot; solens position lige nu' },
+    { id:'live', label:'Skydække', shaderId:8, live:true,
+      rows:[{label:'Skyer',ramp:['#0b1b32','#738ca1','#f6f9fc']}],
+      ends:['klart','','overskyet'], source:'Open-Meteo &middot; live, 5° net' }
   ];
   function modeById(id){ for (var i=0;i<MODES.length;i++) if (MODES[i].id===id) return MODES[i]; return MODES[0]; }
 
@@ -1291,11 +1447,19 @@ var TERRA_ICE_RUNS = [2657,2,1,2,348,1,5,11,16,4,313,34,322,44,312,47,314,45,314
     if (mode.ends){ html+='<div class="legend-ends">';
       for (var k=0;k<mode.ends.length;k++) html+='<span>'+mode.ends[k]+'</span>';
       html+='</div>'; }
-    if (mode.sun) html+='<div class="legend-live" id="legend-live"></div>';
+    if (mode.sun || mode.live) html+='<div class="legend-live" id="legend-live"></div>';
     legendEl.innerHTML = html+'<div class="legend-src">'+mode.source+'</div>';
     liveEl = document.getElementById('legend-live');
+    if (mode.live) refreshLiveNote();
   }
   var liveEl = null;
+  function refreshLiveNote(){
+    if (!liveEl || !currentMode || !currentMode.live) return;
+    if (liveState === 'loading') liveEl.textContent = 'henter fra Open-Meteo…';
+    else if (liveState === 'error') liveEl.textContent = 'kunne ikke hente live-data';
+    else if (liveState === 'ready') liveEl.textContent = (liveStamp ? liveStamp.replace('T',' ')+' UTC' : 'live') + ' · 10° net';
+    else liveEl.textContent = '';
+  }
   function pad2(n){ return (n<10?'0':'')+n; }
   function updateSunReadout(){
     if (!liveEl) return;
@@ -1350,6 +1514,8 @@ var TERRA_ICE_RUNS = [2657,2,1,2,348,1,5,11,16,4,313,34,322,44,312,47,314,45,314
       btns[i].setAttribute('aria-pressed', on?'true':'false');
     }
     renderLegend(mode); applyModeFlags(mode); hideTip();
+    // Only go to the network when someone actually asks for this view.
+    if (mode.live) fetchLiveGrid();
   }
 
   (function buildModebar(){
@@ -1502,6 +1668,19 @@ var TERRA_ICE_RUNS = [2657,2,1,2,348,1,5,11,16,4,313,34,322,44,312,47,314,45,314
       var compass=['Ø','NØ','N','NV','V','SV','S','SØ'][Math.round(deg/45)%8];
       rows+='<dt>fart</dt><dd>'+(cms/100).toFixed(2).replace('.',',')+' m/s</dd>';
       rows+='<dt>retning</dt><dd>mod '+compass+'</dd>';
+    } else if (m==='live'){
+      // The coloured field is the ten degree grid; the tooltip asks about
+      // this spot exactly, which is one location and costs almost nothing.
+      var pt = livePointGet(lat, lon);
+      if (!pt) livePointRequest(lat, lon);
+      if (!pt || pt.failed){
+        rows+='<dt>skydække</dt><dd>'+(pt && pt.failed ? '–' : 'henter…')+'</dd>';
+      } else {
+        rows+='<dt>skydække</dt><dd>'+pt.cloud+' %</dd>';
+        if (pt.temp != null) rows+='<dt>temperatur</dt><dd>'+pt.temp.toFixed(1).replace('.',',')+' °C</dd>';
+        if (pt.wind != null) rows+='<dt>vind</dt><dd>'+pt.wind.toFixed(1).replace('.',',')+' m/s</dd>';
+        if (pt.rad != null) rows+='<dt>indstråling</dt><dd>'+Math.round(pt.rad)+' W/m²</dd>';
+      }
     } else if (m==='sun'){
       var tms = sunNow();
       var alt = solarAltitude(tms, lat, lon);
