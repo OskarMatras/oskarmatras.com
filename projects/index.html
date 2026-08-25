@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Projekter — Oskar Matras</title>
+<meta name="description" content="Sideprojekter af Oskar Matras — eksperimenter med data, 3D-rendering og interaktion.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  /* ============================================================
+     Projects index.
+
+     Same palette, type and header as the CV page. Two things are
+     specific to this page:
+
+     1. The ambient background is a slowly morphing contour map
+        rather than the CV page's flock. Same idea — something is
+        always quietly moving back there — but the motif follows
+        the content: this is the page that leads to a map.
+     2. Each project card carries a live preview window instead of
+        a static thumbnail, so the card shows the thing rather than
+        describing it.
+     ============================================================ */
+  :root{
+    --navy: #0b2540;
+    --navy-deep: #071a2e;
+    --teal: #14547a;
+    --foam: #f4efe4;
+    --cream: #faf6ee;
+    --gold: #c99a4b;
+    --ink: #16232f;
+    --ink-soft: rgba(22,35,47,0.68);
+    --line: rgba(11,37,64,0.12);
+    --serif:'Fraunces', Georgia, serif;
+    --sans:'Inter', system-ui, -apple-system, sans-serif;
+    --mono:'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+    --maxw: 1040px;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth; overflow-x:hidden; width:100%;}
+  body{
+    margin:0;
+    background:var(--cream);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-weight:400;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+    width:100%;
+  }
+  h1,h2,h3{font-family:var(--serif); font-weight:600; letter-spacing:-0.01em; margin:0;}
+  a{color:inherit;}
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 28px;}
+
+  /* ---------------- Ambient contour background ----------------
+     A fixed, full-viewport canvas traces iso-lines through a drifting
+     sine field — the same trick a topographic map uses, animated. It
+     sits behind everything at low contrast; content blocks float over
+     it on a barely-there tint so the lines still read through. */
+  #contour-bg{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    background:var(--cream);
+  }
+  @media (prefers-reduced-motion: reduce){
+    #contour-bg{ opacity:0.6; }
+  }
+  main, header.site, footer{ position:relative; z-index:2; }
+
+  /* ---------------- Header / nav — identical to the CV page ---------------- */
+  header.site{
+    position:sticky; top:0; z-index:50;
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    background:rgba(250,246,238,0.78);
+    border-bottom:1px solid var(--line);
+  }
+  header.site .wrap{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 28px; gap:16px; flex-wrap:wrap;
+  }
+  .brand{
+    font-family:var(--serif); font-weight:600; font-size:1.05rem;
+    text-decoration:none; letter-spacing:-0.01em; flex-shrink:0;
+  }
+  nav.main{
+    display:flex; gap:26px;
+    overflow-x:auto; -webkit-overflow-scrolling:touch;
+    scrollbar-width:none; min-width:0;
+  }
+  nav.main::-webkit-scrollbar{display:none;}
+  nav.main a{
+    position:relative; text-decoration:none;
+    font-size:0.76rem; letter-spacing:0.07em; text-transform:uppercase;
+    color:var(--ink-soft); padding-bottom:5px;
+    transition:color .25s ease; white-space:nowrap; flex-shrink:0;
+  }
+  nav.main a::after{
+    content:''; position:absolute; left:0; right:0; bottom:0;
+    height:1px; background:var(--navy);
+    transform:scaleX(0); transform-origin:right;
+    transition:transform .3s ease;
+  }
+  nav.main a:hover{color:var(--navy);}
+  nav.main a:hover::after{transform-origin:left; transform:scaleX(1);}
+  nav.main a.current{color:var(--navy);}
+  nav.main a.current::after{transform:scaleX(1);}
+
+  .nav-toggle{
+    display:none; align-items:center; justify-content:center;
+    width:38px; height:38px; margin-left:auto;
+    background:none; border:none; padding:0;
+    color:var(--navy); cursor:pointer;
+  }
+  .nav-toggle svg{width:22px; height:22px;}
+
+  @media (max-width: 640px){
+    header.site .wrap{ padding:14px 18px; gap:12px; }
+    .brand{ font-size:0.95rem; }
+    .nav-toggle{ display:inline-flex; }
+    nav.main{
+      display:none; flex-basis:100%; flex-direction:column;
+      gap:0; overflow:visible; padding-top:6px;
+    }
+    nav.main.open{ display:flex; }
+    nav.main a{ padding:11px 2px; font-size:0.8rem; border-top:1px solid var(--line); }
+    nav.main a::after{ display:none; }
+  }
+
+  /* ---------------- Hero ---------------- */
+  .hero{ padding:84px 0 40px; }
+  .hero .eyebrow{
+    display:inline-block; font-size:0.8rem; letter-spacing:0.08em;
+    text-transform:uppercase; color:var(--gold); font-weight:600;
+    margin-bottom:16px;
+  }
+  .hero h1{ font-size:clamp(2.2rem, 5vw, 3.2rem); line-height:1.05; }
+  .hero p.lead{ max-width:58ch; margin-top:18px; font-size:1.05rem; color:var(--ink-soft); }
+
+  section.block{ padding:12px 0 88px; }
+
+  /* ---------------- Cards ----------------
+     The gradient-border-follows-the-cursor treatment from the CV page,
+     kept identical so the two pages feel like one system. */
+  .cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(330px,1fr));
+    gap:26px;
+  }
+  .card{
+    position:relative;
+    display:flex; flex-direction:column;
+    text-decoration:none; color:inherit;
+    background:rgba(250,246,238,0.72);
+    backdrop-filter:blur(3px);
+    -webkit-backdrop-filter:blur(3px);
+    border:1px solid var(--line);
+    border-radius:18px;
+    overflow:hidden;
+    transition:transform .35s cubic-bezier(.2,.7,.3,1), box-shadow .35s ease;
+    will-change:transform;
+  }
+  .card::before{
+    content:'';
+    position:absolute; inset:0;
+    border-radius:inherit;
+    padding:2.5px;
+    background:radial-gradient(320px circle at var(--mx,50%) var(--my,50%), var(--gold) 0%, rgba(201,154,75,0.55) 38%, rgba(201,154,75,0) 74%);
+    -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite:xor;
+            mask-composite:exclude;
+    opacity:0;
+    transition:opacity .35s ease;
+    pointer-events:none;
+    z-index:3;
+  }
+  .card:hover{
+    transform:translateY(-4px);
+    box-shadow:0 26px 50px rgba(11,37,64,0.18), 0 0 50px rgba(201,154,75,0.28);
+  }
+  .card:hover::before{opacity:1;}
+  .card:focus-visible{ outline:2px solid var(--gold); outline-offset:3px; }
+
+  /* The preview window: a dark inset that previews the piece itself.
+     Aspect-locked so the grid stays even no matter the copy length. */
+  .preview{
+    position:relative;
+    aspect-ratio:16 / 10;
+    background:#080d16;
+    border-bottom:1px solid var(--line);
+    overflow:hidden;
+  }
+  .preview canvas{ display:block; width:100%; height:100%; }
+  /* A soft vignette keeps the preview from fighting the cream card edge. */
+  .preview::after{
+    content:'';
+    position:absolute; inset:0;
+    background:radial-gradient(120% 90% at 50% 45%, rgba(0,0,0,0) 55%, rgba(4,8,14,0.55) 100%);
+    pointer-events:none;
+  }
+  .preview .badge{
+    position:absolute; left:14px; top:13px; z-index:2;
+    font-family:var(--mono); font-size:0.62rem; letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:rgba(240,243,249,0.78);
+    background:rgba(8,13,22,0.6);
+    border:1px solid rgba(232,238,250,0.16);
+    border-radius:999px;
+    padding:5px 11px;
+    backdrop-filter:blur(4px);
+    -webkit-backdrop-filter:blur(4px);
+  }
+
+  .card-body{ padding:26px 28px 30px; display:flex; flex-direction:column; flex:1; }
+  .card .tag{
+    font-family:var(--mono);
+    font-size:0.68rem; color:var(--gold); text-transform:uppercase;
+    letter-spacing:0.09em; font-weight:500;
+  }
+  .card h3{ font-size:1.4rem; margin-top:11px; }
+  .card p{ color:var(--ink-soft); font-size:0.95rem; margin:12px 0 0; }
+  .card .go{
+    display:inline-flex; align-items:center; gap:7px;
+    margin-top:20px; font-size:0.85rem; font-weight:500; color:var(--navy);
+  }
+  .card .go .arrow{ transition:transform .3s ease; display:inline-block; }
+  .card:hover .go .arrow{ transform:translateX(4px); }
+
+  /* Placeholder card — makes a short list look deliberate rather than empty. */
+  .card.soon{
+    background:transparent;
+    border:1px dashed rgba(11,37,64,0.22);
+    align-items:center; justify-content:center;
+    text-align:center;
+    padding:44px 30px;
+    min-height:260px;
+    cursor:default;
+  }
+  .card.soon:hover{ transform:none; box-shadow:none; }
+  .card.soon::before{ display:none; }
+  .card.soon .mark{
+    font-family:var(--serif); font-size:1.6rem; color:var(--gold);
+    margin-bottom:12px; opacity:0.8;
+  }
+  .card.soon h3{ font-size:1.1rem; margin:0; color:var(--ink-soft); font-weight:500; }
+  .card.soon p{ font-size:0.88rem; max-width:30ch; margin-top:9px; }
+
+  footer{
+    padding:36px 0 60px; text-align:center;
+    font-size:0.85rem; color:var(--ink-soft);
+    border-top:1px solid var(--line);
+    background:rgba(250,246,238,0.55);
+  }
+
+  @media (max-width: 640px){
+    .hero{ padding:52px 0 28px; }
+    .wrap{ padding:0 18px; }
+    .cards{ grid-template-columns:1fr; gap:20px; }
+    .card-body{ padding:22px 22px 26px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .card, .card .go .arrow{ transition:none; }
+    .card:hover{ transform:none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Fixed, full-page ambient contour animation -->
+<canvas id="contour-bg" aria-hidden="true"></canvas>
+
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="/">Oskar Matras</a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Åbn menu" aria-expanded="false" aria-controls="main-nav">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    </button>
+    <nav class="main" id="main-nav">
+      <a href="/#om">Om</a>
+      <a href="/#erfaring">Erfaring</a>
+      <a href="/#praktik">Praktik</a>
+      <a href="/#uddannelse">Uddannelse</a>
+      <a href="/#kompetencer">Kompetencer</a>
+      <a href="/projects" class="current">Projekter</a>
+      <a href="/#kontakt">Kontakt</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <span class="eyebrow">Sideprojekter</span>
+      <h1>Projekter</h1>
+      <p class="lead">En samling af ting jeg bygger ved siden af — mest eksperimenter med data, 3D-rendering og interaktion. Listen vokser.</p>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="cards">
+
+        <a class="card" href="/projects/TerraThroughTime">
+          <div class="preview">
+            <canvas id="pv-terra" aria-hidden="true"></canvas>
+            <span class="badge">Live</span>
+          </div>
+          <div class="card-body">
+            <span class="tag">Datavisualisering &middot; WebGL</span>
+            <h3>Terra Through Time</h3>
+            <p>Et verdenskort bygget af 64.800 animerede 3D-søjler — reel højde og havdybde, stiliserede tidevand, og global befolkningsvækst fra 1800 til i dag.</p>
+            <span class="go">Åbn projekt <span class="arrow">→</span></span>
+          </div>
+        </a>
+
+        <div class="card soon">
+          <div class="mark">✳</div>
+          <h3>Næste projekt</h3>
+          <p>Der er mere på vej — flere datasæt på det samme kort, og et par ting der ikke ligner kort overhovedet.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    © <span id="year"></span> Oskar Matras
+  </div>
+</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // Mobile nav dropdown — same behaviour as the CV page.
+  (function(){
+    var toggle = document.getElementById('nav-toggle');
+    var nav = document.getElementById('main-nav');
+    if(!toggle || !nav) return;
+    toggle.addEventListener('click', function(){
+      var open = nav.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    nav.addEventListener('click', function(e){
+      if(e.target.tagName === 'A'){
+        nav.classList.remove('open');
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+    });
+  })();
+
+  // Cursor position drives the gold gradient border on each card.
+  document.querySelectorAll('.card').forEach(function(el){
+    el.addEventListener('mousemove', function(e){
+      var r = el.getBoundingClientRect();
+      el.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+      el.style.setProperty('--my', (e.clientY - r.top) + 'px');
+    });
+  });
+
+  // ---------------------------------------------------------------
+  // Ambient contour map.
+  //
+  // A scalar field made of three drifting sine waves is sampled on a
+  // coarse grid, and marching squares traces the iso-lines through it
+  // at a handful of levels. Because the field moves, the "terrain"
+  // slowly reshapes itself — ridges merge, basins open — without ever
+  // repeating exactly. Every few levels is drawn in gold as an index
+  // contour, the way a real topographic sheet marks every fifth line.
+  // ---------------------------------------------------------------
+  (function(){
+    var canvas = document.getElementById('contour-bg');
+    if(!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var W, H, DPR, cols, rows;
+    var CELL = 26;
+    var field = [];
+
+    function resize(){
+      DPR = Math.min(window.devicePixelRatio || 1, 2);
+      W = Math.max(1, window.innerWidth); H = Math.max(1, window.innerHeight);
+      canvas.width = Math.round(W * DPR);
+      canvas.height = Math.round(H * DPR);
+      canvas.style.width = W + 'px';
+      canvas.style.height = H + 'px';
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+      cols = Math.ceil(W / CELL) + 1;
+      rows = Math.ceil(H / CELL) + 1;
+      field = new Float32Array(cols * rows);
+    }
+    // Re-checked every frame rather than only on the resize event: a page
+    // that loads in a background tab can report a zero-size viewport, and
+    // no resize event ever follows to correct it.
+    function ensureSize(){
+      var w = Math.max(1, window.innerWidth), h = Math.max(1, window.innerHeight);
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      if(w !== W || h !== H || dpr !== DPR) resize();
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    var LEVELS = [-1.5, -0.9, -0.3, 0.3, 0.9, 1.5];
+
+    function sample(t){
+      // Three sine waves at different angles and speeds. Their sum has no
+      // common period, so the field never loops back to a previous state.
+      var i = 0;
+      for(var r = 0; r < rows; r++){
+        var y = r * CELL;
+        for(var c = 0; c < cols; c++){
+          var x = c * CELL;
+          field[i++] =
+            Math.sin(x * 0.0062 + t * 0.00019) +
+            Math.sin(y * 0.0078 - t * 0.00014) +
+            Math.sin((x + y) * 0.0037 + t * 0.00024) +
+            Math.sin((x - y * 1.6) * 0.0029 - t * 0.00011);
+        }
+      }
+    }
+
+    // Linear interpolation along a cell edge, so lines land where the
+    // level actually crosses rather than snapping to cell midpoints.
+    function lerp(v1, v2, p1, p2, L){
+      var d = v2 - v1;
+      var s = Math.abs(d) < 1e-6 ? 0.5 : (L - v1) / d;
+      return p1 + (p2 - p1) * s;
+    }
+
+    function drawLevel(L){
+      ctx.beginPath();
+      for(var r = 0; r < rows - 1; r++){
+        for(var c = 0; c < cols - 1; c++){
+          var i0 = r * cols + c;
+          var tl = field[i0], tr = field[i0 + 1];
+          var bl = field[i0 + cols], br = field[i0 + cols + 1];
+
+          var idx = (tl > L ? 8 : 0) | (tr > L ? 4 : 0) | (br > L ? 2 : 0) | (bl > L ? 1 : 0);
+          if(idx === 0 || idx === 15) continue;
+
+          var x0 = c * CELL, y0 = r * CELL, x1 = x0 + CELL, y1 = y0 + CELL;
+          // Crossing points on each edge, computed only when needed.
+          var aX, aY, bX, bY, cX, cY, dX, dY;
+          aX = lerp(tl, tr, x0, x1, L); aY = y0;   // top
+          bX = x1; bY = lerp(tr, br, y0, y1, L);   // right
+          cX = lerp(bl, br, x0, x1, L); cY = y1;   // bottom
+          dX = x0; dY = lerp(tl, bl, y0, y1, L);   // left
+
+          switch(idx){
+            case 1:  case 14: ctx.moveTo(dX,dY); ctx.lineTo(cX,cY); break;
+            case 2:  case 13: ctx.moveTo(cX,cY); ctx.lineTo(bX,bY); break;
+            case 3:  case 12: ctx.moveTo(dX,dY); ctx.lineTo(bX,bY); break;
+            case 4:  case 11: ctx.moveTo(aX,aY); ctx.lineTo(bX,bY); break;
+            case 6:  case 9:  ctx.moveTo(aX,aY); ctx.lineTo(cX,cY); break;
+            case 7:  case 8:  ctx.moveTo(dX,dY); ctx.lineTo(aX,aY); break;
+            // Saddle cases: two separate segments through the cell.
+            case 5:  ctx.moveTo(dX,dY); ctx.lineTo(aX,aY); ctx.moveTo(cX,cY); ctx.lineTo(bX,bY); break;
+            case 10: ctx.moveTo(aX,aY); ctx.lineTo(bX,bY); ctx.moveTo(dX,dY); ctx.lineTo(cX,cY); break;
+          }
+        }
+      }
+      ctx.stroke();
+    }
+
+    function draw(t){
+      ensureSize();
+      sample(t);
+      ctx.clearRect(0, 0, W, H);
+      for(var k = 0; k < LEVELS.length; k++){
+        // Index contours (every third line) are gold and slightly heavier.
+        var index = (k % 3 === 0);
+        ctx.strokeStyle = index ? 'rgba(201,154,75,0.30)' : 'rgba(11,37,64,0.16)';
+        ctx.lineWidth = index ? 1.15 : 0.85;
+        drawLevel(LEVELS[k]);
+      }
+    }
+
+    var running = !document.hidden;
+    document.addEventListener('visibilitychange', function(){ running = !document.hidden; });
+
+    if(reduce){
+      // Static single frame, but still redraw if the viewport changes so it
+      // never gets stuck at a stale size.
+      draw(0);
+      window.addEventListener('resize', function(){ draw(0); });
+      document.addEventListener('visibilitychange', function(){ if(!document.hidden) draw(0); });
+      return;
+    }
+    function loop(now){
+      if(running) draw(now);
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+  })();
+
+  // ---------------------------------------------------------------
+  // Card preview: a miniature of the column world.
+  //
+  // Not the real scene — that one is three.js and several megabytes of
+  // data. This is a hand-rolled 2D stand-in: a grid of columns drawn
+  // back to front in a light isometric projection, heights from a
+  // moving sine field, colored on the same sea/land ramp the project
+  // uses. It reads as the piece at a glance and costs almost nothing.
+  // ---------------------------------------------------------------
+  (function(){
+    var canvas = document.getElementById('pv-terra');
+    if(!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var card = canvas.closest('.card');
+    var W, H, DPR;
+    var COLS = 42, ROWS = 19;
+    // Where the water line sits in the 0..1 height range. Set well above the
+    // midpoint so the field comes out mostly ocean, the way a world map does.
+    var SEA_LEVEL = 0.58;
+    var hover = false;
+
+    if(card){
+      card.addEventListener('mouseenter', function(){ hover = true; });
+      card.addEventListener('mouseleave', function(){ hover = false; });
+    }
+
+    function resize(){
+      DPR = Math.min(window.devicePixelRatio || 1, 2);
+      var r = canvas.getBoundingClientRect();
+      W = Math.max(1, r.width); H = Math.max(1, r.height);
+      canvas.width = Math.round(W * DPR);
+      canvas.height = Math.round(H * DPR);
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    }
+
+    // Sea ramp runs deep navy → teal → pale foam; land runs olive → gold
+    // → near-white, mirroring how a relief map is printed.
+    var SEA  = [[8,20,38],[20,84,122],[150,205,208]];
+    var LAND = [[35,61,36],[142,117,73],[246,244,236]];
+
+    function ramp(stops, u){
+      u = u < 0 ? 0 : (u > 1 ? 1 : u);
+      var seg = u < 0.5 ? 0 : 1;
+      var f = seg === 0 ? u / 0.5 : (u - 0.5) / 0.5;
+      var a = stops[seg], b = stops[seg + 1];
+      return 'rgb(' + Math.round(a[0] + (b[0]-a[0])*f) + ',' +
+                      Math.round(a[1] + (b[1]-a[1])*f) + ',' +
+                      Math.round(a[2] + (b[2]-a[2])*f) + ')';
+    }
+
+    function height(cx, cy, t){
+      // Sum of a few sines gives continent-sized blobs with coastlines.
+      return Math.sin(cx * 0.26 + t * 0.00028) * 0.6
+           + Math.sin(cy * 0.42 - t * 0.00021) * 0.45
+           + Math.sin((cx + cy) * 0.19 + t * 0.00035) * 0.5
+           + Math.sin((cx - cy) * 0.11 - t * 0.00016) * 0.35;
+    }
+
+    function draw(t){
+      ensureSize();
+      ctx.clearRect(0, 0, W, H);
+
+      var speed = hover && !reduce ? 1.9 : 1.0;
+      var tt = t * speed;
+
+      // Isometric-ish projection: each row back to front steps down and
+      // right a little, so the field reads as a surface rather than a bar
+      // chart. Column width is derived so the grid always fills the frame.
+      var skew = W * 0.0055;
+      var dx = (W - skew * ROWS) / COLS;
+      var dy = H * 0.038;
+      var baseY = H * 0.235;
+      var amp = H * 0.115 * (hover && !reduce ? 1.14 : 1);
+      var barW = Math.max(1.4, dx * 0.72);
+
+      for(var r = 0; r < ROWS; r++){
+        var oy = baseY + r * dy;
+        var ox = skew * r;
+        for(var c = 0; c < COLS; c++){
+          var h = height(c, r, tt);
+          var u = (h + 1.9) / 3.8;             // normalise to 0..1
+          var x = ox + c * dx;
+
+          if(u > SEA_LEVEL){
+            // Land: a column standing up out of the water plane, its height
+            // and color both driven by how far above sea level it sits.
+            var lu = (u - SEA_LEVEL) / (1 - SEA_LEVEL);
+            var hh = lu * amp * 1.15;
+            ctx.fillStyle = ramp(LAND, lu);
+            ctx.fillRect(x, oy - hh, barW, hh + 2.2);
+          } else {
+            // Ocean: a thin slab at the water plane, shaded by depth. Kept
+            // low so land still rises out of it, but thick enough that the
+            // sea reads as a surface rather than a scatter of dashes.
+            ctx.fillStyle = ramp(SEA, u / SEA_LEVEL);
+            ctx.fillRect(x, oy - 1.4, barW, 3.4);
+          }
+        }
+      }
+    }
+
+    // The preview box is sized by CSS aspect-ratio, which can still be
+    // settling (or zero, in a background tab) on the first frame — so the
+    // backing store is re-checked every frame instead of trusting the
+    // initial measurement.
+    function ensureSize(){
+      var r = canvas.getBoundingClientRect();
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      if(r.width < 1 || r.height < 1) return;
+      if(Math.abs(r.width - W) > 0.5 || Math.abs(r.height - H) > 0.5 || dpr !== DPR) resize();
+    }
+
+    resize();
+
+    // Only animate while the card is actually on screen.
+    var visible = true;
+    if('IntersectionObserver' in window){
+      new IntersectionObserver(function(entries){
+        visible = entries[0].isIntersecting;
+      }, { threshold: 0 }).observe(canvas);
+    }
+    var running = !document.hidden;
+    document.addEventListener('visibilitychange', function(){ running = !document.hidden; });
+
+    if(reduce){
+      draw(0);
+      window.addEventListener('resize', function(){ draw(0); });
+      document.addEventListener('visibilitychange', function(){ if(!document.hidden) draw(0); });
+      return;
+    }
+    function loop(now){
+      if(running && visible) draw(now);
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+  })();
+</script>
+
+</body>
+</html>

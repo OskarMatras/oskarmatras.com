@@ -1,85 +1,228 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
 <meta charset="utf-8">
-<title>Terra Through Time</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terra Through Time — Oskar Matras</title>
+<meta name="description" content="Et verdenskort bygget af 64.800 animerede 3D-søjler — højde, tidevand og befolkning fra 1800 til i dag.">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,340;0,9..144,480;0,9..144,600;1,9..144,480&family=Work+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
 <style>
+  /* ============================================================
+     Terra Through Time — project page.
+
+     The page reads as part of the CV site: cream ground, navy ink,
+     Fraunces + Inter, same sticky header. The one exception is the
+     map itself, which stays on its own dark ground because the
+     elevation and tide palettes are built for it — washed onto
+     cream they lose most of their range.
+
+     Rather than hide that contrast, the map is framed as a plate:
+     an inset dark panel with a rounded edge, a soft shadow and a
+     printed-style caption underneath, the way a photographic plate
+     sits on the page of an atlas. Everything inside the plate keeps
+     the original dark UI; everything outside it is site chrome.
+     ============================================================ */
   :root{
+    /* Site palette — identical to index.html */
+    --navy: #0b2540;
+    --navy-deep: #071a2e;
+    --teal: #14547a;
+    --cream: #faf6ee;
+    --foam: #f4efe4;
+    --gold: #c99a4b;
+    --ink: #16232f;
+    --ink-soft: rgba(22,35,47,0.68);
+    --line: rgba(11,37,64,0.12);
+
+    --serif:'Fraunces', Georgia, serif;
+    --sans:'Inter', system-ui, -apple-system, sans-serif;
+    --mono:'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+
+    --maxw: 720px;      /* prose column, close to index.html's 880 minus padding */
+    --platew: 1180px;   /* the map plate is allowed to run wider than the prose */
+
+    /* Dark palette — scoped to the plate only. These keep their original
+       names so every rule inside the stage works untouched. The accent is
+       the site gold lifted a few steps so it still reads on near-black. */
     --bg:#080d16;
     --bg-panel:rgba(13,20,33,0.72);
     --bg-panel-solid:#0d1421;
-    --ink:#f0f3f9;
-    --ink-dim:#8f9cb5;
-    --ink-faint:#586180;
-    --accent:#ffb454;
-    --accent-dim:#c98f47;
-    --line:rgba(232,238,250,0.10);
-    --line-strong:rgba(232,238,250,0.18);
+    --accent:#dcab5c;
+    --accent-dim:#a8823f;
     --pop-a:#241234; --pop-b:#a13d63; --pop-c:#ffcf6b;
     --tide-a:#083c47; --tide-b:#3fb9c4; --tide-c:#e0f8f4;
-    --serif:'Fraunces',ui-serif,Georgia,serif;
-    --sans:'Work Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-    --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
-    --nav-h:56px;
   }
+
   *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
+  html{scroll-behavior:smooth; overflow-x:hidden; width:100%;}
   body{
-    background:var(--bg);
+    margin:0; padding:0;
+    background:var(--cream);
     color:var(--ink);
     font-family:var(--sans);
+    font-weight:400;
+    line-height:1.6;
     -webkit-font-smoothing:antialiased;
     text-rendering:optimizeLegibility;
     overflow-x:hidden;
+    width:100%;
   }
+  h1,h2,h3{font-family:var(--serif); font-weight:600; letter-spacing:-0.01em; margin:0;}
+  a{color:inherit;}
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 28px;}
+  .wrap-wide{max-width:var(--platew); margin:0 auto; padding:0 28px;}
 
-  /* ---------- top bar ---------- */
-  .topbar{
-    height:var(--nav-h);
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:0 1.25rem;
+  /* ---------------- Header / nav — lifted from index.html ---------------- */
+  header.site{
+    position:sticky; top:0; z-index:50;
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    background:rgba(250,246,238,0.78);
     border-bottom:1px solid var(--line);
-    background:var(--bg);
-    position:relative;
-    z-index:5;
+  }
+  header.site .wrap-wide{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 28px; gap:16px; flex-wrap:wrap;
   }
   .brand{
-    font-family:var(--serif);
-    font-weight:600;
-    font-size:1.05rem;
-    color:var(--ink);
-    text-decoration:none;
-    letter-spacing:-0.005em;
+    font-family:var(--serif); font-weight:600; font-size:1.05rem;
+    text-decoration:none; letter-spacing:-0.01em; flex-shrink:0; color:var(--ink);
   }
+  nav.main{
+    display:flex; gap:26px;
+    overflow-x:auto; -webkit-overflow-scrolling:touch;
+    scrollbar-width:none; min-width:0;
+  }
+  nav.main::-webkit-scrollbar{display:none;}
+  nav.main a{
+    position:relative; text-decoration:none;
+    font-size:0.76rem; letter-spacing:0.07em; text-transform:uppercase;
+    color:var(--ink-soft); padding-bottom:5px;
+    transition:color .25s ease; white-space:nowrap; flex-shrink:0;
+  }
+  nav.main a::after{
+    content:''; position:absolute; left:0; right:0; bottom:0;
+    height:1px; background:var(--navy);
+    transform:scaleX(0); transform-origin:right;
+    transition:transform .3s ease;
+  }
+  nav.main a:hover{color:var(--navy);}
+  nav.main a:hover::after{transform-origin:left; transform:scaleX(1);}
+  nav.main a.current{color:var(--navy);}
+  nav.main a.current::after{transform:scaleX(1);}
+
+  .nav-toggle{
+    display:none; align-items:center; justify-content:center;
+    width:38px; height:38px; margin-left:auto;
+    background:none; border:none; padding:0;
+    color:var(--navy); cursor:pointer;
+  }
+  .nav-toggle svg{width:22px; height:22px;}
+
+  @media (max-width: 640px){
+    header.site .wrap-wide{ padding:14px 18px; gap:12px; }
+    .brand{ font-size:0.95rem; }
+    .nav-toggle{ display:inline-flex; }
+    nav.main{
+      display:none; flex-basis:100%; flex-direction:column;
+      gap:0; overflow:visible; padding-top:6px;
+    }
+    nav.main.open{ display:flex; }
+    nav.main a{
+      padding:11px 2px; font-size:0.8rem;
+      border-top:1px solid var(--line);
+    }
+    nav.main a::after{ display:none; }
+  }
+
+  /* ---------------- Lede ----------------
+     Breadcrumb, eyebrow, title and standfirst, all on cream — this is the
+     part that has to say "same site" before the dark plate appears. */
+  .lede{ padding:52px 0 30px; }
   .crumbs{
     font-family:var(--mono);
-    font-size:0.72rem;
-    letter-spacing:0.03em;
-    color:var(--ink-faint);
-    display:flex;
-    align-items:center;
-    gap:0.5rem;
+    font-size:0.72rem; letter-spacing:0.03em;
+    color:var(--ink-soft);
+    display:flex; align-items:center; gap:0.5rem;
+    margin-bottom:26px;
   }
-  .crumbs a{ color:var(--ink-dim); text-decoration:none; }
-  .crumbs a:hover{ color:var(--ink); }
-  .crumbs .current{ color:var(--ink); }
+  .crumbs a{ color:var(--ink-soft); text-decoration:none; transition:color .25s ease; }
+  .crumbs a:hover{ color:var(--navy); }
+  .crumbs .sep{ color:var(--line); }
+  .crumbs .current{ color:var(--navy); }
 
-  /* ---------- stage: fills the rest of the viewport, edge to edge ---------- */
+  .lede .eyebrow{
+    display:inline-block; font-size:0.8rem; letter-spacing:0.08em;
+    text-transform:uppercase; color:var(--gold); font-weight:600;
+    margin-bottom:14px;
+  }
+  .lede h1{
+    font-size:clamp(2.1rem, 5vw, 3.1rem);
+    line-height:1.05; text-wrap:balance;
+  }
+  .lede .standfirst{
+    max-width:62ch; margin-top:18px;
+    font-size:1.05rem; color:var(--ink-soft);
+  }
+
+  /* ---------------- The plate ----------------
+     A dark inset that holds the map. The negative-margin trick lets it
+     bleed to the screen edge on phones, where 28px of cream on either
+     side of a 3D scene is just wasted width. */
+  .plate-wrap{ padding:8px 0 0; }
+  .plate{ margin:0; }
+  .plate .frame{
+    position:relative;
+    border-radius:18px;
+    overflow:hidden;
+    background:var(--bg);
+    border:1px solid rgba(11,37,64,0.18);
+    box-shadow:
+      0 30px 60px -18px rgba(11,37,64,0.42),
+      0 8px 20px -8px rgba(11,37,64,0.22);
+  }
+  .plate figcaption{
+    display:flex; gap:0.6rem; align-items:baseline;
+    margin-top:14px; padding:0 4px;
+    font-family:var(--mono); font-size:0.72rem; line-height:1.6;
+    color:var(--ink-soft);
+  }
+  .plate figcaption .fig{ color:var(--gold); flex-shrink:0; }
+
+  @media (max-width: 640px){
+    .plate-wrap .wrap-wide{ padding:0; }
+    .plate .frame{ border-radius:0; border-left:none; border-right:none; }
+    .plate figcaption{ padding:0 18px; }
+  }
+
+  /* ---------------- Stage ----------------
+     Sized to the plate rather than the viewport. resize() in the app script
+     reads stageEl.clientWidth/Height, so the scene follows this box. */
   .stage{
     position:relative;
     width:100%;
-    height:calc(100vh - var(--nav-h));
-    min-height:460px;
+    height:min(74vh, 720px);
+    min-height:420px;
     background:var(--bg);
     overflow:hidden;
+    color:#f0f3f9;
+    font-family:var(--sans);
+    /* Dark-side overrides, scoped so every rule inside the stage — panels,
+       legend, controls — keeps working exactly as written, while the same
+       variable names stay light everywhere outside the plate. */
+    --ink:#f0f3f9;
+    --ink-dim:#8f9cb5;
+    --ink-faint:#586180;
+    --line:rgba(232,238,250,0.10);
+    --line-strong:rgba(232,238,250,0.18);
   }
   .stage canvas{
-    display:block;
-    width:100%;
-    height:100%;
-    cursor:grab;
-    touch-action:none;
+    display:block; width:100%; height:100%;
+    cursor:grab; touch-action:none;
   }
   .stage canvas:active{cursor:grabbing;}
 
@@ -252,72 +395,125 @@
     .legend{ min-width:0; }
   }
 
-  /* ---------- about section ---------- */
+  /* ---------------- Prose ----------------
+     Back on cream. Same measure and rhythm as the CV page's body copy. */
   .about{
-    padding:3.6rem clamp(1.25rem,4vw,2.5rem) 0;
-    max-width:640px;
+    max-width:var(--maxw);
     margin:0 auto;
+    padding:64px 28px 0;
   }
   .about .kicker{
     font-family:var(--mono);
-    font-size:0.72rem;
-    letter-spacing:0.12em;
-    text-transform:uppercase;
-    color:var(--accent-dim);
-    margin:0 0 0.9rem;
+    font-size:0.72rem; letter-spacing:0.12em; text-transform:uppercase;
+    color:var(--gold); margin:0 0 0.9rem;
   }
   .about h2{
-    font-family:var(--serif);
-    font-weight:600;
-    font-size:1.7rem;
-    letter-spacing:-0.01em;
-    margin:0 0 1rem;
-    text-wrap:balance;
+    font-size:clamp(1.5rem, 3vw, 1.9rem);
+    margin:0 0 1rem; text-wrap:balance;
   }
   .about p{
-    font-size:1rem;
-    line-height:1.68;
-    color:#cdd6e6;
-    margin:0 0 1.05rem;
+    font-size:1rem; line-height:1.72;
+    color:var(--ink-soft); margin:0 0 1.05rem;
   }
-  .about p:last-child{margin-bottom:0;}
+  .about p:last-of-type{margin-bottom:0;}
   .about strong{color:var(--ink); font-weight:600;}
-  .about a{ color:var(--accent); text-decoration-color:var(--accent-dim); }
+  .about a{color:var(--navy); text-decoration-color:var(--gold); text-underline-offset:2px;}
+  .about a:hover{color:var(--teal);}
+
+  /* Sources sit in a tinted well rather than under a rule — it separates
+     the citation block from the essay without another horizontal line,
+     and echoes the .alt section tint on the CV page. */
   .about .sources{
-    margin-top:1.6rem;
-    padding-top:1.4rem;
-    border-top:1px solid var(--line);
+    margin-top:2rem;
+    padding:22px 24px;
+    border-radius:14px;
+    background:rgba(241,237,226,0.6);
+    border:1px solid var(--line);
     font-family:var(--mono);
-    font-size:0.78rem;
-    line-height:1.8;
-    color:var(--ink-faint);
+    font-size:0.75rem; line-height:1.85;
+    color:var(--ink-soft);
   }
-  .about .sources a{ color:var(--ink-dim); }
+  .about .sources em{ font-style:italic; color:var(--ink); }
+
+  /* ---------------- Next / back ---------------- */
+  .pagenav{
+    max-width:var(--maxw); margin:56px auto 0; padding:0 28px;
+  }
+  .backlink{
+    display:inline-flex; align-items:center; gap:8px;
+    text-decoration:none; font-size:0.85rem; font-weight:500;
+    color:var(--navy);
+    padding:11px 20px;
+    border:1px solid var(--line); border-radius:999px;
+    transition:border-color .25s ease, transform .25s ease, box-shadow .25s ease;
+  }
+  .backlink:hover{
+    border-color:var(--navy);
+    transform:translateY(-2px);
+    box-shadow:0 10px 24px rgba(11,37,64,0.14);
+  }
 
   footer.note{
-    padding:2.4rem clamp(1.25rem,4vw,2.5rem) 3.2rem;
-    max-width:640px;
+    max-width:var(--maxw);
     margin:0 auto;
-    margin-top:2.2rem;
+    padding:46px 28px 64px;
     font-family:var(--mono);
-    font-size:0.75rem;
-    line-height:1.7;
-    color:var(--ink-faint);
+    font-size:0.72rem; line-height:1.8;
+    color:var(--ink-soft);
   }
-  footer.note a{ color:var(--ink-dim); }
+
+  @media (max-width: 640px){
+    .lede{ padding:36px 0 24px; }
+    .lede .crumbs{ margin-bottom:20px; }
+    .about{ padding:48px 18px 0; }
+    .about .sources{ padding:18px 18px; }
+    .pagenav{ padding:0 18px; }
+    footer.note{ padding:40px 18px 56px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    .backlink{transition:none;}
+  }
 </style>
+</head>
+<body>
 
-<div class="page">
-
-  <nav class="topbar">
+<header class="site">
+  <div class="wrap-wide">
     <a class="brand" href="/">Oskar Matras</a>
-    <div class="crumbs">
-      <a href="/projects">Projects</a>
-      <span>/</span>
-      <span class="current">Terra Through Time</span>
-    </div>
-  </nav>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Åbn menu" aria-expanded="false" aria-controls="main-nav">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    </button>
+    <nav class="main" id="main-nav">
+      <a href="/#om">Om</a>
+      <a href="/#erfaring">Erfaring</a>
+      <a href="/#kompetencer">Kompetencer</a>
+      <a href="/projects" class="current">Projekter</a>
+      <a href="/#kontakt">Kontakt</a>
+    </nav>
+  </div>
+</header>
 
+<section class="lede">
+  <div class="wrap-wide">
+    <nav class="crumbs" aria-label="Brødkrumme">
+      <a href="/">Forside</a>
+      <span class="sep">/</span>
+      <a href="/projects">Projekter</a>
+      <span class="sep">/</span>
+      <span class="current">Terra Through Time</span>
+    </nav>
+    <span class="eyebrow">Datavisualisering &middot; WebGL</span>
+    <h1>Terra Through Time</h1>
+    <p class="standfirst">A world map built from 64,800 animated columns — one for every degree of latitude and longitude. Switch what they measure and the whole field reads itself again: real elevation, a breathing tide, or two centuries of population growth.</p>
+  </div>
+</section>
+
+<div class="plate-wrap">
+  <div class="wrap-wide">
+    <figure class="plate">
+      <div class="frame">
   <section class="stage" id="stage" data-mode="elev">
     <canvas id="gl"></canvas>
     <div class="stage-loading" id="loading">loading world data&hellip;</div>
@@ -377,22 +573,33 @@
 
     <div class="hint">drag to orbit &middot; scroll to zoom</div>
   </section>
-
-  <main class="about">
-    <p class="kicker">Terra Through Time &middot; vol. 1</p>
-    <h2>A world made of columns, read three ways</h2>
-    <p>Sixty-four thousand eight hundred columns, one for every degree of latitude and longitude, standing in for the surface of the earth. Switch what they're showing and the whole field reads itself again: <strong>Elevation</strong> rises into real mountain ranges and sinks into real ocean trenches, colored from NOAA's relief data the way a printed wall map is. <strong>Tides</strong> turns the coastline into water, breathing in and out on a stylized day cycle. <strong>Population</strong> turns height into people &mdash; drag the year slider, or press play, and watch two centuries of growth move across the map: empires and colonies in 1800, the industrial cities of 1900, the postwar surge, the world as it stands today.</p>
-    <p>This is the first piece in an ongoing series about showing real data on a moving map of the world, built to make adding a new dataset &mdash; rainfall, migration, internet adoption, anything with a place and a time &mdash; mostly a matter of preparing the numbers, not rebuilding the map. The technique behind the columns themselves &mdash; how sixty-four thousand of them move at once without touching the CPU every frame &mdash; is written up separately as <a href="/ColumnAtlas">Column Atlas</a>.</p>
-    <div class="sources">
-      Elevation &amp; coastline: NOAA ETOPO1 and a GSHHS-derived coastline, via <em>basemap-data</em>.<br>
-      Population: Gapminder's long-run population estimates (HYDE for pre-1950, UN thereafter) &mdash; the same blend Our World in Data cites for its own population chart.<br>
-      Country population is spread evenly across that country's land cells in this grid; it is not a true population-density map.
-    </div>
-  </main>
-
-  <footer class="note">Built with three.js &mdash; one instanced draw call, GPU-driven height and color. &copy; Oskar Matras.</footer>
-
+      </div>
+      <figcaption>
+        <span class="fig">Fig. 1</span>
+        <span>64,800 columns on a one-degree grid. Drag to orbit, scroll to zoom, and switch what the heights mean with the controls above.</span>
+      </figcaption>
+    </figure>
+  </div>
 </div>
+
+<main class="about">
+  <p class="kicker">Terra Through Time &middot; vol. 1</p>
+  <h2>A world made of columns, read three ways</h2>
+  <p>Sixty-four thousand eight hundred columns, one for every degree of latitude and longitude, standing in for the surface of the earth. Switch what they're showing and the whole field reads itself again: <strong>Elevation</strong> rises into real mountain ranges and sinks into real ocean trenches, colored from NOAA's relief data the way a printed wall map is. <strong>Tides</strong> turns the coastline into water, breathing in and out on a stylized day cycle. <strong>Population</strong> turns height into people &mdash; drag the year slider, or press play, and watch two centuries of growth move across the map: empires and colonies in 1800, the industrial cities of 1900, the postwar surge, the world as it stands today.</p>
+  <p>This is the first piece in an ongoing series about showing real data on a moving map of the world, built to make adding a new dataset &mdash; rainfall, migration, internet adoption, anything with a place and a time &mdash; mostly a matter of preparing the numbers, not rebuilding the map. All sixty-four thousand columns move at once as a single instanced draw call, with height and color resolved on the GPU, so the animation never depends on JavaScript touching each column every frame.</p>
+  <div class="sources">
+    Elevation &amp; coastline: NOAA ETOPO1 and a GSHHS-derived coastline, via <em>basemap-data</em>.<br>
+    Population: Gapminder's long-run population estimates (HYDE for pre-1950, UN thereafter) &mdash; the same blend Our World in Data cites for its own population chart.<br>
+    Country population is spread evenly across that country's land cells in this grid; it is not a true population-density map.
+  </div>
+</main>
+
+<div class="pagenav">
+  <a class="backlink" href="/projects">&larr; Alle projekter</a>
+</div>
+
+<footer class="note">Bygget med three.js &mdash; ét instanced draw call, GPU-drevet højde og farve. &copy; <span id="year"></span> Oskar Matras.</footer>
+
 
 <script>
 /**
@@ -870,3 +1077,39 @@ var POPULATION_DATA_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
   requestAnimationFrame(tick);
 })();
 </script>
+<script>
+  // Year stamp + mobile nav dropdown, same behaviour as the CV page.
+  (function(){
+    var y = document.getElementById('year');
+    if(y) y.textContent = new Date().getFullYear();
+
+    var toggle = document.getElementById('nav-toggle');
+    var nav = document.getElementById('main-nav');
+    if(toggle && nav){
+      toggle.addEventListener('click', function(){
+        var open = nav.classList.toggle('open');
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+      nav.addEventListener('click', function(e){
+        if(e.target.tagName === 'A'){
+          nav.classList.remove('open');
+          toggle.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
+
+    // The stage is now sized by its container rather than the viewport, so
+    // watch the box itself — a width change from the layout (not just a
+    // window resize) still has to reach the renderer.
+    var stageEl = document.getElementById('stage');
+    if(stageEl && 'ResizeObserver' in window){
+      var ro = new ResizeObserver(function(){
+        window.dispatchEvent(new Event('resize'));
+      });
+      ro.observe(stageEl);
+    }
+  })();
+</script>
+
+</body>
+</html>
