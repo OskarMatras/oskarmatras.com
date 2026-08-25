@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Projekter — Oskar Matras</title>
-<meta name="description" content="Sideprojekter af Oskar Matras — eksperimenter med data, 3D-rendering og interaktion.">
+<title>Projekter · Oskar Matras</title>
+<meta name="description" content="Sideprojekter af Oskar Matras: eksperimenter med data, 3D-rendering og interaktion.">
+<link rel="canonical" href="https://OskarMatras.com/Projects">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,12 +19,11 @@
      specific to this page:
 
      1. The ambient background is a slowly morphing contour map
-        rather than the CV page's flock. Same idea — something is
-        always quietly moving back there — but the motif follows
+        rather than the CV page's flock. Same idea (something is
+        always quietly moving back there) but the motif follows
         the content: this is the page that leads to a map.
-     2. Each project card carries a live preview window instead of
-        a static thumbnail, so the card shows the thing rather than
-        describing it.
+     2. Each card carries a real frame of the project rather than a
+        drawing of one, so the card shows the thing itself.
      ============================================================ */
   :root{
     --navy: #0b2540;
@@ -60,7 +60,7 @@
 
   /* ---------------- Ambient contour background ----------------
      A fixed, full-viewport canvas traces iso-lines through a drifting
-     sine field — the same trick a topographic map uses, animated. It
+     sine field, the same trick a topographic map uses, animated. It
      sits behind everything at low contrast; content blocks float over
      it on a barely-there tint so the lines still read through. */
   #contour-bg{
@@ -75,7 +75,7 @@
   }
   main, header.site, footer{ position:relative; z-index:2; }
 
-  /* ---------------- Header / nav — identical to the CV page ---------------- */
+  /* ---------------- Header / nav, identical to the CV page ---------------- */
   header.site{
     position:sticky; top:0; z-index:50;
     backdrop-filter:blur(10px);
@@ -189,16 +189,23 @@
   .card:hover::before{opacity:1;}
   .card:focus-visible{ outline:2px solid var(--gold); outline-offset:3px; }
 
-  /* The preview window: a dark inset that previews the piece itself.
-     Aspect-locked so the grid stays even no matter the copy length. */
+  /* The preview window: a still frame of the actual piece, in a dark inset
+     that matches the plate on the project page. Aspect-locked so the grid
+     stays even no matter the copy length. */
   .preview{
     position:relative;
-    aspect-ratio:16 / 10;
+    aspect-ratio:21 / 9;
     background:#080d16;
     border-bottom:1px solid var(--line);
     overflow:hidden;
   }
-  .preview canvas{ display:block; width:100%; height:100%; }
+  .preview img{
+    display:block; width:100%; height:100%;
+    object-fit:cover;
+    transform:scale(1.02);
+    transition:transform .6s cubic-bezier(.2,.7,.3,1);
+  }
+  .card:hover .preview img{ transform:scale(1.06); }
   /* A soft vignette keeps the preview from fighting the cream card edge. */
   .preview::after{
     content:'';
@@ -234,7 +241,7 @@
   .card .go .arrow{ transition:transform .3s ease; display:inline-block; }
   .card:hover .go .arrow{ transform:translateX(4px); }
 
-  /* Placeholder card — makes a short list look deliberate rather than empty. */
+  /* Placeholder card: makes a short list look deliberate rather than empty. */
   .card.soon{
     background:transparent;
     border:1px dashed rgba(11,37,64,0.22);
@@ -290,7 +297,7 @@
       <a href="/#praktik">Praktik</a>
       <a href="/#uddannelse">Uddannelse</a>
       <a href="/#kompetencer">Kompetencer</a>
-      <a href="/projects" class="current">Projekter</a>
+      <a href="/Projects" class="current">Projekter</a>
       <a href="/#kontakt">Kontakt</a>
     </nav>
   </div>
@@ -301,7 +308,7 @@
     <div class="wrap">
       <span class="eyebrow">Sideprojekter</span>
       <h1>Projekter</h1>
-      <p class="lead">En samling af ting jeg bygger ved siden af — mest eksperimenter med data, 3D-rendering og interaktion. Listen vokser.</p>
+      <p class="lead">En samling af ting jeg bygger ved siden af. Mest eksperimenter med data, 3D-rendering og interaktion. Listen vokser.</p>
     </div>
   </section>
 
@@ -309,15 +316,18 @@
     <div class="wrap">
       <div class="cards">
 
-        <a class="card" href="/projects/TerraThroughTime">
+        <a class="card" href="/Projects/TerraThroughTime">
           <div class="preview">
-            <canvas id="pv-terra" aria-hidden="true"></canvas>
-            <span class="badge">Live</span>
+            <!-- Above the fold and the whole point of the card, so it loads
+                 eagerly rather than lazily. -->
+            <img src="/Projects/terra-preview.jpg" width="1120" height="480" decoding="async" fetchpriority="high"
+                 alt="Verdenskortet gengivet som tusindvis af 3D-søjler, farvet efter højde og havdybde.">
+            <span class="badge">Interaktiv</span>
           </div>
           <div class="card-body">
             <span class="tag">Datavisualisering &middot; WebGL</span>
             <h3>Terra Through Time</h3>
-            <p>Et verdenskort bygget af 64.800 animerede 3D-søjler — reel højde og havdybde, stiliserede tidevand, og global befolkningsvækst fra 1800 til i dag.</p>
+            <p>Et verdenskort bygget af 64.800 animerede 3D-søjler: reel højde og havdybde, stiliserede tidevand, og global befolkningsvækst fra 1800 til i dag.</p>
             <span class="go">Åbn projekt <span class="arrow">→</span></span>
           </div>
         </a>
@@ -325,7 +335,7 @@
         <div class="card soon">
           <div class="mark">✳</div>
           <h3>Næste projekt</h3>
-          <p>Der er mere på vej — flere datasæt på det samme kort, og et par ting der ikke ligner kort overhovedet.</p>
+          <p>Der er mere på vej. Flere datasæt på det samme kort, og et par ting der ikke ligner kort overhovedet.</p>
         </div>
 
       </div>
@@ -342,7 +352,7 @@
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
 
-  // Mobile nav dropdown — same behaviour as the CV page.
+  // Mobile nav dropdown, same behaviour as the CV page.
   (function(){
     var toggle = document.getElementById('nav-toggle');
     var nav = document.getElementById('main-nav');
@@ -374,7 +384,7 @@
   // A scalar field made of three drifting sine waves is sampled on a
   // coarse grid, and marching squares traces the iso-lines through it
   // at a handful of levels. Because the field moves, the "terrain"
-  // slowly reshapes itself — ridges merge, basins open — without ever
+  // slowly reshapes itself (ridges merge, basins open) without ever
   // repeating exactly. Every few levels is drawn in gold as an index
   // contour, the way a real topographic sheet marks every fifth line.
   // ---------------------------------------------------------------
@@ -498,144 +508,6 @@
     }
     function loop(now){
       if(running) draw(now);
-      requestAnimationFrame(loop);
-    }
-    requestAnimationFrame(loop);
-  })();
-
-  // ---------------------------------------------------------------
-  // Card preview: a miniature of the column world.
-  //
-  // Not the real scene — that one is three.js and several megabytes of
-  // data. This is a hand-rolled 2D stand-in: a grid of columns drawn
-  // back to front in a light isometric projection, heights from a
-  // moving sine field, colored on the same sea/land ramp the project
-  // uses. It reads as the piece at a glance and costs almost nothing.
-  // ---------------------------------------------------------------
-  (function(){
-    var canvas = document.getElementById('pv-terra');
-    if(!canvas) return;
-    var ctx = canvas.getContext('2d');
-    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var card = canvas.closest('.card');
-    var W, H, DPR;
-    var COLS = 42, ROWS = 19;
-    // Where the water line sits in the 0..1 height range. Set well above the
-    // midpoint so the field comes out mostly ocean, the way a world map does.
-    var SEA_LEVEL = 0.58;
-    var hover = false;
-
-    if(card){
-      card.addEventListener('mouseenter', function(){ hover = true; });
-      card.addEventListener('mouseleave', function(){ hover = false; });
-    }
-
-    function resize(){
-      DPR = Math.min(window.devicePixelRatio || 1, 2);
-      var r = canvas.getBoundingClientRect();
-      W = Math.max(1, r.width); H = Math.max(1, r.height);
-      canvas.width = Math.round(W * DPR);
-      canvas.height = Math.round(H * DPR);
-      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-    }
-
-    // Sea ramp runs deep navy → teal → pale foam; land runs olive → gold
-    // → near-white, mirroring how a relief map is printed.
-    var SEA  = [[8,20,38],[20,84,122],[150,205,208]];
-    var LAND = [[35,61,36],[142,117,73],[246,244,236]];
-
-    function ramp(stops, u){
-      u = u < 0 ? 0 : (u > 1 ? 1 : u);
-      var seg = u < 0.5 ? 0 : 1;
-      var f = seg === 0 ? u / 0.5 : (u - 0.5) / 0.5;
-      var a = stops[seg], b = stops[seg + 1];
-      return 'rgb(' + Math.round(a[0] + (b[0]-a[0])*f) + ',' +
-                      Math.round(a[1] + (b[1]-a[1])*f) + ',' +
-                      Math.round(a[2] + (b[2]-a[2])*f) + ')';
-    }
-
-    function height(cx, cy, t){
-      // Sum of a few sines gives continent-sized blobs with coastlines.
-      return Math.sin(cx * 0.26 + t * 0.00028) * 0.6
-           + Math.sin(cy * 0.42 - t * 0.00021) * 0.45
-           + Math.sin((cx + cy) * 0.19 + t * 0.00035) * 0.5
-           + Math.sin((cx - cy) * 0.11 - t * 0.00016) * 0.35;
-    }
-
-    function draw(t){
-      ensureSize();
-      ctx.clearRect(0, 0, W, H);
-
-      var speed = hover && !reduce ? 1.9 : 1.0;
-      var tt = t * speed;
-
-      // Isometric-ish projection: each row back to front steps down and
-      // right a little, so the field reads as a surface rather than a bar
-      // chart. Column width is derived so the grid always fills the frame.
-      var skew = W * 0.0055;
-      var dx = (W - skew * ROWS) / COLS;
-      var dy = H * 0.038;
-      var baseY = H * 0.235;
-      var amp = H * 0.115 * (hover && !reduce ? 1.14 : 1);
-      var barW = Math.max(1.4, dx * 0.72);
-
-      for(var r = 0; r < ROWS; r++){
-        var oy = baseY + r * dy;
-        var ox = skew * r;
-        for(var c = 0; c < COLS; c++){
-          var h = height(c, r, tt);
-          var u = (h + 1.9) / 3.8;             // normalise to 0..1
-          var x = ox + c * dx;
-
-          if(u > SEA_LEVEL){
-            // Land: a column standing up out of the water plane, its height
-            // and color both driven by how far above sea level it sits.
-            var lu = (u - SEA_LEVEL) / (1 - SEA_LEVEL);
-            var hh = lu * amp * 1.15;
-            ctx.fillStyle = ramp(LAND, lu);
-            ctx.fillRect(x, oy - hh, barW, hh + 2.2);
-          } else {
-            // Ocean: a thin slab at the water plane, shaded by depth. Kept
-            // low so land still rises out of it, but thick enough that the
-            // sea reads as a surface rather than a scatter of dashes.
-            ctx.fillStyle = ramp(SEA, u / SEA_LEVEL);
-            ctx.fillRect(x, oy - 1.4, barW, 3.4);
-          }
-        }
-      }
-    }
-
-    // The preview box is sized by CSS aspect-ratio, which can still be
-    // settling (or zero, in a background tab) on the first frame — so the
-    // backing store is re-checked every frame instead of trusting the
-    // initial measurement.
-    function ensureSize(){
-      var r = canvas.getBoundingClientRect();
-      var dpr = Math.min(window.devicePixelRatio || 1, 2);
-      if(r.width < 1 || r.height < 1) return;
-      if(Math.abs(r.width - W) > 0.5 || Math.abs(r.height - H) > 0.5 || dpr !== DPR) resize();
-    }
-
-    resize();
-
-    // Only animate while the card is actually on screen.
-    var visible = true;
-    if('IntersectionObserver' in window){
-      new IntersectionObserver(function(entries){
-        visible = entries[0].isIntersecting;
-      }, { threshold: 0 }).observe(canvas);
-    }
-    var running = !document.hidden;
-    document.addEventListener('visibilitychange', function(){ running = !document.hidden; });
-
-    if(reduce){
-      draw(0);
-      window.addEventListener('resize', function(){ draw(0); });
-      document.addEventListener('visibilitychange', function(){ if(!document.hidden) draw(0); });
-      return;
-    }
-    function loop(now){
-      if(running && visible) draw(now);
       requestAnimationFrame(loop);
     }
     requestAnimationFrame(loop);

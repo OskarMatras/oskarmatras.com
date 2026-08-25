@@ -1,0 +1,8 @@
+# Cloudflare Pages redirects.
+# The canonical paths are capitalised (/Projects/TerraThroughTime). Anyone
+# who types or has bookmarked the lowercase form is sent to the real one
+# rather than getting a 404.
+/projects            /Projects                  301
+/projects/*          /Projects/:splat           301
+/TerraThroughTime    /Projects/TerraThroughTime 301
+/ColumnAtlas         /Projects                  301

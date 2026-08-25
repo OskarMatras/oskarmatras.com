@@ -3,8 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Terra Through Time — Oskar Matras</title>
-<meta name="description" content="Et verdenskort bygget af 64.800 animerede 3D-søjler — højde, tidevand og befolkning fra 1800 til i dag.">
+<title>Terra Through Time · Oskar Matras</title>
+<meta name="description" content="Et verdenskort bygget af 64.800 animerede 3D-søjler: højde, terræn, tidevand og befolkning fra 1800 til i dag.">
+<link rel="canonical" href="https://OskarMatras.com/Projects/TerraThroughTime">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,12 +13,12 @@
 
 <style>
   /* ============================================================
-     Terra Through Time — project page.
+     Terra Through Time, project page.
 
      The page reads as part of the CV site: cream ground, navy ink,
      Fraunces + Inter, same sticky header. The one exception is the
      map itself, which stays on its own dark ground because the
-     elevation and tide palettes are built for it — washed onto
+     elevation and tide palettes are built for it. Washed onto
      cream they lose most of their range.
 
      Rather than hide that contrast, the map is framed as a plate:
@@ -27,7 +28,7 @@
      the original dark UI; everything outside it is site chrome.
      ============================================================ */
   :root{
-    /* Site palette — identical to index.html */
+    /* Site palette, identical to index.html */
     --navy: #0b2540;
     --navy-deep: #071a2e;
     --teal: #14547a;
@@ -45,7 +46,7 @@
     --maxw: 720px;      /* prose column, close to index.html's 880 minus padding */
     --platew: 1180px;   /* the map plate is allowed to run wider than the prose */
 
-    /* Dark palette — scoped to the plate only. These keep their original
+    /* Dark palette, scoped to the plate only. These keep their original
        names so every rule inside the stage works untouched. The accent is
        the site gold lifted a few steps so it still reads on near-black. */
     --bg:#080d16;
@@ -76,7 +77,7 @@
   .wrap{max-width:var(--maxw); margin:0 auto; padding:0 28px;}
   .wrap-wide{max-width:var(--platew); margin:0 auto; padding:0 28px;}
 
-  /* ---------------- Header / nav — lifted from index.html ---------------- */
+  /* ---------------- Header / nav, lifted from index.html ---------------- */
   header.site{
     position:sticky; top:0; z-index:50;
     backdrop-filter:blur(10px);
@@ -140,7 +141,7 @@
   }
 
   /* ---------------- Lede ----------------
-     Breadcrumb, eyebrow, title and standfirst, all on cream — this is the
+     Breadcrumb, eyebrow, title and standfirst, all on cream. This is the
      part that has to say "same site" before the dark plate appears. */
   .lede{ padding:52px 0 30px; }
   .crumbs{
@@ -211,8 +212,8 @@
     overflow:hidden;
     color:#f0f3f9;
     font-family:var(--sans);
-    /* Dark-side overrides, scoped so every rule inside the stage — panels,
-       legend, controls — keeps working exactly as written, while the same
+    /* Dark-side overrides, scoped so every rule inside the stage (panels,
+       legend, controls) keeps working exactly as written, while the same
        variable names stay light everywhere outside the plate. */
     --ink:#f0f3f9;
     --ink-dim:#8f9cb5;
@@ -253,24 +254,28 @@
 
   .modebar{
     display:flex;
-    gap:0.35rem;
+    flex-wrap:wrap;
+    gap:0.3rem;
     background:var(--bg-panel);
     backdrop-filter:blur(10px);
     border:1px solid var(--line);
     border-radius:10px;
     padding:0.3rem;
     margin-left:auto;
+    justify-content:flex-end;
+    max-width:100%;
   }
   .mode-btn{
     font-family:var(--mono);
-    font-size:0.76rem;
-    letter-spacing:0.03em;
+    font-size:0.72rem;
+    letter-spacing:0.02em;
     color:var(--ink-dim);
     background:transparent;
     border:none;
     border-radius:7px;
-    padding:0.5rem 0.85rem;
+    padding:0.45rem 0.7rem;
     cursor:pointer;
+    white-space:nowrap;
     transition:background 0.2s ease,color 0.2s ease;
   }
   .mode-btn:hover{color:var(--ink);}
@@ -299,25 +304,11 @@
   .legend-row:first-child{margin-top:0;}
   .legend-row:last-child{margin-bottom:0;}
   .legend-label{width:3.6rem; flex:none; letter-spacing:0.02em;}
-  .legend-bar{ flex:1; height:7px; border-radius:4px; background:linear-gradient(90deg,#0a1b33,#12586a,#bfe6de); }
-  .legend-bar.land{ background:linear-gradient(90deg,#233d24,#8e7549,#f6f4ec); }
-  .legend-bar.tide{ background:linear-gradient(90deg,var(--tide-a),var(--tide-b),var(--tide-c)); }
-  .legend-bar.pop{ background:linear-gradient(90deg,var(--pop-a),var(--pop-b),var(--pop-c)); }
+  /* Ramps are written straight onto the element by the mode table in JS,
+     so adding a dataset never means adding CSS. */
+  .legend-bar{ flex:1; height:7px; border-radius:4px; background:#333; }
   .legend-ends{display:flex; justify-content:space-between; font-size:0.63rem; color:var(--ink-faint); margin-top:0.25rem;}
   .legend-src{font-size:0.62rem; color:var(--ink-faint); margin-top:0.45rem; padding-top:0.4rem; border-top:1px solid var(--line);}
-  .legend [data-legend]{display:none;}
-  .legend[data-mode="elev"] [data-legend="elev"]{display:flex;}
-  .legend[data-mode="elev"] [data-legend="elev-ends"]{display:flex;}
-  .legend[data-mode="tide"] [data-legend="tide"]{display:flex;}
-  .legend[data-mode="pop"] [data-legend="pop"]{display:flex;}
-  .legend[data-mode="pop"] [data-legend="pop-ends"]{display:flex;}
-  .legend-src[data-legend]{display:block;}
-  .legend[data-mode="elev"] .legend-src[data-legend="tide-src"],
-  .legend[data-mode="elev"] .legend-src[data-legend="pop-src"]{display:none;}
-  .legend[data-mode="tide"] .legend-src[data-legend="elev-src"],
-  .legend[data-mode="tide"] .legend-src[data-legend="pop-src"]{display:none;}
-  .legend[data-mode="pop"] .legend-src[data-legend="elev-src"],
-  .legend[data-mode="pop"] .legend-src[data-legend="tide-src"]{display:none;}
 
   .controls{
     display:flex;
@@ -338,8 +329,33 @@
     color:var(--ink-dim);
     letter-spacing:0.02em;
   }
-  .stage[data-mode="tide"] .control-group[data-for="tide"]{display:flex;}
-  .stage[data-mode="pop"] .control-group[data-for="pop"]{display:flex;}
+  /* Which controls a mode needs is declared by the mode table in JS, which
+     sets these flags on the stage, so the rules don't grow per dataset. */
+  .stage[data-tide="1"] .control-group[data-for="tide"]{display:flex;}
+  .stage[data-year="1"] .control-group[data-for="pop"]{display:flex;}
+
+  /* Reset view: sits with the hint, bottom right, out of the way until
+     you've spun the map somewhere you'd rather not be. */
+  .resetview{
+    position:absolute;
+    right:1rem; bottom:1rem;
+    z-index:4;
+    font-family:var(--mono);
+    font-size:0.66rem;
+    letter-spacing:0.04em;
+    color:var(--ink-dim);
+    background:var(--bg-panel);
+    backdrop-filter:blur(10px);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:0.4rem 0.8rem;
+    cursor:pointer;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .3s ease, color .2s ease, border-color .2s ease;
+  }
+  .resetview.show{ opacity:1; pointer-events:auto; }
+  .resetview:hover{ color:var(--ink); border-color:var(--line-strong); }
   .control-group span.val{ font-variant-numeric:tabular-nums; color:var(--ink); }
   #speedVal{ width:2.6rem; display:inline-block; }
   #yearVal{ width:3rem; display:inline-block; color:var(--accent); font-size:0.82rem; }
@@ -420,7 +436,7 @@
   .about a{color:var(--navy); text-decoration-color:var(--gold); text-underline-offset:2px;}
   .about a:hover{color:var(--teal);}
 
-  /* Sources sit in a tinted well rather than under a rule — it separates
+  /* Sources sit in a tinted well rather than under a rule. It separates
      the citation block from the essay without another horizontal line,
      and echoes the .alt section tint on the CV page. */
   .about .sources{
@@ -489,7 +505,7 @@
       <a href="/#om">Om</a>
       <a href="/#erfaring">Erfaring</a>
       <a href="/#kompetencer">Kompetencer</a>
-      <a href="/projects" class="current">Projekter</a>
+      <a href="/Projects" class="current">Projekter</a>
       <a href="/#kontakt">Kontakt</a>
     </nav>
   </div>
@@ -500,13 +516,13 @@
     <nav class="crumbs" aria-label="Brødkrumme">
       <a href="/">Forside</a>
       <span class="sep">/</span>
-      <a href="/projects">Projekter</a>
+      <a href="/Projects">Projekter</a>
       <span class="sep">/</span>
       <span class="current">Terra Through Time</span>
     </nav>
     <span class="eyebrow">Datavisualisering &middot; WebGL</span>
     <h1>Terra Through Time</h1>
-    <p class="standfirst">A world map built from 64,800 animated columns — one for every degree of latitude and longitude. Switch what they measure and the whole field reads itself again: real elevation, a breathing tide, or two centuries of population growth.</p>
+    <p class="standfirst">A world map built from 64,800 animated columns, one for every degree of latitude and longitude. Switch what they measure and the whole field reads itself again: real elevation, rugged terrain, a breathing tide, or two centuries of population.</p>
   </div>
 </section>
 
@@ -519,44 +535,13 @@
     <div class="stage-loading" id="loading">loading world data&hellip;</div>
 
     <div class="panel panel-top">
-      <div class="modebar" role="group" aria-label="What the map shows">
-        <button class="mode-btn is-active" data-mode="elev" type="button">Elevation</button>
-        <button class="mode-btn" data-mode="tide" type="button">Tides</button>
-        <button class="mode-btn" data-mode="pop" type="button">Population</button>
-      </div>
+      <!-- Buttons are generated from the mode table in JS so a new dataset
+           only has to be described once. -->
+      <div class="modebar" id="modebar" role="group" aria-label="What the map shows"></div>
     </div>
 
     <div class="panel panel-bottom">
-      <div class="legend" id="legend" data-mode="elev">
-        <div class="legend-row" data-legend="elev">
-          <span class="legend-label">Seafloor</span>
-          <span class="legend-bar"></span>
-        </div>
-        <div class="legend-row" data-legend="elev">
-          <span class="legend-label">Land</span>
-          <span class="legend-bar land"></span>
-        </div>
-        <div class="legend-ends" data-legend="elev-ends">
-          <span>trench</span><span>sea level</span><span>peak</span>
-        </div>
-        <div class="legend-row" data-legend="tide">
-          <span class="legend-label">Water</span>
-          <span class="legend-bar tide"></span>
-        </div>
-        <div class="legend-ends" data-legend="tide">
-          <span>low tide</span><span></span><span>high tide</span>
-        </div>
-        <div class="legend-row" data-legend="pop">
-          <span class="legend-label">People</span>
-          <span class="legend-bar pop"></span>
-        </div>
-        <div class="legend-ends" data-legend="pop-ends">
-          <span>sparse</span><span></span><span>dense</span>
-        </div>
-        <div class="legend-src" data-legend="elev-src">NOAA ETOPO1 &middot; GSHHS coastline</div>
-        <div class="legend-src" data-legend="tide-src">stylized &middot; by coastal proximity</div>
-        <div class="legend-src" data-legend="pop-src">Gapminder &middot; HYDE &middot; UN</div>
-      </div>
+      <div class="legend" id="legend"></div>
 
       <div class="controls">
         <div class="control-group" data-for="tide">
@@ -571,6 +556,7 @@
       </div>
     </div>
 
+    <button class="resetview" id="resetview" type="button">reset view</button>
     <div class="hint">drag to orbit &middot; scroll to zoom</div>
   </section>
       </div>
@@ -585,20 +571,22 @@
 <main class="about">
   <p class="kicker">Terra Through Time &middot; vol. 1</p>
   <h2>A world made of columns, read three ways</h2>
-  <p>Sixty-four thousand eight hundred columns, one for every degree of latitude and longitude, standing in for the surface of the earth. Switch what they're showing and the whole field reads itself again: <strong>Elevation</strong> rises into real mountain ranges and sinks into real ocean trenches, colored from NOAA's relief data the way a printed wall map is. <strong>Tides</strong> turns the coastline into water, breathing in and out on a stylized day cycle. <strong>Population</strong> turns height into people &mdash; drag the year slider, or press play, and watch two centuries of growth move across the map: empires and colonies in 1800, the industrial cities of 1900, the postwar surge, the world as it stands today.</p>
-  <p>This is the first piece in an ongoing series about showing real data on a moving map of the world, built to make adding a new dataset &mdash; rainfall, migration, internet adoption, anything with a place and a time &mdash; mostly a matter of preparing the numbers, not rebuilding the map. All sixty-four thousand columns move at once as a single instanced draw call, with height and color resolved on the GPU, so the animation never depends on JavaScript touching each column every frame.</p>
+  <p>Sixty-four thousand eight hundred columns, one for every degree of latitude and longitude, standing in for the surface of the earth. Switch what they're showing and the whole field reads itself again. <strong>Elevation</strong> rises into real mountain ranges and sinks into real ocean trenches, colored from NOAA's relief data the way a printed wall map is. <strong>Relief</strong> measures how sharply the ground changes instead of how high it sits, so coastlines, mountain chains and the mid-ocean ridges light up while the plains and abyssal basins go flat. <strong>Tides</strong> turns the coastline into water, breathing in and out on a stylized day cycle.</p>
+  <p>Three more views read the same grid through two centuries of people. <strong>Population</strong> turns height into headcount: drag the year slider, or press play, and watch the map fill in from the empires and colonies of 1800, through the industrial cities of 1900 and the postwar surge, to the world as it stands today. <strong>Density</strong> divides that by how much ground a cell actually covers, since a one-degree cell near the poles is a fraction of the size of one at the equator. <strong>Growth</strong> shows the change since the previous decade rather than the total, which is where the demographic transition becomes visible as it moves across the world.</p>
+  <p>This is the first piece in an ongoing series about showing real data on a moving map of the world, built so that adding a dataset (rainfall, migration, internet adoption, anything with a place and a time) is mostly a matter of preparing the numbers rather than rebuilding the map. All sixty-four thousand columns move at once as a single instanced draw call, with height and color resolved on the GPU, so the animation never depends on JavaScript touching each column every frame.</p>
   <div class="sources">
     Elevation &amp; coastline: NOAA ETOPO1 and a GSHHS-derived coastline, via <em>basemap-data</em>.<br>
-    Population: Gapminder's long-run population estimates (HYDE for pre-1950, UN thereafter) &mdash; the same blend Our World in Data cites for its own population chart.<br>
-    Country population is spread evenly across that country's land cells in this grid; it is not a true population-density map.
+    Population: Gapminder's long-run population estimates (HYDE for pre-1950, UN thereafter), the same blend Our World in Data cites for its own population chart.<br>
+    Relief, Density and Growth are derived here from those two sources rather than measured separately: relief from the local range in the elevation grid, density by dividing population by the cosine-of-latitude area of each cell, growth by differencing consecutive decades.<br>
+    Country population is spread evenly across that country's land cells in this grid, so Density compares countries rather than cities; it is not a true population-density map.
   </div>
 </main>
 
 <div class="pagenav">
-  <a class="backlink" href="/projects">&larr; Alle projekter</a>
+  <a class="backlink" href="/Projects">&larr; Alle projekter</a>
 </div>
 
-<footer class="note">Bygget med three.js &mdash; ét instanced draw call, GPU-drevet højde og farve. &copy; <span id="year"></span> Oskar Matras.</footer>
+<footer class="note">Bygget med three.js: ét instanced draw call, GPU-drevet højde og farve. &copy; <span id="year"></span> Oskar Matras.</footer>
 
 
 <script>
@@ -622,7 +610,7 @@ var POPULATION_DATA_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
   var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   var COLS = 360, ROWS = 180, SPACING = 1.0;
-  var MIN_H = 0.05, MAX_H = 5.4;
+  var MIN_H = 0.05, MAX_H = 12.0;
   var KEYFRAMES = (function(){
     var ys = [];
     for (var y = 1800; y <= 2020; y += 10) ys.push(y);
@@ -650,15 +638,20 @@ var POPULATION_DATA_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
   }
 
   var count = COLS * ROWS;
+
+  // WebGL only guarantees 16 vertex attribute slots, and eleven separate
+  // per-instance floats plus position and normal runs that close to the
+  // ceiling. The scalars are packed into two vec4s instead:
+  //   aPhysA = (elevNorm, isLand, tideAmp, tidePhase)
+  //   aPhysB = (revealPhase, swapPhase, relief, invArea)
   var aOffset = new Float32Array(count * 2);
-  var aElevNorm = new Float32Array(count);
-  var aIsLand = new Float32Array(count);
-  var aTideAmp = new Float32Array(count);
-  var aTidePhase = new Float32Array(count);
-  var aRevealPhase = new Float32Array(count);
-  var aSwapPhase = new Float32Array(count);
+  var aPhysA = new Float32Array(count * 4);
+  var aPhysB = new Float32Array(count * 4);
   var aColor = new Float32Array(count * 3);
   var aGridUV = new Float32Array(count * 2);
+  // Kept as a plain array too: buildRelief needs to read elevation back.
+  var aElevNorm = new Float32Array(count);
+  var aInvArea = new Float32Array(count);
 
   (function buildWorld(){
     var raw = decodeBase64(WORLD_DATA_B64);
@@ -667,6 +660,14 @@ var POPULATION_DATA_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     for (var j = 0; j < ROWS; j++){
       var ny = j / ROWS;
       var worldZ = (j - ROWS / 2 + 0.5) * SPACING;
+
+      // Cell area on a sphere falls off with the cosine of latitude, so a
+      // one-degree cell near the poles covers far less ground than one at
+      // the equator. Dividing an evenly spread population by that area is
+      // what turns "people per cell" into something density-like.
+      var latRad = (0.5 - (j + 0.5) / ROWS) * Math.PI;
+      var cosLat = Math.max(0.10, Math.cos(latRad));
+
       for (var i = 0; i < COLS; i++, idx++, off += 5){
         var e = view.getInt8(off);
         var r = view.getUint8(off + 1);
@@ -683,23 +684,179 @@ var POPULATION_DATA_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
         aOffset[idx * 2] = worldX;
         aOffset[idx * 2 + 1] = worldZ;
-        aElevNorm[idx] = elevNorm;
-        aIsLand[idx] = isLand ? 1 : 0;
-        aTideAmp[idx] = t / 255;
-        aTidePhase[idx] = (i / COLS) * Math.PI * 2 * 1.6 + (rng() - 0.5) * 0.6;
-        aRevealPhase[idx] = radial;
-        aSwapPhase[idx] = clamp01((i / COLS) + (rng() - 0.5) * 0.06);
+
+        aPhysA[idx * 4]     = elevNorm;
+        aPhysA[idx * 4 + 1] = isLand ? 1 : 0;
+        aPhysA[idx * 4 + 2] = t / 255;
+        aPhysA[idx * 4 + 3] = (i / COLS) * Math.PI * 2 * 1.6 + (rng() - 0.5) * 0.6;
+
+        aPhysB[idx * 4]     = radial;
+        aPhysB[idx * 4 + 1] = clamp01((i / COLS) + (rng() - 0.5) * 0.06);
+        // aPhysB.z (relief) is filled by buildRelief once elevation is known.
+        aPhysB[idx * 4 + 3] = 1 / cosLat;
+
         aColor[idx * 3] = r / 255;
         aColor[idx * 3 + 1] = g / 255;
         aColor[idx * 3 + 2] = b / 255;
         aGridUV[idx * 2] = i;
         aGridUV[idx * 2 + 1] = j;
+
+        aElevNorm[idx] = elevNorm;
+        aInvArea[idx] = 1 / cosLat;
+      }
+    }
+  })();
+
+  // Local relief: how far elevation swings across the eight neighbours of
+  // each cell. Mountain chains and continental shelves light up; plains and
+  // abyssal basins stay flat. Same ETOPO grid as the elevation mode, just
+  // read for its gradient instead of its value.
+  (function buildRelief(){
+    for (var j = 0; j < ROWS; j++){
+      for (var i = 0; i < COLS; i++){
+        var mn = 1e9, mx = -1e9;
+        for (var dj = -1; dj <= 1; dj++){
+          var jj = j + dj;
+          if (jj < 0 || jj >= ROWS) continue;
+          for (var di = -1; di <= 1; di++){
+            var ii = (i + di + COLS) % COLS;   // wrap across the dateline
+            var v = aElevNorm[jj * COLS + ii];
+            if (v < mn) mn = v;
+            if (v > mx) mx = v;
+          }
+        }
+        aPhysB[(j * COLS + i) * 4 + 2] = clamp01((mx - mn) / 0.55);
       }
     }
   })();
 
   // population texture data: N_FRAMES stacked vertically, each COLS wide x ROWS tall
   var popTextureData = decodeBase64(POPULATION_DATA_B64); // length COLS*ROWS*N_FRAMES
+
+  // Normalisation constants for the two derived population views, measured
+  // from the data itself rather than guessed. Normalising by the single
+  // largest cell would let one outlier (a dense metropolitan cell, or a
+  // country whose estimate jumps between two sources) flatten everything
+  // else into the bottom of the ramp. A high percentile is used instead, so
+  // the visible range covers what almost every cell actually does, and only
+  // genuine extremes clip at the top.
+  var densityNorm = 1, growthNorm = 1;
+  (function measureDerived(){
+    var BINS = 2048;
+    var densHist = new Int32Array(BINS), densMax = 0;
+    var growHist = new Int32Array(BINS), growMax = 0;
+    var densN = 0, growN = 0;
+    var frameSize = COLS * ROWS;
+    var f, k, p, d, gdiff;
+
+    // First pass: the true maxima, needed to scale the histograms.
+    for (f = 0; f < N_FRAMES; f++){
+      var base = f * frameSize, prev = (f - 1) * frameSize;
+      for (k = 0; k < frameSize; k++){
+        p = popTextureData[base + k] / 255;
+        if (p <= 0) continue;
+        d = p * aInvArea[k];
+        if (d > densMax) densMax = d;
+        if (f > 0){
+          gdiff = p - popTextureData[prev + k] / 255;
+          if (gdiff > growMax) growMax = gdiff;
+        }
+      }
+    }
+    if (densMax <= 0) densMax = 1;
+    if (growMax <= 0) growMax = 1;
+
+    // Second pass: bin every non-zero value.
+    for (f = 0; f < N_FRAMES; f++){
+      var base2 = f * frameSize, prev2 = (f - 1) * frameSize;
+      for (k = 0; k < frameSize; k++){
+        p = popTextureData[base2 + k] / 255;
+        if (p <= 0) continue;
+        d = p * aInvArea[k];
+        densHist[Math.min(BINS - 1, (d / densMax * BINS) | 0)]++;
+        densN++;
+        if (f > 0){
+          gdiff = p - popTextureData[prev2 + k] / 255;
+          if (gdiff > 0){
+            growHist[Math.min(BINS - 1, (gdiff / growMax * BINS) | 0)]++;
+            growN++;
+          }
+        }
+      }
+    }
+
+    function percentile(hist, total, max, q){
+      if (total === 0) return max;
+      var target = total * q, running = 0;
+      for (var i = 0; i < BINS; i++){
+        running += hist[i];
+        if (running >= target) return ((i + 1) / BINS) * max;
+      }
+      return max;
+    }
+
+    densityNorm = percentile(densHist, densN, densMax, 0.992);
+    growthNorm = percentile(growHist, growN, growMax, 0.995);
+    if (densityNorm <= 0) densityNorm = densMax;
+    if (growthNorm <= 0) growthNorm = growMax;
+  })();
+
+  // ---------------------------------------------------------------
+  // Mode table
+  //
+  // Everything that differs between datasets lives here: the label on the
+  // button, the legend, which controls it needs, and where its numbers come
+  // from. Adding a dataset means adding a row, not touching the UI code.
+  // ---------------------------------------------------------------
+  var MODES = [
+    {
+      id: 'elev', label: 'Elevation', shaderId: 0,
+      rows: [
+        { label: 'Seafloor', ramp: ['#0a1b33', '#12586a', '#bfe6de'] },
+        { label: 'Land',     ramp: ['#233d24', '#8e7549', '#f6f4ec'] }
+      ],
+      ends: ['trench', 'sea level', 'peak'],
+      source: 'NOAA ETOPO1 &middot; GSHHS coastline'
+    },
+    {
+      id: 'relief', label: 'Relief', shaderId: 5,
+      rows: [ { label: 'Ruggedness', ramp: ['#101b2b', '#5d6b7d', '#f2e6cd'] } ],
+      ends: ['flat', '', 'steep'],
+      source: 'derived &middot; local range in the ETOPO grid'
+    },
+    {
+      id: 'tide', label: 'Tides', shaderId: 1, tide: true,
+      rows: [ { label: 'Water', ramp: ['#083c47', '#3fb9c4', '#e0f8f4'] } ],
+      ends: ['low tide', '', 'high tide'],
+      source: 'stylized &middot; by coastal proximity'
+    },
+    {
+      id: 'pop', label: 'Population', shaderId: 2, year: true, needsVertexTex: true,
+      rows: [ { label: 'People', ramp: ['#241234', '#a13d63', '#ffcf6b'] } ],
+      ends: ['sparse', '', 'dense'],
+      source: 'Gapminder &middot; HYDE &middot; UN'
+    },
+    {
+      id: 'dens', label: 'Density', shaderId: 3, year: true, needsVertexTex: true,
+      rows: [ { label: 'Per km²', ramp: ['#1b1030', '#4d6bb3', '#9fe8ff'] } ],
+      ends: ['empty', '', 'crowded'],
+      source: 'derived &middot; population per unit land area'
+    },
+    {
+      id: 'growth', label: 'Growth', shaderId: 4, year: true, needsVertexTex: true,
+      // 1800 is the first year on record, so it has no previous decade to be
+      // compared against and would render as a flat, empty world. The mode
+      // starts at the second keyframe instead.
+      minYear: 1810,
+      rows: [ { label: 'Added', ramp: ['#12210f', '#4f9b3f', '#f4ff9b'] } ],
+      ends: ['none', '', 'fastest'],
+      source: 'derived &middot; change since the previous decade'
+    }
+  ];
+  function modeById(id){
+    for (var i = 0; i < MODES.length; i++) if (MODES[i].id === id) return MODES[i];
+    return MODES[0];
+  }
 
   // ---------------------------------------------------------------
   // Scene
@@ -720,17 +877,27 @@ var POPULATION_DATA_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
   var supportsPop = !!(renderer.capabilities && renderer.capabilities.vertexTextures);
 
   var scene = new THREE.Scene();
-  var camera = new THREE.PerspectiveCamera(40, 1, 0.1, 1000);
+  // A narrow field of view flattens the perspective, which is what lets the
+  // map read as a flat sheet that happens to have depth rather than as a
+  // scene you are standing inside.
+  var camera = new THREE.PerspectiveCamera(26, 1, 0.1, 2000);
 
-  var geo = new THREE.BoxGeometry(1, 1, 1);
-  geo.translate(0, 0.5, 0);
+  // An InstancedBufferGeometry driven by a plain Mesh rather than an
+  // InstancedMesh: the latter always carries a per-instance mat4, four more
+  // attribute slots this shader never uses, since every column is placed by
+  // aOffset instead. The box's uv is dropped for the same reason.
+  var box = new THREE.BoxGeometry(1, 1, 1);
+  box.translate(0, 0.5, 0);
+  box.deleteAttribute('uv');
+
+  var geo = new THREE.InstancedBufferGeometry();
+  geo.index = box.index;
+  geo.setAttribute('position', box.attributes.position);
+  geo.setAttribute('normal', box.attributes.normal);
+  geo.instanceCount = count;
   geo.setAttribute('aOffset', new THREE.InstancedBufferAttribute(aOffset, 2));
-  geo.setAttribute('aElevNorm', new THREE.InstancedBufferAttribute(aElevNorm, 1));
-  geo.setAttribute('aIsLand', new THREE.InstancedBufferAttribute(aIsLand, 1));
-  geo.setAttribute('aTideAmp', new THREE.InstancedBufferAttribute(aTideAmp, 1));
-  geo.setAttribute('aTidePhase', new THREE.InstancedBufferAttribute(aTidePhase, 1));
-  geo.setAttribute('aRevealPhase', new THREE.InstancedBufferAttribute(aRevealPhase, 1));
-  geo.setAttribute('aSwapPhase', new THREE.InstancedBufferAttribute(aSwapPhase, 1));
+  geo.setAttribute('aPhysA', new THREE.InstancedBufferAttribute(aPhysA, 4));
+  geo.setAttribute('aPhysB', new THREE.InstancedBufferAttribute(aPhysB, 4));
   geo.setAttribute('aColor', new THREE.InstancedBufferAttribute(aColor, 3));
   geo.setAttribute('aGridUV', new THREE.InstancedBufferAttribute(aGridUV, 2));
 
@@ -748,43 +915,55 @@ var POPULATION_DATA_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
   var uniforms = {
     uTime: { value: 0 },
     uTideSpeed: { value: 1.6 },
-    uModeMix: { value: 0 },
-    uPopMix: { value: 0 },
+    uModeA: { value: 0 },
+    uModeB: { value: 0 },
+    uMorph: { value: 1 },
     uReveal: { value: 0 },
-    uFootprint: { value: 0.78 },
-    uLightDir: { value: new THREE.Vector3(0.45, 0.86, 0.32).normalize() },
+    uFootprint: { value: 0.86 },
+    uLightDir: { value: new THREE.Vector3(0.42, 0.80, 0.43).normalize() },
     uFogColor: { value: new THREE.Color(0x080d16) },
-    uFogNear: { value: 430 },
-    uFogFar: { value: 860 },
+    uFogNear: { value: 620 },
+    uFogFar: { value: 1250 },
     uPopTexture: { value: popTexture },
     uYearIndexLow: { value: 0 },
-    uYearFrac: { value: 0 }
+    uYearFrac: { value: 0 },
+    uDensityNorm: { value: densityNorm },
+    uGrowthNorm: { value: growthNorm }
   };
 
   var vertexShader = [
     'attribute vec2 aOffset;',
-    'attribute float aElevNorm;',
-    'attribute float aIsLand;',
-    'attribute float aTideAmp;',
-    'attribute float aTidePhase;',
-    'attribute float aRevealPhase;',
-    'attribute float aSwapPhase;',
+    'attribute vec4 aPhysA;',   // elevNorm, isLand, tideAmp, tidePhase
+    'attribute vec4 aPhysB;',   // revealPhase, swapPhase, relief, invArea
     'attribute vec3 aColor;',
     'attribute vec2 aGridUV;',
 
+    '#define aElevNorm     aPhysA.x',
+    '#define aIsLand       aPhysA.y',
+    '#define aTideAmp      aPhysA.z',
+    '#define aTidePhase    aPhysA.w',
+    '#define aRevealPhase  aPhysB.x',
+    '#define aSwapPhase    aPhysB.y',
+    '#define aRelief       aPhysB.z',
+    '#define aInvArea      aPhysB.w',
+
     'uniform float uTime;',
     'uniform float uTideSpeed;',
-    'uniform float uModeMix;',
-    'uniform float uPopMix;',
+    'uniform int uModeA;',
+    'uniform int uModeB;',
+    'uniform float uMorph;',
     'uniform float uReveal;',
     'uniform float uFootprint;',
     'uniform sampler2D uPopTexture;',
     'uniform float uYearIndexLow;',
     'uniform float uYearFrac;',
+    'uniform float uDensityNorm;',
+    'uniform float uGrowthNorm;',
 
     'varying vec3 vColor;',
     'varying vec3 vNormal;',
     'varying float vViewZ;',
+    'varying float vLocalY;',
 
     'const float MIN_H = ' + MIN_H.toFixed(3) + ';',
     'const float MAX_H = ' + MAX_H.toFixed(3) + ';',
@@ -805,11 +984,30 @@ var POPULATION_DATA_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     '  return col;',
     '}',
 
+    // Every dataset's height and colour is computed once into a global, then
+    // picked from twice: once for the mode being left, once for the mode
+    // being entered. Globals rather than parameters purely so pick() can see
+    // them without a twelve-argument signature.
+    'float gH[6];',
+    'vec3  gC[6];',
+
+    'void pick(int m, out float h, out vec3 c){',
+    '  if (m == 0){ h = gH[0]; c = gC[0]; }',
+    '  else if (m == 1){ h = gH[1]; c = gC[1]; }',
+    '  else if (m == 2){ h = gH[2]; c = gC[2]; }',
+    '  else if (m == 3){ h = gH[3]; c = gC[3]; }',
+    '  else if (m == 4){ h = gH[4]; c = gC[4]; }',
+    '  else { h = gH[5]; c = gC[5]; }',
+    '}',
+
     'void main(){',
     '  float elevNorm01 = aElevNorm*0.5 + 0.5;',
 
-    '  float elevH = mix(MIN_H, MAX_H, pow(elevNorm01, aIsLand > 0.5 ? 1.12 : 0.88));',
+    // --- 0: elevation -------------------------------------------------
+    '  gH[0] = mix(MIN_H, MAX_H, pow(elevNorm01, aIsLand > 0.5 ? 1.12 : 0.88));',
+    '  gC[0] = aColor;',
 
+    // --- 1: tides -----------------------------------------------------
     '  float tideH;',
     '  if (aIsLand > 0.5) {',
     '    tideH = mix(MIN_H, MIN_H*2.4, elevNorm01*0.35 + 0.08);',
@@ -818,10 +1016,6 @@ var POPULATION_DATA_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     '    float base = mix(MIN_H*1.5, MAX_H*0.32, aTideAmp);',
     '    tideH = max(base + wave*aTideAmp*(MAX_H*0.30), MIN_H*0.8);',
     '  }',
-
-    '  float swapT = easeInOutCubic(staggered(uModeMix, aSwapPhase, 0.55));',
-    '  float baseH = mix(elevH, tideH, swapT);',
-
     '  vec3 slateA = vec3(0.20,0.23,0.28);',
     '  vec3 slateB = vec3(0.28,0.31,0.36);',
     '  vec3 slateC = vec3(0.36,0.40,0.45);',
@@ -829,25 +1023,57 @@ var POPULATION_DATA_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     '  vec3 tideB = vec3(0.247,0.725,0.769);',
     '  vec3 tideC = vec3(0.878,0.976,0.965);',
     '  float waterLevelT = clamp((tideH - MIN_H*0.8)/(MAX_H*0.62 - MIN_H*0.8), 0.0, 1.0);',
-    '  vec3 colorElev = aColor;',
-    '  vec3 colorTide = aIsLand > 0.5 ? ramp3(slateA, slateB, slateC, elevNorm01) : ramp3(tideA, tideB, tideC, waterLevelT);',
-    '  vec3 baseColor = mix(colorElev, colorTide, swapT);',
+    '  gH[1] = tideH;',
+    '  gC[1] = aIsLand > 0.5 ? ramp3(slateA, slateB, slateC, elevNorm01) : ramp3(tideA, tideB, tideC, waterLevelT);',
 
+    // --- 2: population, 3: density, 4: growth -------------------------
     '  float u = (aGridUV.x + 0.5) / COLS_F;',
     '  float vLow = (uYearIndexLow*ROWS_F + aGridUV.y + 0.5) / (ROWS_F*N_FRAMES_F);',
     '  float vHigh = ((uYearIndexLow+1.0)*ROWS_F + aGridUV.y + 0.5) / (ROWS_F*N_FRAMES_F);',
     '  float popLow = texture2D(uPopTexture, vec2(u, vLow)).r;',
     '  float popHigh = texture2D(uPopTexture, vec2(u, vHigh)).r;',
     '  float popNorm = mix(popLow, popHigh, uYearFrac);',
-    '  float popH = mix(MIN_H, MAX_H, pow(popNorm, 0.82));',
     '  vec3 popA = vec3(0.141,0.071,0.204);',
     '  vec3 popB = vec3(0.631,0.239,0.388);',
     '  vec3 popC = vec3(1.0,0.812,0.420);',
-    '  vec3 popColor = ramp3(popA, popB, popC, popNorm);',
+    '  gH[2] = mix(MIN_H, MAX_H, pow(popNorm, 0.82));',
+    '  gC[2] = ramp3(popA, popB, popC, popNorm);',
 
-    '  float popT = smoothstep(0.0, 1.0, uPopMix);',
-    '  float datasetH = mix(baseH, popH, popT);',
-    '  vec3 vColorPre = mix(baseColor, popColor, popT);',
+    '  float densNorm = clamp(popNorm*aInvArea/uDensityNorm, 0.0, 1.0);',
+    '  densNorm = pow(densNorm, 0.7);',
+    '  vec3 densA = vec3(0.106,0.063,0.188);',
+    '  vec3 densB = vec3(0.302,0.420,0.702);',
+    '  vec3 densC = vec3(0.624,0.910,1.0);',
+    '  gH[3] = mix(MIN_H, MAX_H, densNorm);',
+    '  gC[3] = ramp3(densA, densB, densC, densNorm);',
+
+    // Growth compares the frame being shown with the one before it, so the
+    // first decade in the record has nothing to compare against and reads
+    // as flat rather than as a world-wide surge.
+    '  float vPrev = (max(uYearIndexLow - 1.0, 0.0)*ROWS_F + aGridUV.y + 0.5) / (ROWS_F*N_FRAMES_F);',
+    '  float popPrev = texture2D(uPopTexture, vec2(u, vPrev)).r;',
+    '  float growth = clamp((popNorm - popPrev)/max(uGrowthNorm, 0.0001), 0.0, 1.0);',
+    '  growth = pow(growth, 0.85);',
+    '  vec3 growA = vec3(0.071,0.129,0.059);',
+    '  vec3 growB = vec3(0.310,0.608,0.247);',
+    '  vec3 growC = vec3(0.957,1.0,0.608);',
+    '  gH[4] = mix(MIN_H, MAX_H*0.92, growth);',
+    '  gC[4] = ramp3(growA, growB, growC, growth);',
+
+    // --- 5: relief ----------------------------------------------------
+    '  vec3 relA = vec3(0.063,0.106,0.169);',
+    '  vec3 relB = vec3(0.365,0.420,0.490);',
+    '  vec3 relC = vec3(0.949,0.902,0.804);',
+    '  gH[5] = mix(MIN_H, MAX_H*0.88, pow(aRelief, 0.75));',
+    '  gC[5] = ramp3(relA, relB, relC, aRelief);',
+
+    // --- blend between the outgoing and incoming dataset ---------------
+    '  float hA, hB; vec3 cA, cB;',
+    '  pick(uModeA, hA, cA);',
+    '  pick(uModeB, hB, cB);',
+    '  float swapT = easeInOutCubic(staggered(uMorph, aSwapPhase, 0.55));',
+    '  float datasetH = mix(hA, hB, swapT);',
+    '  vec3 vColorPre = mix(cA, cB, smoothstep(0.0, 1.0, uMorph));',
 
     '  float revealT = easeOutCubic(staggered(uReveal, aRevealPhase, 0.62));',
     '  float finalH = max(datasetH * revealT, 0.012);',
@@ -862,6 +1088,7 @@ var POPULATION_DATA_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     '  vViewZ = -mvPosition.z;',
     '  vNormal = normalize(normalMatrix * normal);',
     '  vColor = vColorPre;',
+    '  vLocalY = position.y;',   // 0 at the foot of a column, 1 at its cap
     '}'
   ].join('\n');
 
@@ -869,6 +1096,7 @@ var POPULATION_DATA_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     'varying vec3 vColor;',
     'varying vec3 vNormal;',
     'varying float vViewZ;',
+    'varying float vLocalY;',
 
     'uniform vec3 uLightDir;',
     'uniform vec3 uFogColor;',
@@ -879,8 +1107,20 @@ var POPULATION_DATA_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     '  vec3 N = normalize(vNormal);',
     '  float diff = max(dot(N, normalize(uLightDir)), 0.0);',
     '  float top = max(N.y, 0.0);',
-    '  vec3 lit = vColor * (0.40 + 0.46*diff + 0.24*top);',
-    '  float rim = pow(1.0 - abs(N.z), 2.0) * 0.05;',
+    // Stronger directional term than a flat ambient would give: with the
+    // camera looking down, the two visible side faces need to read as
+    // clearly lit and clearly shadowed or the field flattens out.
+    '  vec3 lit = vColor * (0.26 + 0.62*diff + 0.26*top);',
+
+    // Cheap ambient occlusion. Real shadow maps across 64,800 instances are
+    // not worth the cost; darkening the sides towards their base fakes the
+    // contact shadow that sells the columns as standing on a surface, and
+    // costs one varying.
+    '  float sideness = 1.0 - abs(N.y);',
+    '  float ao = mix(0.42, 1.0, pow(clamp(vLocalY, 0.0, 1.0), 0.7));',
+    '  lit *= mix(1.0, ao, sideness);',
+
+    '  float rim = pow(1.0 - abs(N.z), 2.0) * 0.04;',
     '  lit += rim;',
     '  float fogF = clamp((vViewZ - uFogNear)/(uFogFar - uFogNear), 0.0, 1.0);',
     '  vec3 finalColor = mix(lit, uFogColor, fogF);',
@@ -894,15 +1134,35 @@ var POPULATION_DATA_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     fragmentShader: fragmentShader
   });
 
-  var mesh = new THREE.InstancedMesh(geo, material, count);
+  var mesh = new THREE.Mesh(geo, material);
   mesh.frustumCulled = false;
   scene.add(mesh);
 
   // ---------------------------------------------------------------
-  // Camera orbit
+  // Camera
+  //
+  // The default is close to a plan view, tipped just far enough that the
+  // columns show their sides: a map first, a model second. There is no idle
+  // auto-rotation. The map holds whatever orientation you leave it in, and
+  // switching dataset never moves it.
   // ---------------------------------------------------------------
-  var cam = { theta: 0.62, phi: 0.96, radius: 560 };
-  var minRadius = 180, maxRadius = 980;
+  var HOME = { theta: 0, phi: 0.56 };
+  var cam = { theta: HOME.theta, phi: HOME.phi, radius: 700 };
+  var minRadius = 200, maxRadius = 1400;
+  var userZoomed = false;
+
+  // Frame the whole 360x180 grid for the current aspect ratio, so the map
+  // fills a wide desktop plate and still fits inside a narrow phone one.
+  function fitRadius(){
+    var vFov = camera.fov * Math.PI / 180;
+    var aspect = camera.aspect || 1;
+    var hFov = 2 * Math.atan(Math.tan(vFov / 2) * aspect);
+    var halfW = COLS * SPACING * 0.5 + 8;
+    var halfD = ROWS * SPACING * 0.5 + 8;
+    var needW = halfW / Math.tan(hFov / 2);
+    var needD = (halfD * Math.cos(cam.phi)) / Math.tan(vFov / 2);
+    return Math.min(maxRadius, Math.max(minRadius, Math.max(needW, needD) * 1.06));
+  }
 
   function updateCamera(){
     var sp = Math.sin(cam.phi), cp = Math.cos(cam.phi);
@@ -913,9 +1173,27 @@ var POPULATION_DATA_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     );
     camera.lookAt(0, 4, 0);
   }
-  updateCamera();
 
-  var dragging = false, lastX = 0, lastY = 0, lastInteract = 0;
+  var resetBtn = document.getElementById('resetview');
+  function movedFromHome(){
+    return Math.abs(cam.theta - HOME.theta) > 0.02 ||
+           Math.abs(cam.phi - HOME.phi) > 0.02 ||
+           userZoomed;
+  }
+  function refreshResetBtn(){
+    if (resetBtn) resetBtn.classList.toggle('show', movedFromHome());
+  }
+  function resetView(){
+    cam.theta = HOME.theta;
+    cam.phi = HOME.phi;
+    userZoomed = false;
+    cam.radius = fitRadius();
+    updateCamera();
+    refreshResetBtn();
+  }
+  if (resetBtn) resetBtn.addEventListener('click', resetView);
+
+  var dragging = false, lastX = 0, lastY = 0;
   canvas.addEventListener('pointerdown', function(e){
     dragging = true; lastX = e.clientX; lastY = e.clientY;
     canvas.setPointerCapture(e.pointerId);
@@ -925,16 +1203,19 @@ var POPULATION_DATA_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     var dx = e.clientX - lastX, dy = e.clientY - lastY;
     lastX = e.clientX; lastY = e.clientY;
     cam.theta -= dx * 0.0055;
-    cam.phi = Math.min(1.48, Math.max(0.32, cam.phi - dy * 0.0045));
-    lastInteract = performance.now();
+    // Never allow a view from below the horizon, and never quite straight
+    // down, where the columns would lose their sides entirely.
+    cam.phi = Math.min(1.40, Math.max(0.12, cam.phi - dy * 0.0045));
     updateCamera();
+    refreshResetBtn();
   });
   window.addEventListener('pointerup', function(){ dragging = false; });
   canvas.addEventListener('wheel', function(e){
     e.preventDefault();
-    cam.radius = Math.min(maxRadius, Math.max(minRadius, cam.radius + e.deltaY * 0.12));
-    lastInteract = performance.now();
+    cam.radius = Math.min(maxRadius, Math.max(minRadius, cam.radius + e.deltaY * 0.16));
+    userZoomed = true;
     updateCamera();
+    refreshResetBtn();
   }, { passive: false });
 
   function resize(){
@@ -943,42 +1224,103 @@ var POPULATION_DATA_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
+    if (!userZoomed) cam.radius = fitRadius();
+    updateCamera();
   }
   window.addEventListener('resize', resize);
   resize();
+  resetView();
 
   // ---------------------------------------------------------------
   // UI wiring
   // ---------------------------------------------------------------
-  var modeTarget = 0, popTarget = 0, revealTarget = 1;
-  var modeMixState = 0, popMixState = 0, revealState = reduceMotion ? 1 : 0;
-  var MODE_DURATION = 1.7, REVEAL_DURATION = 2.0, POP_DURATION = 1.4;
+  var revealTarget = 1;
+  var revealState = reduceMotion ? 1 : 0;
+  var MODE_DURATION = 1.7, REVEAL_DURATION = 2.0;
+
+  var morph = 1;
+  var currentMode = MODES[0];
 
   var legendEl = document.getElementById('legend');
-  var modeButtons = document.querySelectorAll('.mode-btn');
-  var popBtn = document.querySelector('.mode-btn[data-mode="pop"]');
-  if (!supportsPop && popBtn) {
-    popBtn.disabled = true;
-    popBtn.title = 'Population mode needs vertex texture support, unavailable on this device.';
-    popBtn.style.opacity = '0.35';
-    popBtn.style.cursor = 'not-allowed';
+  var modebarEl = document.getElementById('modebar');
+
+  function rampCss(stops){
+    return 'linear-gradient(90deg,' + stops.join(',') + ')';
   }
 
-  modeButtons.forEach(function(btn){
-    btn.addEventListener('click', function(){
-      var mode = btn.getAttribute('data-mode');
-      if (mode === 'pop' && !supportsPop) return;
-      modeButtons.forEach(function(b){ b.classList.toggle('is-active', b === btn); });
-      stageEl.setAttribute('data-mode', mode);
-      legendEl.setAttribute('data-mode', mode);
-      if (mode === 'pop') {
-        popTarget = 1;
-      } else {
-        popTarget = 0;
-        modeTarget = mode === 'tide' ? 1 : 0;
-      }
+  function renderLegend(mode){
+    var html = '';
+    for (var i = 0; i < mode.rows.length; i++){
+      var row = mode.rows[i];
+      html += '<div class="legend-row"><span class="legend-label">' + row.label +
+              '</span><span class="legend-bar" style="background:' + rampCss(row.ramp) + '"></span></div>';
+    }
+    if (mode.ends){
+      html += '<div class="legend-ends">';
+      for (var k = 0; k < mode.ends.length; k++) html += '<span>' + mode.ends[k] + '</span>';
+      html += '</div>';
+    }
+    html += '<div class="legend-src">' + mode.source + '</div>';
+    legendEl.innerHTML = html;
+  }
+
+  function setMode(mode){
+    if (mode === currentMode) return;
+    if (mode.needsVertexTex && !supportsPop) return;
+    // The mode being left is frozen as A, the new one becomes B, and the
+    // morph runs from one to the other. The camera is deliberately not
+    // touched here: changing dataset must never change orientation.
+    uniforms.uModeA.value = currentMode.shaderId;
+    uniforms.uModeB.value = mode.shaderId;
+    morph = 0;
+    uniforms.uMorph.value = 0;
+    currentMode = mode;
+
+    var btns = modebarEl.querySelectorAll('.mode-btn');
+    for (var i = 0; i < btns.length; i++){
+      btns[i].classList.toggle('is-active', btns[i].getAttribute('data-mode') === mode.id);
+      btns[i].setAttribute('aria-pressed', btns[i].getAttribute('data-mode') === mode.id ? 'true' : 'false');
+    }
+    stageEl.setAttribute('data-mode', mode.id);
+    stageEl.setAttribute('data-tide', mode.tide ? '1' : '0');
+    stageEl.setAttribute('data-year', mode.year ? '1' : '0');
+    renderLegend(mode);
+    applyYearFloor(mode);
+  }
+
+  // A mode may not be defined for the whole record. The slider's floor moves
+  // with it, and the year is carried up if it was below the new floor.
+  function applyYearFloor(mode){
+    var floor = mode.minYear || 1800;
+    yearInput.min = floor;
+    if (currentYear < floor) setYear(floor);
+  }
+
+  (function buildModebar(){
+    var html = '';
+    for (var i = 0; i < MODES.length; i++){
+      var m = MODES[i];
+      var disabled = (m.needsVertexTex && !supportsPop);
+      html += '<button class="mode-btn' + (i === 0 ? ' is-active' : '') + '" data-mode="' + m.id +
+              '" type="button" aria-pressed="' + (i === 0 ? 'true' : 'false') + '"' +
+              (disabled ? ' disabled title="Needs vertex texture support, unavailable on this device." style="opacity:0.35;cursor:not-allowed"' : '') +
+              '>' + m.label + '</button>';
+    }
+    modebarEl.innerHTML = html;
+    modebarEl.addEventListener('click', function(e){
+      var btn = e.target.closest ? e.target.closest('.mode-btn') : null;
+      if (!btn || btn.disabled) return;
+      setMode(modeById(btn.getAttribute('data-mode')));
     });
-  });
+  })();
+
+  // Prime the UI for the starting mode without running a transition.
+  uniforms.uModeA.value = MODES[0].shaderId;
+  uniforms.uModeB.value = MODES[0].shaderId;
+  stageEl.setAttribute('data-mode', MODES[0].id);
+  stageEl.setAttribute('data-tide', MODES[0].tide ? '1' : '0');
+  stageEl.setAttribute('data-year', MODES[0].year ? '1' : '0');
+  renderLegend(MODES[0]);
 
   var speedInput = document.getElementById('speed');
   var speedVal = document.getElementById('speedVal');
@@ -1045,24 +1387,20 @@ var POPULATION_DATA_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     last = now;
     time += dt;
 
-    modeMixState = approach(modeMixState, modeTarget, dt / MODE_DURATION);
-    popMixState = approach(popMixState, popTarget, dt / POP_DURATION);
+    morph = approach(morph, 1, dt / MODE_DURATION);
     revealState = approach(revealState, revealTarget, dt / REVEAL_DURATION);
 
     if (playing && !reduceMotion) {
+      // Loop back to the current mode's own start, not the record's, so
+      // Growth does not drop into the decade it cannot describe.
+      var floor = currentMode.minYear || 1800;
       var next = currentYear + dt * PLAY_YEARS_PER_SEC;
-      if (next > 2023) next = 1800;
+      if (next > 2023) next = floor;
       setYear(next);
     }
 
-    if (!reduceMotion && !dragging && (now - lastInteract) > 2600) {
-      cam.theta += dt * 0.024;
-      updateCamera();
-    }
-
     uniforms.uTime.value = time;
-    uniforms.uModeMix.value = modeMixState;
-    uniforms.uPopMix.value = popMixState;
+    uniforms.uMorph.value = morph;
     uniforms.uReveal.value = revealState;
 
     renderer.render(scene, camera);
@@ -1099,7 +1437,7 @@ var POPULATION_DATA_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     }
 
     // The stage is now sized by its container rather than the viewport, so
-    // watch the box itself — a width change from the layout (not just a
+    // watch the box itself: a width change from the layout (not just a
     // window resize) still has to reach the renderer.
     var stageEl = document.getElementById('stage');
     if(stageEl && 'ResizeObserver' in window){

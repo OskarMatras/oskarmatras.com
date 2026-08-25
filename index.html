@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Oskar Matras — CV</title>
-<meta name="description" content="Oskar Matras — CV og profil.">
+<title>Oskar Matras · CV</title>
+<meta name="description" content="Oskar Matras · CV og profil.">
+<link rel="canonical" href="https://OskarMatras.com/">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -62,7 +63,7 @@
   }
   .brand{font-family:'Fraunces', serif; font-weight:600; font-size:1.05rem; text-decoration:none; letter-spacing:-0.01em; flex-shrink:0;}
   /* Nav scrolls horizontally within its own box instead of ever forcing the
-     page itself to grow wider than the viewport — the classic cause of
+     page itself to grow wider than the viewport, the classic cause of
      mobile browsers letting you pinch-zoom out into empty space. Below
      640px this is replaced entirely by a dropdown (see .nav-toggle rules),
      since scrolling a nav bar is easy to miss on a phone. */
@@ -96,7 +97,7 @@
   nav.main a:hover{color:var(--navy);}
   nav.main a:hover::after{transform-origin:left; transform:scaleX(1);}
 
-  /* Hamburger toggle — hidden on desktop, shown only under the mobile
+  /* Hamburger toggle: hidden on desktop, shown only under the mobile
      breakpoint where nav.main switches from a horizontal row to a
      full-width dropdown panel. */
   .nav-toggle{
@@ -158,7 +159,7 @@
 
   /* ---------------- Ambient boids background ----------------
      A full-viewport, fixed canvas runs a small flocking simulation behind
-     everything, all the time — so no matter how far down the page you've
+     everything, all the time, so no matter how far down the page you have
      scrolled, something is quietly moving back there. Content sections sit
      above it with a translucent, blurred background so text stays legible
      while the motion still reads through faintly. */
@@ -176,7 +177,7 @@
   /* ---------------- Corner flower ----------------
      A small ornament built entirely from layered sine waves, fixed with its
      own center pinned exactly to the top-right corner of the viewport, so
-     only a quarter of it ever shows — spinning there permanently, through
+     only a quarter of it ever shows, spinning there permanently, through
      every section, at every scroll position. The canvas itself pokes past
      the right/top edge on purpose (that's how only a quarter shows); it
      sits inside a viewport-sized, overflow:hidden clip box so that poking-out
@@ -196,7 +197,7 @@
     pointer-events:none;
   }
   @media (max-width: 700px){
-    /* On phones, don't also push the canvas above the top edge — between
+    /* On phones, don't also push the canvas above the top edge. Between
        that and the notch/status bar area, the quarter that showed on
        desktop was getting eaten down to almost nothing. Only offset
        horizontally, so the inward-facing half of the flower shows in full
@@ -214,7 +215,7 @@
   }
   .section-head h2{font-size:clamp(1.6rem, 3vw, 2.1rem); margin-top:8px;}
   /* Content sections sit above the boids canvas on a light, barely-there
-     tint — just enough to keep text contrast solid, while the flock still
+     tint, just enough to keep text contrast solid, while the flock still
      reads clearly through every section, not just the hero. */
   section.block{
     padding:64px 0;
@@ -333,7 +334,7 @@
     font-size:0.88rem; background:var(--cream);
   }
 
-  /* ---------------- Contact — same living-border + magnetic tilt/deform as the cards ---------------- */
+  /* ---------------- Contact: same living-border + magnetic tilt/deform as the cards ---------------- */
   .contact-box{
     position:relative;
     background:var(--navy); color:var(--cream);
@@ -383,7 +384,7 @@
 </head>
 <body>
 
-<!-- Fixed, full-page ambient boids animation — always moving, everywhere on the page -->
+<!-- Fixed, full-page ambient boids animation: always moving, everywhere on the page -->
 <canvas id="boids-bg" aria-hidden="true"></canvas>
 <div id="corner-flower-clip"><canvas id="corner-flower" aria-hidden="true"></canvas></div>
 
@@ -399,7 +400,7 @@
       <a href="#praktik">Praktik</a>
       <a href="#uddannelse">Uddannelse</a>
       <a href="#kompetencer">Kompetencer</a>
-      <a href="/projects">Projekter</a>
+      <a href="/Projects">Projekter</a>
       <a href="#kontakt">Kontakt</a>
     </nav>
   </div>
@@ -437,13 +438,13 @@
           <span class="tag">Startup</span>
           <h3>FoodVoice</h3>
           <p>Lead server-tekniker og AI-specialist. Står for kundekontakt og er ansigtet udadtil for firmaet.</p>
-          <div class="period">2026 — nu</div>
+          <div class="period">2026–nu</div>
         </div>
         <div class="card">
           <span class="tag">Forening · Stifter</span>
           <h3>FysFolk</h3>
           <p>Stiftet forening for fysik-interesserede unge. Stadig et lille hobbyprojekt ved siden af.</p>
-          <div class="period">2026 — nu</div>
+          <div class="period">2026–nu</div>
         </div>
       </div>
     </div>
@@ -462,7 +463,7 @@
           <div class="content">
             <div class="role">Lead server-tekniker &amp; AI-specialist</div>
             <div class="org">FoodVoice (Startup)</div>
-            <div class="period">2026 — nu</div>
+            <div class="period">2026–nu</div>
             <p>Ansvarlig for kundekontakt og fungerer som firmaets udadvendte ansigt, samtidig med teknisk drift og AI-relateret arbejde.</p>
           </div>
         </div>
@@ -480,7 +481,7 @@
           <div class="content">
             <div class="role">Sælger → salgsoplæring</div>
             <div class="org">LeadDoubler</div>
-            <div class="period">2023 — 2024</div>
+            <div class="period">2023–2024</div>
             <p>Startede som sælger og gik videre til at stå for oplæring af nye sælgere.</p>
           </div>
         </div>
@@ -522,7 +523,7 @@
             <div class="role">Børnehavepraktik</div>
             <div class="org">Pædagogisk praktik</div>
             <div class="period">1 uge</div>
-            <p>Arbejdede som pædagog i en uge — en af de hyggeligste oplevelser jeg har haft. Fik en hjemmemalet kop af et af børnene.</p>
+            <p>Arbejdede som pædagog i en uge. En af de hyggeligste oplevelser jeg har haft. Fik en hjemmemalet kop af et af børnene.</p>
           </div>
         </div>
       </div>
@@ -540,9 +541,9 @@
         <div class="titem">
           <div class="dot"></div>
           <div class="content">
-            <div class="role">STX — Mat/Fys og Bioteknologi-linje</div>
+            <div class="role">STX, Mat/Fys og Bioteknologi-linje</div>
             <div class="org">Vordingborg Gymnasium og HF</div>
-            <div class="period">2023 — 2026</div>
+            <div class="period">2023–2026</div>
             <p>Startede årgang 2023/2024, blev student i 2026.</p>
           </div>
         </div>
@@ -576,7 +577,7 @@
     <div class="wrap">
       <div class="contact-box">
         <h2>Lad os tale sammen</h2>
-        <p>Har du en opgave, et job eller bare lyst til at sige hej? Skriv eller ring til mig — telefon foretrækkes.</p>
+        <p>Har du en opgave, et job eller bare lyst til at sige hej? Skriv eller ring til mig; telefon foretrækkes.</p>
         <div class="cta-row">
           <a class="btn primary" href="tel:+4561607471">Ring: 61 60 74 71</a>
           <a class="btn ghost" href="mailto:Oskarstanislav@gmail.com">Oskarstanislav@gmail.com</a>
@@ -627,7 +628,7 @@
     var isContact = el.classList.contains('contact-box');
     var base = isContact ? 20 : (isFeature ? 18 : 16);
     // The contact box is much larger than a card, so it gets a gentler
-    // tilt/deform intensity — enough to feel alive without looking odd.
+    // tilt/deform intensity: enough to feel alive without looking odd.
     var tiltAmp = isContact ? 8 : 18;
     var deformAmp = isContact ? 30 : 26;
     var lift = isContact ? -4 : -8;
@@ -683,7 +684,7 @@
   });
 
   // Ambient boids: a small flock drifts across a fixed, full-viewport canvas
-  // behind the whole page, all the time — independent of scroll position —
+  // behind the whole page, all the time, independent of scroll position,
   // using a standard alignment/cohesion/separation flocking model.
   (function(){
     var canvas = document.getElementById('boids-bg');
@@ -786,7 +787,7 @@
     requestAnimationFrame(loop);
   })();
 
-  // Corner flower: a small ornament made purely of layered sine waves —
+  // Corner flower: a small ornament made purely of layered sine waves.
   // each "petal ring" is radius = base + amplitude*sin(k*angle + phase),
   // several of these stacked with translucent fills and independent
   // rotation speeds. The canvas is pinned via CSS so its own center sits
