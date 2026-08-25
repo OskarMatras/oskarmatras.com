@@ -335,7 +335,7 @@
     <div class="modebar panel-box" id="modebar" role="group" aria-label="What the map shows"></div>
   </div>
 
-  <div class="hint" id="hint">træk for at dreje &middot; scroll for at zoome &middot; hold musen over et land</div>
+  <div class="hint" id="hint">træk for at flytte kortet &middot; scroll for at zoome &middot; shift+træk for at dreje</div>
 
   <div class="hud-bottom">
     <div class="legend panel-box" id="legend"></div>
@@ -375,6 +375,10 @@
 
     <h2>Moving between moments</h2>
     <p>Two kinds of change need two different treatments. Quantities, like population or current speed, are interpolated: any year between two records is a genuine blend of the two, so scrubbing the slider glides. Territory is not a quantity. Who holds a piece of ground is a category, and averaging two categories produces a state that never existed, so instead each cell hands over on its own offset within the interval. A hard switch becomes a border that sweeps across the ground.</p>
+
+    <h2>Getting around</h2>
+    <p>The map behaves like a map rather than like a model on a turntable. <strong>Drag</strong> takes hold of the ground and moves it. <strong>Scroll</strong> zooms towards whatever is under the pointer, so you can put Australia in the middle of the screen and keep going until single columns fill it. <strong>Shift-drag</strong>, or the right or middle button, tilts and turns the view: flat overhead for reading the shapes, low and oblique for reading the heights. Arrow keys pan, plus and minus zoom, and <em>nulstil visning</em> puts everything back.</p>
+    <p>The opening framing fills the window rather than floating the world in the middle of it, which means the far east and west of the Pacific sit just off the edges. They are one drag away.</p>
 
     <h2>Hovering</h2>
     <p>Point anywhere and the map reports what it knows about that cell: elevation in metres, current speed and heading, the country and its population for the selected year, or the state that held the ground and how far it reached.</p>
@@ -923,78 +927,202 @@ var TERRA_ICE_RUNS = [2657,2,1,2,348,1,5,11,16,4,313,34,322,44,312,47,314,45,314
   var mesh = new THREE.Mesh(geo, new THREE.ShaderMaterial({uniforms:uniforms, vertexShader:vs, fragmentShader:fs}));
   mesh.frustumCulled = false;
   scene.add(mesh);
-
   // ---------------------------------------------------------------
   // Camera
+  //
+  // This behaves like a map, not like a model on a turntable. Dragging
+  // takes hold of the ground and moves it, the wheel zooms towards
+  // whatever is under the pointer, and the tilt only changes if you ask
+  // for it with shift or the right button. The default framing fills the
+  // window rather than floating the world in the middle of it.
   // ---------------------------------------------------------------
   var HOME = { theta:0, phi:0.56 };
-  var cam = { theta:HOME.theta, phi:HOME.phi, radius:700 };
-  var minRadius = 60, maxRadius = 1800, userZoomed = false;
+  var cam = { theta:HOME.theta, phi:HOME.phi, radius:700, tx:0, tz:0 };
+  var minRadius = 18, maxRadius = 2200;
+  var userMoved = false;
 
-  function fitRadius(){
+  var HALF_W = COLS*SPACING*0.5, HALF_D = ROWS*SPACING*0.5;
+  // How far the centre of the view may wander past the edge of the world.
+  // Enough to put a corner like New Zealand in the middle of the screen,
+  // not so much that you can lose the map altogether.
+  var PAN_LIMIT_X = HALF_W + 40, PAN_LIMIT_Z = HALF_D + 30;
+
+  function fillRadius(){
     var vFov = camera.fov*Math.PI/180;
     var hFov = 2*Math.atan(Math.tan(vFov/2)*(camera.aspect||1));
-    var needW = (COLS*SPACING*0.5+6)/Math.tan(hFov/2);
-    var needD = ((ROWS*SPACING*0.5+6)*Math.cos(cam.phi))/Math.tan(vFov/2);
-    return Math.min(maxRadius, Math.max(minRadius, Math.max(needW,needD)*1.04));
+    var needW = HALF_W/Math.tan(hFov/2);
+    var needD = (HALF_D*Math.cos(cam.phi))/Math.tan(vFov/2);
+    // The smaller of the two fills the window: whichever axis runs out first
+    // decides, and the other overflows off-screen. Backed off a little from a
+    // hard fill, which cropped longitude so tightly that Australia was cut in
+    // half on the default view. At this setting the map still reaches every
+    // edge and the continents stay whole.
+    return Math.min(maxRadius, Math.max(minRadius, Math.min(needW, needD)*1.16));
   }
+
   function updateCamera(){
     var sp = Math.sin(cam.phi), cp = Math.cos(cam.phi);
-    camera.position.set(cam.radius*sp*Math.sin(cam.theta), cam.radius*cp, cam.radius*sp*Math.cos(cam.theta));
-    camera.lookAt(0,4,0);
+    camera.position.set(
+      cam.tx + cam.radius*sp*Math.sin(cam.theta),
+      cam.radius*cp,
+      cam.tz + cam.radius*sp*Math.cos(cam.theta)
+    );
+    camera.lookAt(cam.tx, 2, cam.tz);
   }
+
+  // Where a screen point lands on the ground plane, for both dragging and
+  // zooming towards the pointer.
+  var _ndc = new THREE.Vector2(), _ray = new THREE.Raycaster();
+  function screenToGround(clientX, clientY){
+    var r = canvas.getBoundingClientRect();
+    _ndc.x = ((clientX-r.left)/r.width)*2 - 1;
+    _ndc.y = -((clientY-r.top)/r.height)*2 + 1;
+    _ray.setFromCamera(_ndc, camera);
+    var o = _ray.ray.origin, d = _ray.ray.direction;
+    if (Math.abs(d.y) < 1e-6) return null;
+    var t = -o.y/d.y;
+    if (t <= 0) return null;
+    return { x:o.x + d.x*t, z:o.z + d.z*t };
+  }
+  function clampTarget(){
+    cam.tx = Math.max(-PAN_LIMIT_X, Math.min(PAN_LIMIT_X, cam.tx));
+    cam.tz = Math.max(-PAN_LIMIT_Z, Math.min(PAN_LIMIT_Z, cam.tz));
+  }
+
   var resetBtn = document.getElementById('resetview');
-  function movedFromHome(){ return Math.abs(cam.theta-HOME.theta)>0.02 || Math.abs(cam.phi-HOME.phi)>0.02 || userZoomed; }
-  function refreshReset(){ if (resetBtn) resetBtn.classList.toggle('show', movedFromHome()); }
-  function resetView(){ cam.theta=HOME.theta; cam.phi=HOME.phi; userZoomed=false; cam.radius=fitRadius(); updateCamera(); refreshReset(); }
+  function refreshReset(){ if (resetBtn) resetBtn.classList.toggle('show', userMoved); }
+  function resetView(){
+    cam.theta = HOME.theta; cam.phi = HOME.phi;
+    cam.tx = 0; cam.tz = 0;
+    userMoved = false;
+    cam.radius = fillRadius();
+    updateCamera(); refreshReset();
+  }
   if (resetBtn) resetBtn.addEventListener('click', resetView);
 
-  var dragging=false, lastX=0, lastY=0, pointers=new Map(), pinchStart=0, pinchRadius=0;
+  function zoomBy(factor, clientX, clientY){
+    var before = (clientX != null) ? screenToGround(clientX, clientY) : null;
+    cam.radius = Math.max(minRadius, Math.min(maxRadius, cam.radius*factor));
+    updateCamera();
+    if (before){
+      // Put the point that was under the pointer back under the pointer.
+      var after = screenToGround(clientX, clientY);
+      if (after){ cam.tx += before.x - after.x; cam.tz += before.z - after.z; clampTarget(); updateCamera(); }
+    }
+    userMoved = true; refreshReset();
+  }
+
+  var mode = null;              // 'pan' | 'orbit'
+  var grabbed = null;           // ground point held under the pointer
+  var lastX = 0, lastY = 0;
+  var pointers = new Map(), pinchStart = 0, pinchRadius = 0, pinchMid = null;
+
+  canvas.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+
   canvas.addEventListener('pointerdown', function(e){
-    pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
-    if (pointers.size===1){ dragging=true; lastX=e.clientX; lastY=e.clientY; canvas.classList.add('dragging'); }
-    else if (pointers.size===2){ dragging=false; var p=Array.from(pointers.values());
-      pinchStart=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y); pinchRadius=cam.radius; }
+    pointers.set(e.pointerId, {x:e.clientX, y:e.clientY});
+    if (pointers.size === 1){
+      // Shift, right button or middle button tilt and turn; a plain drag moves
+      // the map. Three ways in, because the tilt is the least guessable of them.
+      mode = (e.shiftKey || e.button === 2 || e.button === 1) ? 'orbit' : 'pan';
+      grabbed = screenToGround(e.clientX, e.clientY);
+      lastX = e.clientX; lastY = e.clientY;
+      canvas.classList.add('dragging');
+    } else if (pointers.size === 2){
+      mode = null;
+      var p = Array.from(pointers.values());
+      pinchStart = Math.hypot(p[0].x-p[1].x, p[0].y-p[1].y);
+      pinchRadius = cam.radius;
+      pinchMid = { x:(p[0].x+p[1].x)/2, y:(p[0].y+p[1].y)/2 };
+    }
     canvas.setPointerCapture(e.pointerId);
   });
+
   canvas.addEventListener('pointermove', function(e){
-    if (pointers.has(e.pointerId)) pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
-    if (pointers.size===2 && pinchStart>0){
-      var q=Array.from(pointers.values()), d=Math.hypot(q[0].x-q[1].x,q[0].y-q[1].y);
-      if (d>0){ cam.radius=Math.min(maxRadius,Math.max(minRadius,pinchRadius*(pinchStart/d)));
-        userZoomed=true; updateCamera(); refreshReset(); }
+    if (pointers.has(e.pointerId)) pointers.set(e.pointerId, {x:e.clientX, y:e.clientY});
+
+    if (pointers.size === 2 && pinchStart > 0){
+      var q = Array.from(pointers.values());
+      var d = Math.hypot(q[0].x-q[1].x, q[0].y-q[1].y);
+      if (d > 0){
+        var want = Math.max(minRadius, Math.min(maxRadius, pinchRadius*(pinchStart/d)));
+        zoomBy(want/cam.radius, pinchMid.x, pinchMid.y);
+      }
+      hideTip();
       return;
     }
-    if (dragging){
-      var dx=e.clientX-lastX, dy=e.clientY-lastY;
-      lastX=e.clientX; lastY=e.clientY;
-      cam.theta-=dx*0.0055;
-      cam.phi=Math.min(1.40,Math.max(0.12,cam.phi-dy*0.0045));
-      updateCamera(); refreshReset(); hideTip();
+
+    if (mode === 'pan'){
+      if (grabbed){
+        // Solve for the target that brings the grabbed ground point back
+        // under the pointer. Re-measuring against the current camera each
+        // move makes this settle rather than drift.
+        var now = screenToGround(e.clientX, e.clientY);
+        if (now){
+          cam.tx += grabbed.x - now.x;
+          cam.tz += grabbed.z - now.z;
+          clampTarget(); updateCamera();
+          userMoved = true; refreshReset();
+        }
+      }
+      hideTip();
       return;
     }
-    hoverAt(e.clientX,e.clientY);
+
+    if (mode === 'orbit'){
+      var dx = e.clientX-lastX, dy = e.clientY-lastY;
+      lastX = e.clientX; lastY = e.clientY;
+      cam.theta -= dx*0.0055;
+      cam.phi = Math.min(1.40, Math.max(0.12, cam.phi - dy*0.0045));
+      updateCamera(); userMoved = true; refreshReset(); hideTip();
+      return;
+    }
+
+    hoverAt(e.clientX, e.clientY);
   });
+
   function endPointer(e){
     pointers.delete(e.pointerId);
-    if (pointers.size<2) pinchStart=0;
-    if (pointers.size===0){ dragging=false; canvas.classList.remove('dragging'); }
+    if (pointers.size < 2) pinchStart = 0;
+    if (pointers.size === 0){ mode = null; grabbed = null; canvas.classList.remove('dragging'); }
   }
   window.addEventListener('pointerup', endPointer);
   window.addEventListener('pointercancel', endPointer);
   canvas.addEventListener('pointerleave', hideTip);
+
   canvas.addEventListener('wheel', function(e){
     e.preventDefault();
-    cam.radius=Math.min(maxRadius,Math.max(minRadius,cam.radius*Math.exp(e.deltaY*0.0012)));
-    userZoomed=true; updateCamera(); refreshReset(); hoverAt(e.clientX,e.clientY);
+    zoomBy(Math.exp(e.deltaY*0.0012), e.clientX, e.clientY);
+    hoverAt(e.clientX, e.clientY);
   }, {passive:false});
 
+  // Keyboard: arrows pan by a tenth of the view, +/- zoom.
+  window.addEventListener('keydown', function(e){
+    if (readerOpen) return;
+    // The year slider is a range input and owns the arrow keys while focused.
+    var t = e.target;
+    if (t && (t.tagName === "INPUT" || t.tagName === "BUTTON" || t.isContentEditable)) return;
+    var step = cam.radius*0.09, handled = true;
+    var s = Math.sin(cam.theta), c = Math.cos(cam.theta);
+    if (e.key === 'ArrowLeft'){ cam.tx -= c*step; cam.tz += s*step; }
+    else if (e.key === 'ArrowRight'){ cam.tx += c*step; cam.tz -= s*step; }
+    else if (e.key === 'ArrowUp'){ cam.tx -= s*step; cam.tz -= c*step; }
+    else if (e.key === 'ArrowDown'){ cam.tx += s*step; cam.tz += c*step; }
+    else if (e.key === '+' || e.key === '='){ zoomBy(0.85, null, null); }
+    else if (e.key === '-' || e.key === '_'){ zoomBy(1/0.85, null, null); }
+    else handled = false;
+    if (handled){
+      e.preventDefault();
+      clampTarget(); updateCamera(); userMoved = true; refreshReset();
+    }
+  });
+
   function resize(){
-    var w=stageEl.clientWidth, h=stageEl.clientHeight;
-    if (!w||!h) return;
-    renderer.setSize(w,h,false);
-    camera.aspect=w/h; camera.updateProjectionMatrix();
-    if (!userZoomed) cam.radius=fitRadius();
+    var w = stageEl.clientWidth, h = stageEl.clientHeight;
+    if (!w || !h) return;
+    renderer.setSize(w, h, false);
+    camera.aspect = w/h; camera.updateProjectionMatrix();
+    if (!userMoved) cam.radius = fillRadius();
     updateCamera();
   }
   window.addEventListener('resize', resize);
