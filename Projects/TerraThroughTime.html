@@ -393,8 +393,9 @@
 
     <h2>The nine views</h2>
     <p><strong>Højde</strong> is elevation in real metres, land and sea floor alike, from the same global model that feeds most web maps. Permanent ice comes from its own layer rather than from the height, so Greenland and Antarctica are drawn as ice instead of as brown upland, and the open sea carries a slow swell. <strong>Terræn</strong> measures how sharply the ground changes rather than how high it sits, so mountain chains, coastlines and the mid-ocean ridges stand out while plains and abyssal basins stay flat.</p>
-    <p><strong>Havstrømme</strong> lets twelve thousand drifters go on the surface and has the measured current carry them, each leaving a short trail. Nothing is choreographed: every drifter only ever reads the day's u and v. Where the flow is strong and coherent the trails line up into a stream, which is how the equatorial jets, the Agulhas, the Kuroshio and the Antarctic Circumpolar draw themselves, eddies and all. Speed is exaggerated by a long way, as it is on every current map: real water takes a day and a half to cross a degree.</p>
-    <p>Two honest limits. This is one five-day mean, not a climatology, so eddies show as strongly as the average flow. And it is the <em>surface</em>: the deep overturning that people mean by the Greenland pump is a circulation in the water column, not on top of it, and no surface field can show it. At one degree the narrow western boundary currents are also smeared into the gyre around them, so a drifter released off Hatteras will often turn back into the recirculation rather than run for Europe.</p>
+    <p><strong>Havstrømme</strong> is the standing pattern of the surface ocean, not the state of it on any particular day. The source is a single five-day mean, and at one degree that is as much eddy as it is circulation: every gyre came wrapped in small closed swirls that are perfectly real, are different the following week, and are not what anyone means by an ocean current. So the field is filtered until only the large-scale flow is left. What survives is what an atlas would name. The Antarctic Circumpolar runs right round the bottom of the world, the equatorial jets stripe the Pacific and the Indian, and the three great western boundary currents — the Gulf Stream off Hatteras, the Kuroshio off Japan, the Agulhas rounding South Africa — stand up as ridges against the quiet middles of the gyres.</p>
+    <p>Height is the strength of the current and nothing else, so the map reads as a relief of where the water is moving. The movement over the top is a field of noise dragged along the flow, which is decoration rather than measurement: it tells you the direction and lets the eye see that the water is going somewhere, and it is not a drifter and does not claim to be. Speed is exaggerated by a long way, as it is on every current map, since real water takes a day and a half to cross a single degree.</p>
+    <p>Two honest limits. Filtering trades detail for legibility: it is what removes the eddies, and it also broadens the narrow currents, so the Gulf Stream here is a wide ridge rather than the sharp jet it is in life. And this is the <em>surface</em>. The deep overturning that people mean by the Greenland pump is a circulation in the water column, not on top of it, and no surface field can show it — what you can see is its surface branch, the warm water of the North Atlantic Drift leaning north-east towards Iceland and Norway, which is slow and broad and easy to miss next to the equator.</p>
     <p><strong>Befolkning</strong> turns height into headcount from 1800 to today. <strong>Tæthed</strong> divides that by how much ground a cell actually covers, since a one-degree cell near the poles is a fraction of the size of one at the equator. strong> shows not the total but how fast it is growing: the population figures are stored as logarithms, so the step from one decade to the next is a ratio rather than a difference, and what is drawn is the rate of increase. That is where the demographic transition becomes visible as it moves across the world./strong> shows the change since the previous decade rather than the total, which is where the demographic transition becomes visible as it moves across the world.</p>
     <p><strong>Riger</strong> runs from 500 BC to 2010. Each cell is coloured by whichever state held it, and stands as tall as that state was large at the time, so empires rise and subside as they gain and lose ground. Rome is worth watching: two cells at 323 BC, forty-nine by 200 BC, then the whole Mediterranean.</p>
 
@@ -416,7 +417,7 @@
       <strong>Sources</strong><br>
       Elevation, land and sea floor: Terrain Tiles on AWS, the open global model assembled from SRTM, GMTED2010 and ETOPO1. Sampled to this one-degree grid; values are metres.<br><br>
       Permanent ice and glaciers: Natural Earth 1:110m, kept as its own layer so Antarctica and Greenland are drawn as ice rather than as brown upland at the same height as Tibet.<br><br>
-      Ocean surface currents: OSCAR (Ocean Surface Current Analysis Real-time, NOAA/NASA), a single five-day mean centred on 31 January 2014. Each cell here averages the source vectors that fall inside it, which is both the honest way to downsample a velocity field and what stops the map looking like static. Coverage stops at 80° north and south.<br><br>
+      Ocean surface currents: OSCAR (Ocean Surface Current Analysis Real-time, NOAA/NASA), a single five-day mean centred on 31 January 2014, sampled to this one-degree grid. It is then low-pass filtered here: eight passes of a three-by-three average, which is close to a Gaussian of about five degrees. The filter knows where the land is, since averaging a velocity across a coastline would invent water moving through Africa, and it averages vectors as vectors, u with u and v with v, so the opposing arms of an eddy cancel and vanish while a coherent stream survives every pass. Colour and height run on the cube-ish root of speed rather than on speed itself, because surface currents span two decades and on a straight scale the equatorial jets erase everything else. Coverage stops at 80&deg; north and south, and thins well before that wherever the source masks sea ice.<br><br>
       Population, and the per-country figures on hover: Our World in Data's long-run population series, which blends Gapminder, HYDE and the UN.<br><br>
       Historical territory: historical-basemaps, after Nüssli's Euratlas and successors, sampled at twenty-one dates between 500 BC and 2010. Borders before the modern era are approximate by nature, and the underlying maps say so.<br><br>
       Modern country boundaries, used for the hover labels: Natural Earth 1:110m.<br><br>
@@ -963,7 +964,7 @@ var TERRA_ICE_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     uDensityNorm:{value:densityNorm}, uGrowthNorm:{value:growthNorm},
     uDensityLo:{value:densityLo}, uPopLo:{value:popLo}, uPopHi:{value:popHi},
     uHoverCell:{value:new THREE.Vector2(-1,-1)},
-    uCurSpeed:{value:1.0},
+    uCurSpeed:{value:1.0}, uCurPhase:{value:0},
     uCurNorm:{value:CUR_NORM},
     uDissolve:{value:0.78},         // fraction of the interval a hand-over spreads across
     uElevMax:{value:ELEV_MAX}, uDepthMax:{value:DEPTH_MAX},
@@ -988,6 +989,7 @@ var TERRA_ICE_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     'uniform float uDensityNorm; uniform float uGrowthNorm;',
     'uniform float uDensityLo; uniform float uPopLo; uniform float uPopHi;',
     'uniform vec2 uHoverCell; uniform float uCurSpeed; uniform float uDissolve; uniform float uCurNorm;',
+    'uniform float uCurPhase;',
     'uniform float uElevMax; uniform float uDepthMax;',
     'uniform float uSunDecl; uniform float uSunLon;',
     'uniform sampler2D uLiveTexture; uniform float uLiveOn;',
@@ -1007,6 +1009,15 @@ var TERRA_ICE_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     'float easeOutCubic(float t){ return 1.0-pow(1.0-t,3.0); }',
     'float staggered(float p,float ph,float sp){ return clamp((p-ph*sp)/max(0.0001,1.0-sp),0.0,1.0); }',
     'vec3 ramp3(vec3 a,vec3 b,vec3 c,float t){ return mix(mix(a,b,smoothstep(0.0,0.55,t)), c, smoothstep(0.55,1.0,t)); }',
+    // Value noise, used only to give the ocean surface something to
+    // carry so the eye can see it move. Nothing about the shape of the
+    // flow comes from here.
+    'float cHash(vec2 p){ return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453); }',
+    'float cNoise(vec2 p){',
+    '  vec2 i=floor(p), f=fract(p); f=f*f*(3.0-2.0*f);',
+    '  return mix(mix(cHash(i),cHash(i+vec2(1.0,0.0)),f.x),',
+    '             mix(cHash(i+vec2(0.0,1.0)),cHash(i+vec2(1.0,1.0)),f.x), f.y);',
+    '}',
 
     // Hypsometric tints keyed to real metres rather than to a normalised
     // 0..1, so the bands fall where an atlas would put them: green lowland,
@@ -1085,15 +1096,47 @@ var TERRA_ICE_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     '  gH[1] = mix(MIN_H, MAX_H*0.88, pow(aRelief,0.7));',
     '  gC[1] = ramp3(relA,relB,relC,pow(aRelief,0.7));',
 
-    // 2: ocean currents. The movement is carried by the drifters drawn over
-    // the top, so the columns underneath only set the stage: a dark sea
-    // shaded by depth, land held low and neutral, and the faintest hint of
-    // speed so the fast water is already darker before a trail crosses it.
-    '  float sp = clamp(aCurSpd/uCurNorm, 0.0, 1.0);',
-    '  vec3 seaFloorC = mix(vec3(0.024,0.055,0.106), vec3(0.055,0.145,0.235), pow(clamp(1.0+aElevNorm,0.0,1.0),1.5));',
+    // 2: ocean currents. Height is the strength of the current and
+    // nothing else, so the map stands up into the shapes an atlas would
+    // name: the Antarctic Circumpolar right round the bottom, the
+    // equatorial jets, the Kuroshio, the Gulf Stream and the North
+    // Atlantic Drift reaching up towards Greenland.
+    //
+    // An earlier version banded the water by phase along the flow. It
+    // streamed where the current ran straight and drew bullseyes in the
+    // middle of every gyre, which is not a bug that can be tuned away:
+    // a gyre closes on itself, so a coordinate that counts distance
+    // along the flow has to jump somewhere on the loop.
+    //
+    // So nothing is phased by position. A field of noise is dragged
+    // along the flow instead, and two copies of it, one cycle apart,
+    // are crossfaded so the reset happens where the two agree and there
+    // is no seam to see. The water moves; the map underneath does not.
+    '  float sp = clamp(aCurSpd, 0.0, 1.0);',
+    '  float ang = aCurDir*6.2831853;',
+    '  vec2 dir = vec2(cos(ang), sin(ang));',
+    '  vec2 cpos = vec2(aOffset.x, aOffset.y);',
+    '  float ct = fract(uCurPhase*0.19);',
+    '  float drift = 11.0;',
+    '  float cn0 = cNoise((cpos - dir*(ct*drift))*0.34);',
+    '  float cn1 = cNoise((cpos - dir*((ct-1.0)*drift))*0.34);',
+    '  float shim = mix(cn0, cn1, ct);',
+    // Only the moving water shimmers, and never by much: the still
+    // middle of a basin has nothing to show and should stay still.
+    '  float mov = smoothstep(0.05, 0.40, sp);',
+    '  float glint = (shim-0.5)*mov;',
+    '  vec3 seaFloorC = mix(vec3(0.020,0.047,0.094), vec3(0.035,0.098,0.173), pow(clamp(1.0+aElevNorm,0.0,1.0),1.5));',
     '  vec3 landC = mix(vec3(0.157,0.169,0.176), vec3(0.267,0.263,0.243), pow(clamp(aElevNorm,0.0,1.0),0.6));',
-    '  gH[2] = aIsLand>0.5 ? MAX_H*0.09 : MAX_H*0.045;',
-    '  gC[2] = aIsLand>0.5 ? mix(landC, vec3(0.808,0.851,0.878), smoothstep(0.15,0.7,aIce)) : seaFloorC*(1.0 - 0.30*sp);',
+    '  float curH = MAX_H*(0.04 + 0.46*sp + 0.05*glint);',
+    '  gH[2] = aIsLand>0.5 ? MAX_H*0.09 : curH;',
+    // One unbroken gradient from the dark of a still basin to a pale
+    // crest, so neighbouring cells differ by a shade rather than by a
+    // line being there or not.
+    '  vec3 curC = mix(seaFloorC, vec3(0.094,0.373,0.596), smoothstep(0.16,0.50,sp));',
+    '  curC = mix(curC, vec3(0.310,0.706,0.855), smoothstep(0.35,0.75,sp));',
+    '  curC = mix(curC, vec3(0.780,0.945,1.0), smoothstep(0.70,1.0,sp));',
+    '  curC *= 1.0 + 0.30*glint;',
+    '  gC[2] = aIsLand>0.5 ? mix(landC, vec3(0.808,0.851,0.878), smoothstep(0.15,0.7,aIce)) : curC;',
 
     // 3/4/5: population, density, growth
     '  float pop = popAt(uPopLow,uPopFrac);',
@@ -1220,121 +1263,89 @@ var TERRA_ICE_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
   scene.add(mesh);
 
   // ---------------------------------------------------------------
-  // Ocean currents, drawn as moving water.
+  // Ocean currents.
   //
-  // The first attempt pushed a sine wave through the columns along each
-  // cell's flow direction. It read as static, and for a good reason: two
-  // neighbouring cells pointing a few degrees apart land in different
-  // parts of the wave, so the field sparkles instead of streaming. Speed
-  // was there but movement was not.
+  // The source is a single five-day mean, and at one degree that is as
+  // much eddy as it is circulation: every gyre came with a confetti of
+  // small closed swirls that are real, are different next week, and are
+  // not what anyone means by an ocean current. What is wanted here is the
+  // standing pattern, so the field is low-pass filtered until only the
+  // large-scale flow survives.
   //
-  // This instead does what the water does. Several thousand drifters are
-  // let go on the surface and carried by the measured field, each leaving
-  // a short trail behind it. Where the current is strong and coherent the
-  // trails line up into a stream, which is how the Gulf Stream, the
-  // Kuroshio and the Antarctic Circumpolar draw themselves. Nothing is
-  // choreographed: every drifter is only ever reading OSCAR's u and v.
+  // The filter is a repeated blur that knows where the land is. Averaging
+  // a velocity across a coastline would invent water moving through
+  // Africa, so land cells contribute nothing and each cell divides by the
+  // sea it actually found. Vectors are averaged as vectors, u with u and
+  // v with v, which is the honest way: opposing arms of an eddy cancel
+  // and disappear, while a coherent stream survives every pass.
   // ---------------------------------------------------------------
-  // Advecting drifters is the one thing here that costs real CPU each
-  // frame: twelve thousand runs about 4.5 ms, which is comfortable on a
-  // laptop and less so on a phone, so a small screen gets half as many.
-  var FLOW_N = (Math.min(window.innerWidth, window.innerHeight) < 700) ? 6000 : 12000;
-  var FLOW_TRAIL = 5;                         // points kept per trail
-  var FLOW_SEGS = FLOW_TRAIL;
-  var FLOW_Y = 0.55;                          // rides just above the sea surface
-  var flowX = new Float32Array(FLOW_N);       // world x, i.e. longitude
-  var flowZ = new Float32Array(FLOW_N);       // world z, i.e. latitude, south positive
-  var flowAge = new Float32Array(FLOW_N);
-  var flowLife = new Float32Array(FLOW_N);
-  var flowHist = new Float32Array(FLOW_N * FLOW_TRAIL * 2);
-  var flowFill = new Uint8Array(FLOW_N);      // how many trail points are real yet
-
-  var flowPos = new Float32Array(FLOW_N * FLOW_SEGS * 2 * 3);
-  var flowAlpha = new Float32Array(FLOW_N * FLOW_SEGS * 2);
-  var flowSpd = new Float32Array(FLOW_N * FLOW_SEGS * 2);
-
-  var flowSeed = 1337;
-  function flowRnd(){
-    flowSeed |= 0; flowSeed = (flowSeed + 0x6D2B79F5) | 0;
-    var t = Math.imul(flowSeed ^ (flowSeed >>> 15), 1 | flowSeed);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  }
-
-  // Bilinear sample of the current field. Returns false over land or
-  // outside the data, which reaches to 80 degrees north and south.
-  var _uv = {u:0, v:0, s:0};
-  function flowSample(x, z){
-    var fx = x + COLS*0.5 - 0.5, fz = z + ROWS*0.5 - 0.5;
-    var i0 = Math.floor(fx), j0 = Math.floor(fz);
-    var tx = fx - i0, tz = fz - j0;
-    var u = 0, v = 0, w = 0;
-    for (var dj = 0; dj <= 1; dj++){
-      var jj = j0 + dj; if (jj < 0 || jj >= ROWS) continue;
-      for (var di = 0; di <= 1; di++){
-        var ii = ((i0 + di) % COLS + COLS) % COLS;
-        var k = jj*COLS + ii;
-        if (!seaMask[k]) continue;
-        var wt = (di ? tx : 1-tx) * (dj ? tz : 1-tz);
-        if (wt <= 0) continue;
-        var sp = curRaw[k*3]/100;                       // metres per second
-        var ang = curRaw[k*3+1]/255 * Math.PI*2;
-        u += Math.cos(ang)*sp*wt;
-        v += -Math.sin(ang)*sp*wt;                      // north is negative z
-        w += wt;
-      }
+  var curU = new Float32Array(N), curV = new Float32Array(N), curSpd = new Float32Array(N);
+  (function buildCurrents(){
+    var k, i, j;
+    for (k = 0; k < N; k++){
+      if (!curRaw[k*3+2]) continue;                       // land, or outside coverage
+      var sp = curRaw[k*3]/100;                           // metres per second
+      var ang = curRaw[k*3+1]/255 * Math.PI*2;
+      curU[k] = Math.cos(ang)*sp; curV[k] = Math.sin(ang)*sp;
     }
-    if (w < 0.35) return false;                         // mostly land: let it go
-    _uv.u = u/w; _uv.v = v/w;
-    _uv.s = Math.sqrt(_uv.u*_uv.u + _uv.v*_uv.v);
-    return true;
-  }
-
-  function flowRespawn(p, firstTime){
-    // Rejection sampling on to open water, weighted by cosine of latitude
-    // so drifters are not piled up at the poles where cells are narrow.
-    for (var tries = 0; tries < 24; tries++){
-      var x = (flowRnd()-0.5)*COLS;
-      var z = (Math.asin(flowRnd()*2-1)/(Math.PI*0.5))*ROWS*0.5;
-      if (flowSample(x, z)){
-        flowX[p] = x; flowZ[p] = z;
-        flowAge[p] = firstTime ? flowRnd()*3.0 : 0;
-        flowLife[p] = 2.6 + flowRnd()*4.2;
-        flowFill[p] = 0;
-        return;
+    // Eight passes of a 3x3 box is close enough to a Gaussian of about five
+    // degrees. Eddies at one to three degrees are gone; the Gulf
+    // Stream, the Kuroshio, the equatorial jets and the Antarctic
+    // Circumpolar are thousands of kilometres long and are not.
+    var tu = new Float32Array(N), tv = new Float32Array(N);
+    for (var pass = 0; pass < 8; pass++){
+      for (j = 0; j < ROWS; j++){
+        for (i = 0; i < COLS; i++){
+          k = j*COLS + i;
+          if (!seaMask[k]){ tu[k] = 0; tv[k] = 0; continue; }
+          var su = 0, sv = 0, n = 0;
+          for (var dj = -1; dj <= 1; dj++){
+            var jj = j + dj; if (jj < 0 || jj >= ROWS) continue;
+            for (var di = -1; di <= 1; di++){
+              var ii = (i + di + COLS) % COLS;            // the ocean wraps
+              var kk = jj*COLS + ii; if (!seaMask[kk]) continue;
+              su += curU[kk]; sv += curV[kk]; n++;
+            }
+          }
+          if (n){ tu[k] = su/n; tv[k] = sv/n; } else { tu[k] = 0; tv[k] = 0; }
+        }
       }
+      curU.set(tu); curV.set(tv);
     }
-    flowX[p] = 0; flowZ[p] = 0; flowAge[p] = 0; flowLife[p] = 0.1; flowFill[p] = 0;
-  }
-  for (var fp = 0; fp < FLOW_N; fp++) flowRespawn(fp, true);
+    for (k = 0; k < N; k++) curSpd[k] = Math.sqrt(curU[k]*curU[k] + curV[k]*curV[k]);
+  })();
+  // Smoothing lowers every speed, and averaging vectors lowers it further
+  // wherever the flow turns, so the scale has to be taken from what came
+  // out rather than from what went in. The strong currents sit near the
+  // top of the range and the quiet middle of an ocean basin near the
+  // bottom, which is the contrast the view is made of.
+  var curSpdNorm = (function(){
+    var v = [], k;
+    for (k = 0; k < N; k++) if (seaMask[k] && curSpd[k] > 0) v.push(curSpd[k]);
+    v.sort(function(a,b){ return a-b; });
+    return v.length ? v[Math.floor(v.length*0.97)] : 1;
+  })();
 
-  var flowGeo = new THREE.BufferGeometry();
-  flowGeo.setAttribute('position', new THREE.BufferAttribute(flowPos, 3));
-  flowGeo.setAttribute('aA', new THREE.BufferAttribute(flowAlpha, 1));
-  flowGeo.setAttribute('aS', new THREE.BufferAttribute(flowSpd, 1));
-  var flowMat = new THREE.ShaderMaterial({
-    uniforms: { uOpacity:{value:0}, uSlow:{value:new THREE.Color(0x4d93b5)}, uFast:{value:new THREE.Color(0xf2feff)} },
-    vertexShader: [
-      'attribute float aA; attribute float aS;',
-      'varying float vA; varying float vS;',
-      'void main(){ vA=aA; vS=aS; gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0); }'
-    ].join('\n'),
-    fragmentShader: [
-      'uniform float uOpacity; uniform vec3 uSlow; uniform vec3 uFast;',
-      'varying float vA; varying float vS;',
-      'void main(){',
-      '  vec3 c = mix(uSlow, uFast, clamp(pow(vS,0.7),0.0,1.0));',
-      '  gl_FragColor = vec4(c, vA*uOpacity);',
-      '}'
-    ].join('\n'),
-    transparent: true,
-    depthWrite: false,
-    blending: THREE.AdditiveBlending
-  });
-  var flowMesh = new THREE.LineSegments(flowGeo, flowMat);
-  flowMesh.frustumCulled = false;
-  flowMesh.visible = false;
-  scene.add(flowMesh);
+  // The two currents slots on the vertex carried the raw five-day
+  // field. They carry the filtered one now: speed, and a unit heading
+  // packed as a turn from zero to one, which is all the shader needs to
+  // know which way the water is going.
+  (function writeCurrentAttributes(){
+    for (var k = 0; k < N; k++){
+      var sp = seaMask[k] ? curSpd[k] : 0;
+      // Shaped here rather than in the shader, so height, colour and the
+      // raycast all read the same number. Surface speeds run over two
+      // decades, from a centimetre a second in the middle of a gyre to
+      // most of a metre on the equator, and on a straight scale the
+      // equatorial jets simply erase everything else. The root opens the
+      // bottom out: the Gulf Stream lands at 0.71, the Kuroshio and the
+      // Agulhas at 0.66, the Antarctic Circumpolar at 0.42, and a still
+      // basin at 0.20.
+      aPhysB[k*4+2] = Math.pow(Math.min(1, sp/curSpdNorm), 0.55);
+      aPhysB[k*4+3] = sp > 0 ? (Math.atan2(curV[k], curU[k])/(Math.PI*2) + 1) % 1 : 0;
+    }
+    geo.attributes.aPhysB.needsUpdate = true;
+  })();
 
   // ---------------------------------------------------------------
   // The cloud deck.
@@ -1391,96 +1402,6 @@ var TERRA_ICE_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
   cloudMesh.visible = false;
   scene.add(cloudMesh);
 
-  // A metre per second of real current becomes this many degrees a second on
-  // the map. Real water would cross a degree in a day and a half, so this is
-  // a deliberate and large exaggeration, of the same kind every current map
-  // makes: the point is the shape of the flow, not the clock.
-  var FLOW_DEG_PER_MS = 20.0;
-  // Trail points are laid down on a timer rather than once a frame. Tied to
-  // the frame they came out sub-pixel, because a drifter only moves about a
-  // fortieth of a degree between frames and five of those is a third of one
-  // screen pixel: the trails were there and invisible.
-  var FLOW_SAMPLE = 0.11, flowAcc = 0;
-
-  function flowStep(dt, rate){
-    var moved = FLOW_DEG_PER_MS * rate;
-    flowAcc += dt;
-    var lay = flowAcc >= FLOW_SAMPLE;
-    // Carry the remainder rather than zeroing, so the phase below is the
-    // true time since the last point was laid and the interval does not
-    // drift with the frame rate.
-    if (lay) flowAcc -= FLOW_SAMPLE;
-    // The trail's fade is a function of this phase, measured after any
-    // shift. When the history moves along one place, each segment inherits
-    // exactly the alpha it already had, so nothing steps. Getting this
-    // wrong made the whole field pulse nine times a second: a clean
-    // seven-frame sawtooth, 3.5 against a median of 1.3.
-    var sub = flowAcc / FLOW_SAMPLE;
-
-    var vi = 0, ai = 0;
-    for (var p = 0; p < FLOW_N; p++){
-      flowAge[p] += dt;
-      var ok = flowSample(flowX[p], flowZ[p]);
-      if (!ok || flowAge[p] > flowLife[p]){
-        flowRespawn(p, false);
-        ok = flowSample(flowX[p], flowZ[p]);
-        // Seed the whole history at the new spot so the first frames do not
-        // draw a streak from wherever this drifter used to be.
-        var b0 = p*FLOW_TRAIL*2;
-        for (var q = 0; q < FLOW_TRAIL; q++){ flowHist[b0+q*2] = flowX[p]; flowHist[b0+q*2+1] = flowZ[p]; }
-      }
-
-      var sp = ok ? _uv.s : 0;
-      if (ok){
-        flowX[p] += _uv.u * moved * dt;
-        flowZ[p] += _uv.v * moved * dt;
-        if (flowX[p] >  COLS*0.5) flowX[p] -= COLS;
-        if (flowX[p] < -COLS*0.5) flowX[p] += COLS;
-        if (flowZ[p] > ROWS*0.5 || flowZ[p] < -ROWS*0.5) flowRespawn(p, false);
-      }
-
-      var base = p*FLOW_TRAIL*2;
-      if (lay){
-        for (var t = FLOW_TRAIL-1; t > 0; t--){
-          flowHist[base+t*2]   = flowHist[base+(t-1)*2];
-          flowHist[base+t*2+1] = flowHist[base+(t-1)*2+1];
-        }
-        flowHist[base] = flowX[p]; flowHist[base+1] = flowZ[p];
-        if (flowFill[p] < FLOW_TRAIL) flowFill[p]++;
-      }
-
-      var lifeT = flowLife[p] > 0 ? flowAge[p]/flowLife[p] : 1;
-      var vis = Math.max(0, Math.min(Math.min(1, flowAge[p]/0.45), Math.min(1, (1-lifeT)/0.3)));
-      var spN = Math.min(1, sp/0.85);
-
-      // Segment nought runs from where the drifter is right now back to the
-      // newest laid point, so the head keeps up between samples.
-      var prevX = flowX[p], prevZ = flowZ[p];
-      for (var s = 0; s < FLOW_SEGS; s++){
-        var hx = flowHist[base+s*2], hz = flowHist[base+s*2+1];
-        var live = (flowFill[p] > s) ? 1 : 0;
-        if (live && Math.abs(prevX - hx) > COLS*0.5) live = 0;   // wrapped the dateline
-        // Both ends get their own place on one straight fade running the
-        // length of the trail. Scaled so the oldest point reaches zero
-        // exactly as it is dropped: fading to a sixth and then vanishing
-        // was the rest of the flicker.
-        var f0 = 1 - (s + sub)/FLOW_SEGS;
-        var f1 = 1 - (s + 1 + sub)/FLOW_SEGS;
-        var a0 = live ? vis*(f0 > 0 ? f0 : 0) : 0;
-        var a1 = live ? vis*(f1 > 0 ? f1 : 0) : 0;
-
-        flowPos[vi++] = prevX; flowPos[vi++] = FLOW_Y; flowPos[vi++] = prevZ;
-        flowPos[vi++] = hx;    flowPos[vi++] = FLOW_Y; flowPos[vi++] = hz;
-        flowAlpha[ai] = a0; flowSpd[ai++] = spN;
-        flowAlpha[ai] = a1; flowSpd[ai++] = spN;
-
-        prevX = hx; prevZ = hz;
-      }
-    }
-    flowGeo.attributes.position.needsUpdate = true;
-    flowGeo.attributes.aA.needsUpdate = true;
-    flowGeo.attributes.aS.needsUpdate = true;
-  }
   // ---------------------------------------------------------------
   // Camera
   //
@@ -1701,7 +1622,7 @@ var TERRA_ICE_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
       ends:['fladt','','stejlt'], source:'afledt &middot; lokal højdeforskel i meter' },
     { id:'cur', label:'Havstrømme', shaderId:2, flow:true,
       rows:[{label:'Fart',ramp:['#081b2e','#28909d','#e0faec']}],
-      ends:['stille','','hurtig'], source:'OSCAR / NOAA &middot; overfladestrømme, 31. jan 2014' },
+      ends:['stille','','hurtig'], source:'OSCAR / NOAA &middot; overfladestrømme, udjævnet til hovedstrømme' },
     { id:'pop', label:'Befolkning', shaderId:3, year:'pop', needsVertexTex:true,
       rows:[{label:'Mennesker',ramp:['#241234','#a13d63','#ffcf6b']}],
       ends:['tyndt','','tæt'], source:'Our World in Data &middot; Gapminder, HYDE, FN' },
@@ -1946,7 +1867,10 @@ var TERRA_ICE_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     var e01=aPhysA[k*4]*0.5+0.5;
     if (m===0) return MIN_H+(MAX_H-MIN_H)*Math.pow(e01, isLandArr[k]?1.05:0.92);
     if (m===1) return MIN_H+(MAX_H*0.88-MIN_H)*Math.pow(aPhysA[k*4+2],0.7);
-    if (m===2) return isLandArr[k]?MIN_H*1.2:MIN_H*0.6+(MAX_H*0.62)*Math.pow(aPhysB[k*4+2],0.55)*0.85;
+    // The travelling crest is left out: the raycast wants the standing
+    // height of the column, not whichever part of the wave happens to be
+    // passing, or the readout would jitter under a still cursor.
+    if (m===2) return isLandArr[k] ? MAX_H*0.09 : MAX_H*(0.04 + 0.46*aPhysB[k*4+2]);
     if (m===6) return isLandArr[k]?MAX_H*0.4:MIN_H*0.5;
     var tl=TIMELINES.pop, fr=frameFor(tl.keys,currentYear);
     var lo=popTextureData[fr.low*N+k]/255, hi=popTextureData[Math.min(POP_FRAMES-1,fr.low+1)*N+k]/255;
@@ -1990,7 +1914,11 @@ var TERRA_ICE_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
       if (m==='relief') rows+='<dt>spænd</dt><dd>'+Math.round(reliefM[k]).toLocaleString('da-DK')+' m</dd>';
     } else if (m==='cur'){
       if (!seaMask[k]) return null;
-      var cms=curRaw[k*3], deg=Math.round(curRaw[k*3+1]/255*360);
+      // Report the filtered field, not the raw one, so the number under
+      // the cursor is the current the map is actually drawing. On the
+      // raw field a cell could read half a metre a second from an eddy
+      // that the view no longer shows at all.
+      var cms=curSpd[k]*100, deg=Math.round(((Math.atan2(curV[k],curU[k])*180/Math.PI)+360)%360);
       var compass=['Ø','NØ','N','NV','V','SV','S','SØ'][Math.round(deg/45)%8];
       rows+='<dt>fart</dt><dd>'+(cms/100).toFixed(2).replace('.',',')+' m/s</dd>';
       rows+='<dt>retning</dt><dd>mod '+compass+'</dd>';
@@ -2126,14 +2054,10 @@ var TERRA_ICE_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     uniforms.uSunLon.value = sp.lon;
     if (currentMode.sun) updateSunReadout();
 
-    // How much of what is on screen is the currents view, counting a
-    // transition as partly there, so the drifters fade with the columns.
-    var flowMix = 0;
-    if (currentMode.id === 'cur') flowMix = morph;
-    else if (MODES[0] && uniforms.uModeA.value === 2) flowMix = 1 - morph;
-    flowMat.uniforms.uOpacity.value = flowMix;
-    flowMesh.visible = flowMix > 0.01;
-    if (flowMesh.visible && !reduceMotion) flowStep(dt, uniforms.uCurSpeed.value);
+    // The currents no longer need a frame of CPU. The flow is a fixed
+    // field and the movement along it is a function of the clock, so all
+    // that has to cross to the GPU each frame is the time itself.
+    if (!reduceMotion) uniforms.uCurPhase.value += dt * uniforms.uCurSpeed.value;
 
     var cloudMix = 0;
     if (currentMode.id === 'live') cloudMix = morph;
