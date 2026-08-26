@@ -858,7 +858,12 @@ var TERRA_ICE_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
   var supportsPop = !!(renderer.capabilities && renderer.capabilities.vertexTextures);
 
   var scene = new THREE.Scene();
-  var camera = new THREE.PerspectiveCamera(26, 1, 0.1, 4000);
+  // A long lens rather than a wide one. At 26 degrees the map was a
+  // pronounced trapezoid, the north squeezed and the south splayed; an
+  // atlas is a rectangle. Pulling the camera back and narrowing the view
+  // to 11 degrees flattens the perspective to almost nothing while the
+  // columns keep their sides.
+  var camera = new THREE.PerspectiveCamera(11, 1, 0.1, 30000);
 
   var box = new THREE.BoxGeometry(1,1,1);
   box.translate(0, 0.5, 0);
@@ -1344,7 +1349,16 @@ var TERRA_ICE_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     var moved = FLOW_DEG_PER_MS * rate;
     flowAcc += dt;
     var lay = flowAcc >= FLOW_SAMPLE;
-    if (lay) flowAcc = 0;
+    // Carry the remainder rather than zeroing, so the phase below is the
+    // true time since the last point was laid and the interval does not
+    // drift with the frame rate.
+    if (lay) flowAcc -= FLOW_SAMPLE;
+    // The trail's fade is a function of this phase, measured after any
+    // shift. When the history moves along one place, each segment inherits
+    // exactly the alpha it already had, so nothing steps. Getting this
+    // wrong made the whole field pulse nine times a second: a clean
+    // seven-frame sawtooth, 3.5 against a median of 1.3.
+    var sub = flowAcc / FLOW_SAMPLE;
 
     var vi = 0, ai = 0;
     for (var p = 0; p < FLOW_N; p++){
@@ -1389,13 +1403,19 @@ var TERRA_ICE_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         var hx = flowHist[base+s*2], hz = flowHist[base+s*2+1];
         var live = (flowFill[p] > s) ? 1 : 0;
         if (live && Math.abs(prevX - hx) > COLS*0.5) live = 0;   // wrapped the dateline
-        var headFade = 1 - s/FLOW_SEGS;
-        var a = live ? vis*headFade : 0;
+        // Both ends get their own place on one straight fade running the
+        // length of the trail. Scaled so the oldest point reaches zero
+        // exactly as it is dropped: fading to a sixth and then vanishing
+        // was the rest of the flicker.
+        var f0 = 1 - (s + sub)/FLOW_SEGS;
+        var f1 = 1 - (s + 1 + sub)/FLOW_SEGS;
+        var a0 = live ? vis*(f0 > 0 ? f0 : 0) : 0;
+        var a1 = live ? vis*(f1 > 0 ? f1 : 0) : 0;
 
         flowPos[vi++] = prevX; flowPos[vi++] = FLOW_Y; flowPos[vi++] = prevZ;
         flowPos[vi++] = hx;    flowPos[vi++] = FLOW_Y; flowPos[vi++] = hz;
-        flowAlpha[ai] = a;            flowSpd[ai++] = spN;
-        flowAlpha[ai] = a*(1-1/FLOW_SEGS); flowSpd[ai++] = spN;
+        flowAlpha[ai] = a0; flowSpd[ai++] = spN;
+        flowAlpha[ai] = a1; flowSpd[ai++] = spN;
 
         prevX = hx; prevZ = hz;
       }
@@ -1413,9 +1433,9 @@ var TERRA_ICE_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
   // for it with shift or the right button. The default framing fills the
   // window rather than floating the world in the middle of it.
   // ---------------------------------------------------------------
-  var HOME = { theta:0, phi:0.56 };
+  var HOME = { theta:0, phi:0.40 };
   var cam = { theta:HOME.theta, phi:HOME.phi, radius:700, tx:0, tz:0 };
-  var minRadius = 18, maxRadius = 2200;
+  var minRadius = 30, maxRadius = 4200;
   var userMoved = false;
 
   var HALF_W = COLS*SPACING*0.5, HALF_D = ROWS*SPACING*0.5;
@@ -1429,12 +1449,12 @@ var TERRA_ICE_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     var hFov = 2*Math.atan(Math.tan(vFov/2)*(camera.aspect||1));
     var needW = HALF_W/Math.tan(hFov/2);
     var needD = (HALF_D*Math.cos(cam.phi))/Math.tan(vFov/2);
-    // The smaller of the two fills the window: whichever axis runs out first
-    // decides, and the other overflows off-screen. Backed off a little from a
-    // hard fill, which cropped longitude so tightly that Australia was cut in
-    // half on the default view. At this setting the map still reaches every
-    // edge and the continents stay whole.
-    return Math.min(maxRadius, Math.max(minRadius, Math.min(needW, needD)*1.16));
+    // The larger of the two shows the whole world, which is the point of an
+    // atlas. Filling the window instead meant cropping about forty degrees
+    // of longitude off each side, so the Pacific was cut in two and had to
+    // be found by dragging. A two by one map on a sixteen by nine window
+    // cannot avoid a margin above and below; an atlas has margins too.
+    return Math.min(maxRadius, Math.max(minRadius, Math.max(needW, needD)*1.02));
   }
 
   function updateCamera(){
@@ -1445,6 +1465,13 @@ var TERRA_ICE_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
       cam.tz + cam.radius*sp*Math.cos(cam.theta)
     );
     camera.lookAt(cam.tx, 2, cam.tz);
+    // Fog has to follow the camera. Fixed distances were tuned for one
+    // particular radius, so pulling back for a flatter, more atlas-like
+    // projection pushed the whole world past the far plane and drowned it
+    // in fog. Held as a ratio, the haze always sits on the far edge and
+    // nowhere else, at any zoom.
+    uniforms.uFogNear.value = cam.radius*0.90;
+    uniforms.uFogFar.value  = cam.radius*2.15;
   }
 
   // Where a screen point lands on the ground plane, for both dragging and
