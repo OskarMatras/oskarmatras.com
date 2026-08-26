@@ -302,6 +302,21 @@
     color:var(--ink-soft); line-height:1.7;
   }
 
+  /* On a phone held upright the world is a wide ribbon across the middle of
+     a very tall screen, and the controls, pinned to the top and bottom
+     edges, ended up stranded a couple of hundred pixels clear of it, with
+     the map floating in between. The ribbon's height is not arbitrary: it
+     is the full width of the screen divided by the world's own proportions,
+     the same figure the camera is framed by. So the same figure can tell
+     the HUD where the map's edges are, and the controls move in to meet
+     them. The nine rem it steps back by is the height of the control stack
+     itself, so the rows land clear of the ribbon rather than on top of it.
+     The floor keeps a sane margin on a screen short enough that the
+     ribbon already reaches the controls. */
+  @media (max-width:760px) and (orientation:portrait){
+    .hud{ padding-block:max(0.7rem, calc((100vh - (100vw / 2.2))/2 - 9rem)); }
+  }
+
   /* On a narrow screen the legend and the controls cannot sit side by side,
      and letting them wrap leaves the legend stranded in mid-air. Stack them
      instead, both hugging the bottom edge. */
