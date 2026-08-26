@@ -395,7 +395,7 @@
     <p><strong>Højde</strong> is elevation in real metres, land and sea floor alike, from the same global model that feeds most web maps. Permanent ice comes from its own layer rather than from the height, so Greenland and Antarctica are drawn as ice instead of as brown upland, and the open sea carries a slow swell. <strong>Terræn</strong> measures how sharply the ground changes rather than how high it sits, so mountain chains, coastlines and the mid-ocean ridges stand out while plains and abyssal basins stay flat.</p>
     <p><strong>Havstrømme</strong> lets twelve thousand drifters go on the surface and has the measured current carry them, each leaving a short trail. Nothing is choreographed: every drifter only ever reads the day's u and v. Where the flow is strong and coherent the trails line up into a stream, which is how the equatorial jets, the Agulhas, the Kuroshio and the Antarctic Circumpolar draw themselves, eddies and all. Speed is exaggerated by a long way, as it is on every current map: real water takes a day and a half to cross a degree.</p>
     <p>Two honest limits. This is one five-day mean, not a climatology, so eddies show as strongly as the average flow. And it is the <em>surface</em>: the deep overturning that people mean by the Greenland pump is a circulation in the water column, not on top of it, and no surface field can show it. At one degree the narrow western boundary currents are also smeared into the gyre around them, so a drifter released off Hatteras will often turn back into the recirculation rather than run for Europe.</p>
-    <p><strong>Befolkning</strong> turns height into headcount from 1800 to today. <strong>Tæthed</strong> divides that by how much ground a cell actually covers, since a one-degree cell near the poles is a fraction of the size of one at the equator. <strong>Vækst</strong> shows the change since the previous decade rather than the total, which is where the demographic transition becomes visible as it moves across the world.</p>
+    <p><strong>Befolkning</strong> turns height into headcount from 1800 to today. <strong>Tæthed</strong> divides that by how much ground a cell actually covers, since a one-degree cell near the poles is a fraction of the size of one at the equator. strong> shows not the total but how fast it is growing: the population figures are stored as logarithms, so the step from one decade to the next is a ratio rather than a difference, and what is drawn is the rate of increase. That is where the demographic transition becomes visible as it moves across the world./strong> shows the change since the previous decade rather than the total, which is where the demographic transition becomes visible as it moves across the world.</p>
     <p><strong>Riger</strong> runs from 500 BC to 2010. Each cell is coloured by whichever state held it, and stands as tall as that state was large at the time, so empires rise and subside as they gain and lose ground. Rome is worth watching: two cells at 323 BC, forty-nine by 200 BC, then the whole Mediterranean.</p>
 
     <p><strong>Sollys</strong> is the only view that is not a stored grid. The position of the sun is worked out from the clock and the earth's orbit, the same arithmetic behind any sunrise table, and the map is lit accordingly: height is insolation, the share of a sunbeam a patch of ground actually catches, and the colour runs through the real twilight steps down to eighteen degrees below the horizon. It moves in real time. The slider runs the clock forward instead, from a day in a few seconds to a year in a couple of minutes, which is where the tilt of the earth shows itself as the lit band slides north and south.</p>
@@ -422,7 +422,7 @@
       Modern country boundaries, used for the hover labels: Natural Earth 1:110m.<br><br>
       Live weather: <a href="https://open-meteo.com/">Open-Meteo</a>, licensed CC BY 4.0. One request of 648 points for the global field, cached for half an hour, and single-point requests for whatever is under the pointer. The limit that shapes this is the length of a URL: a request can carry roughly 650 coordinates, and firing several such requests at once is refused.<br><br>
       Sunlight: computed, not stored. Standard low-precision solar position, good to about a hundredth of a degree of declination for centuries either side of 2000. Checked against published times before it went in: Copenhagen on the June solstice comes out 04:26 and 21:58 local against a published 04:26 and 21:58, Sydney 07:01 and 16:54, and midday altitude at Copenhagen in December lands on 10.89 degrees against a textbook 10.88. It is clear-sky geometry: where the sun is, not what the weather is doing.<br><br>
-      Derived here rather than measured separately: Terræn (local spread of elevation), Tæthed (population over cosine-of-latitude cell area) and Vækst (difference between consecutive decades). Country population is spread evenly across that country's land cells, so Tæthed compares countries rather than cities.<br><br>
+      Population is held on a logarithmic scale: each cell stores 34.5 times the base-ten logarithm of the people standing on it, which is what lets a map carry Bangladesh and the Sahara at once without one of them vanishing. Everything downstream respects that. Density divides by cell area, which on a logarithm means subtracting rather than multiplying, and V&aelig;kst subtracts one decade from the next, which on a logarithm is a ratio and so reads as a rate of growth. Both views are stretched across the range the data actually occupies rather than from zero, because no inhabited cell is anywhere near zero. Derived here rather than measured separately: Terræn (local spread of elevation), Tæthed (population over cosine-of-latitude cell area) and Vækst (difference between consecutive decades). Country population is spread evenly across that country's land cells, so Tæthed compares countries rather than cities.<br><br>
       One editorial decision: the territory source renames Rome as its constitution changes, so Rome, the Roman Republic and the Roman Empire are given a single colour to keep the expansion readable. Every other state is coloured from its own name.
     </div>
 
@@ -473,6 +473,24 @@ var TERRA_ICE_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
   var COLS = 360, ROWS = 180, SPACING = 1.0, N = COLS * ROWS;
   var MIN_H = 0.05, MAX_H = 12.0;
+
+  // The population texture does not hold a headcount. The build writes
+  // byte = 34.49*log10(people per cell) + 6.15, which a regression over
+  // all 3,993 country-years recovers to an RMS of 3.25 bytes out of 255.
+  // Anything that treats the value as a count rather than a logarithm
+  // will be wrong, and the density view was: it multiplied by one over
+  // cos(lat) to divide by cell area, which in log space is not a
+  // division at all. This is one decade of population expressed in the
+  // texture's own 0..1 units.
+  var POP_LOG_DECADE = 34.49 / 255;
+
+  // Density, in the texture's own log units. The shader computes the
+  // same thing; it lives here as well so the normaliser that sets the
+  // scale and the raycast that reads a column's height cannot drift
+  // away from what is actually drawn.
+  function popDensity(p, k){
+    return p + POP_LOG_DECADE * (Math.log(aPhysA[k*4+3]) / Math.LN10);
+  }
 
   function clamp01(v){ return Math.min(1, Math.max(0, v)); }
   function decodeB64(str){
@@ -825,16 +843,23 @@ var TERRA_ICE_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
   var POP_KEYS = (function(){ var y=[]; for (var v=1800; v<=2020; v+=10) y.push(v); y.push(2023); return y; })();
   var POP_FRAMES = POP_KEYS.length;
 
-  var densityNorm = 1, growthNorm = 1;
+  // Both the population and the density views were normalised against
+  // zero at the bottom, and no populated cell is anywhere near zero: the
+  // texture floors at byte 42 and half of all cells sit between 145 and
+  // 184. So the bottom two thirds of the height ramp and of the colour
+  // ramp were never reached, and the world came out a plateau. Both ends
+  // are measured now, and the views are stretched across what the data
+  // actually occupies rather than across what it could in principle.
+  var densityLo = 0, densityNorm = 1, growthNorm = 1, popLo = 0, popHi = 1;
   (function measureDerived(){
     var BINS = 2048;
-    var dH = new Int32Array(BINS), gH = new Int32Array(BINS);
-    var dMax = 0, gMax = 0, dN = 0, gN = 0, f, k, p, d, gd;
+    var pH = new Int32Array(BINS), dH = new Int32Array(BINS), gH = new Int32Array(BINS);
+    var dMax = 0, gMax = 0, pN = 0, dN = 0, gN = 0, f, k, p, d, gd;
     for (f = 0; f < POP_FRAMES; f++){
       var b = f*N, pv = (f-1)*N;
       for (k = 0; k < N; k++){
         p = popTextureData[b+k]/255; if (p <= 0) continue;
-        d = p * aPhysA[k*4+3]; if (d > dMax) dMax = d;
+        d = popDensity(p, k); if (d > dMax) dMax = d;
         if (f > 0){ gd = p - popTextureData[pv+k]/255; if (gd > gMax) gMax = gd; }
       }
     }
@@ -843,7 +868,8 @@ var TERRA_ICE_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
       var b2 = f*N, pv2 = (f-1)*N;
       for (k = 0; k < N; k++){
         p = popTextureData[b2+k]/255; if (p <= 0) continue;
-        d = p * aPhysA[k*4+3];
+        d = popDensity(p, k);
+        pH[Math.min(BINS-1,(p*BINS)|0)]++; pN++;
         dH[Math.min(BINS-1,(d/dMax*BINS)|0)]++; dN++;
         if (f > 0){ gd = p - popTextureData[pv2+k]/255;
           if (gd > 0){ gH[Math.min(BINS-1,(gd/gMax*BINS)|0)]++; gN++; } }
@@ -851,6 +877,9 @@ var TERRA_ICE_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     }
     function pct(h, tot, mx, q){ if (!tot) return mx; var tgt = tot*q, run = 0;
       for (var i = 0; i < BINS; i++){ run += h[i]; if (run >= tgt) return ((i+1)/BINS)*mx; } return mx; }
+    popLo       = pct(pH, pN, 1, 0.004);
+    popHi       = pct(pH, pN, 1, 0.999);
+    densityLo   = pct(dH, dN, dMax, 0.004);
     densityNorm = pct(dH, dN, dMax, 0.992) || dMax;
     growthNorm = pct(gH, gN, gMax, 0.995) || gMax;
   })();
@@ -932,6 +961,7 @@ var TERRA_ICE_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     uPopLow:{value:0}, uPopFrac:{value:0},
     uEmpLow:{value:0}, uEmpFrac:{value:0},
     uDensityNorm:{value:densityNorm}, uGrowthNorm:{value:growthNorm},
+    uDensityLo:{value:densityLo}, uPopLo:{value:popLo}, uPopHi:{value:popHi},
     uHoverCell:{value:new THREE.Vector2(-1,-1)},
     uCurSpeed:{value:1.0},
     uCurNorm:{value:CUR_NORM},
@@ -956,6 +986,7 @@ var TERRA_ICE_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     'uniform sampler2D uPopTexture; uniform sampler2D uEmpTexture;',
     'uniform float uPopLow; uniform float uPopFrac; uniform float uEmpLow; uniform float uEmpFrac;',
     'uniform float uDensityNorm; uniform float uGrowthNorm;',
+    'uniform float uDensityLo; uniform float uPopLo; uniform float uPopHi;',
     'uniform vec2 uHoverCell; uniform float uCurSpeed; uniform float uDissolve; uniform float uCurNorm;',
     'uniform float uElevMax; uniform float uDepthMax;',
     'uniform float uSunDecl; uniform float uSunLon;',
@@ -963,6 +994,7 @@ var TERRA_ICE_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
     'varying vec3 vColor; varying vec3 vNormal; varying float vViewZ; varying float vLocalY;',
 
+    'const float POP_LOG_DECADE = ' + POP_LOG_DECADE.toFixed(6) + ';',
     'const float MIN_H = ' + MIN_H.toFixed(3) + ';',
     'const float MAX_H = ' + MAX_H.toFixed(3) + ';',
     'const float COLS_F = ' + COLS.toFixed(1) + ';',
@@ -1065,10 +1097,20 @@ var TERRA_ICE_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
     // 3/4/5: population, density, growth
     '  float pop = popAt(uPopLow,uPopFrac);',
+    // Stretched across the range the data actually occupies. The raw
+    // value stays untouched for growth below, which is a difference and
+    // so does not care where the floor sits.
+    '  float popN = clamp((pop-uPopLo)/max(uPopHi-uPopLo,0.0001),0.0,1.0);',
     '  vec3 popA=vec3(0.141,0.071,0.204), popB=vec3(0.631,0.239,0.388), popC=vec3(1.0,0.812,0.420);',
-    '  gH[3] = mix(MIN_H,MAX_H,pow(pop,0.82));',
-    '  gC[3] = ramp3(popA,popB,popC,pop);',
-    '  float dens = pow(clamp(pop*aInvArea/uDensityNorm,0.0,1.0),0.7);',
+    '  gH[3] = mix(MIN_H,MAX_H,pow(popN,0.82));',
+    '  gC[3] = ramp3(popA,popB,popC,popN);',
+    // The population texture is a logarithm, not a headcount, so dividing
+    // it by an area is meaningless. In log space dividing is subtracting,
+    // and dividing by cos(lat) is adding log of the inverse. Multiplying
+    // instead put northern Siberia and northern Canada above Bangladesh
+    // and Java as the densest ground on earth.
+    '  float densRaw = pop + POP_LOG_DECADE*log(aInvArea)*0.4342945;',
+    '  float dens = pow(clamp((densRaw-uDensityLo)/max(uDensityNorm-uDensityLo,0.0001),0.0,1.0),0.7);',
     '  vec3 dnA=vec3(0.106,0.063,0.188), dnB=vec3(0.302,0.420,0.702), dnC=vec3(0.624,0.910,1.0);',
     '  gH[4] = mix(MIN_H,MAX_H,dens);',
     '  gC[4] = ramp3(dnA,dnB,dnC,dens);',
@@ -1909,8 +1951,8 @@ var TERRA_ICE_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     var tl=TIMELINES.pop, fr=frameFor(tl.keys,currentYear);
     var lo=popTextureData[fr.low*N+k]/255, hi=popTextureData[Math.min(POP_FRAMES-1,fr.low+1)*N+k]/255;
     var p=lo+(hi-lo)*fr.frac;
-    if (m===3) return MIN_H+(MAX_H-MIN_H)*Math.pow(p,0.82);
-    if (m===4) return MIN_H+(MAX_H-MIN_H)*Math.pow(Math.min(1,p*aPhysA[k*4+3]/densityNorm),0.7);
+    if (m===3) return MIN_H+(MAX_H-MIN_H)*Math.pow(clamp01((p-popLo)/Math.max(popHi-popLo,0.0001)),0.82);
+    if (m===4) return MIN_H+(MAX_H-MIN_H)*Math.pow(clamp01((popDensity(p,k)-densityLo)/Math.max(densityNorm-densityLo,0.0001)),0.7);
     return MIN_H;
   }
   function cellAt(cx,cy){
