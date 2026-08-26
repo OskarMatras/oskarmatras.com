@@ -393,9 +393,10 @@
 
     <h2>The nine views</h2>
     <p><strong>Højde</strong> is elevation in real metres, land and sea floor alike, from the same global model that feeds most web maps. Permanent ice comes from its own layer rather than from the height, so Greenland and Antarctica are drawn as ice instead of as brown upland, and the open sea carries a slow swell. <strong>Terræn</strong> measures how sharply the ground changes rather than how high it sits, so mountain chains, coastlines and the mid-ocean ridges stand out while plains and abyssal basins stay flat.</p>
-    <p><strong>Havstrømme</strong> is the standing pattern of the surface ocean, not the state of it on any particular day. The source is a single five-day mean, and at one degree that is as much eddy as it is circulation: every gyre came wrapped in small closed swirls that are perfectly real, are different the following week, and are not what anyone means by an ocean current. So the field is filtered until only the large-scale flow is left. What survives is what an atlas would name. The Antarctic Circumpolar runs right round the bottom of the world, the equatorial jets stripe the Pacific and the Indian, and the three great western boundary currents — the Gulf Stream off Hatteras, the Kuroshio off Japan, the Agulhas rounding South Africa — stand up as ridges against the quiet middles of the gyres.</p>
-    <p>Height is the strength of the current and nothing else, so the map reads as a relief of where the water is moving. The movement over the top is a field of noise dragged along the flow, which is decoration rather than measurement: it tells you the direction and lets the eye see that the water is going somewhere, and it is not a drifter and does not claim to be. Speed is exaggerated by a long way, as it is on every current map, since real water takes a day and a half to cross a single degree.</p>
-    <p>Two honest limits. Filtering trades detail for legibility: it is what removes the eddies, and it also broadens the narrow currents, so the Gulf Stream here is a wide ridge rather than the sharp jet it is in life. And this is the <em>surface</em>. The deep overturning that people mean by the Greenland pump is a circulation in the water column, not on top of it, and no surface field can show it — what you can see is its surface branch, the warm water of the North Atlantic Drift leaning north-east towards Iceland and Norway, which is slow and broad and easy to miss next to the equator.</p>
+    <p><strong>Havstrømme</strong> is the one view here that is drawn rather than measured, and it is drawn because the thing it shows cannot be photographed. What people mean by the Greenland pump is a single loop running through the entire depth of the ocean: warm water travelling north along the surface of the Atlantic, giving up its heat to the sky over Europe, growing cold and salty and heavy enough off Greenland and Iceland to sink two miles, and then creeping back south along the sea floor. No map of the surface can show the half of it that is underneath. So the loop is drawn as a loop.</p>
+    <p>Follow one crest and you can go round the whole circuit. It leaves the Caribbean warm, runs up the eastern seaboard as the Gulf Stream and across to Europe, cools all the way, and turns dark where it sinks off Greenland. It comes back down the eastern side of the Atlantic cold, joins the Antarctic Circumpolar Current and travels east under Africa, Australia and South America, turns north into the Pacific and warms as it rises, and then returns west through the Indonesian passages, across the Indian Ocean, round South Africa and up into the Atlantic to where it started. A cubic metre of water takes something like a thousand years to make that trip.</p>
+    <p>Warm water is warm-coloured and always running away from the equator; cold water is dark and running back towards it. The same rule draws the five subtropical gyres, thinner and quieter beneath the conveyor: each ocean turns its own wheel, warm up the western side and cold down the eastern, which is why the Gulf Stream is warm and the Canary Current cold, why the Kuroshio is warm and the California Current cold, and so on in every basin on both sides of the equator.</p>
+    <p>Two things to be straight about. The loop appears to cross itself in the South Atlantic, where the cold water going south meets the warm water coming north. That is not a mistake in the drawing: in the ocean one of them is two miles beneath the other, and a flat map has nowhere to put that. And the ribbons are a schematic, positioned by hand from the standard published route, not a measurement. The measurement is still there underneath them — the dim blue field is the real, filtered surface velocity, so the ribbons can be checked against the water they are drawn over.</p>
     <p><strong>Befolkning</strong> turns height into headcount from 1800 to today. <strong>Tæthed</strong> divides that by how much ground a cell actually covers, since a one-degree cell near the poles is a fraction of the size of one at the equator. strong> shows not the total but how fast it is growing: the population figures are stored as logarithms, so the step from one decade to the next is a ratio rather than a difference, and what is drawn is the rate of increase. That is where the demographic transition becomes visible as it moves across the world./strong> shows the change since the previous decade rather than the total, which is where the demographic transition becomes visible as it moves across the world.</p>
     <p><strong>Riger</strong> runs from 500 BC to 2010. Each cell is coloured by whichever state held it, and stands as tall as that state was large at the time, so empires rise and subside as they gain and lose ground. Rome is worth watching: two cells at 323 BC, forty-nine by 200 BC, then the whole Mediterranean.</p>
 
@@ -417,7 +418,8 @@
       <strong>Sources</strong><br>
       Elevation, land and sea floor: Terrain Tiles on AWS, the open global model assembled from SRTM, GMTED2010 and ETOPO1. Sampled to this one-degree grid; values are metres.<br><br>
       Permanent ice and glaciers: Natural Earth 1:110m, kept as its own layer so Antarctica and Greenland are drawn as ice rather than as brown upland at the same height as Tibet.<br><br>
-      Ocean surface currents: OSCAR (Ocean Surface Current Analysis Real-time, NOAA/NASA), a single five-day mean centred on 31 January 2014, sampled to this one-degree grid. It is then low-pass filtered here: eight passes of a three-by-three average, which is close to a Gaussian of about five degrees. The filter knows where the land is, since averaging a velocity across a coastline would invent water moving through Africa, and it averages vectors as vectors, u with u and v with v, so the opposing arms of an eddy cancel and vanish while a coherent stream survives every pass. Colour and height run on the cube-ish root of speed rather than on speed itself, because surface currents span two decades and on a straight scale the equatorial jets erase everything else. Coverage stops at 80&deg; north and south, and thins well before that wherever the source masks sea ice.<br><br>
+      Ocean currents, the field underneath: OSCAR (Ocean Surface Current Analysis Real-time, NOAA/NASA), a single five-day mean centred on 31 January 2014, sampled to this one-degree grid and then low-pass filtered here — eight passes of a three-by-three average, close to a Gaussian of five degrees. The filter knows where the land is, since averaging a velocity across a coastline would invent water moving through Africa, and it averages vectors as vectors, so the opposing arms of an eddy cancel and vanish while a coherent stream survives every pass. Coverage stops at 80&deg; north and south, and thins well before that wherever the source masks sea ice.<br><br>
+      The conveyor and the gyres drawn over it: a schematic, and the only thing on this map that is not measured. The route is the standard one described by NOAA's Ocean Service and by Britannica, after Broecker's conveyor: sinking in the Nordic and Labrador seas, south down the Atlantic as North Atlantic Deep Water, east around Antarctica, north into the Pacific, upwelling, and the warm return through the Indonesian passages and around South Africa. Waypoints are placed by hand along that route and along the five subtropical gyres. Positions are indicative, in the way every published version of this diagram is indicative; the shape of the circuit is the point, not the coordinates. The travelling crest is given a whole number of cycles around each closed loop, so it meets itself without a step.<br><br>
       Population, and the per-country figures on hover: Our World in Data's long-run population series, which blends Gapminder, HYDE and the UN.<br><br>
       Historical territory: historical-basemaps, after Nüssli's Euratlas and successors, sampled at twenty-one dates between 500 BC and 2010. Borders before the modern era are approximate by nature, and the underlying maps say so.<br><br>
       Modern country boundaries, used for the hover labels: Natural Earth 1:110m.<br><br>
@@ -976,6 +978,7 @@ var TERRA_ICE_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
   var vs = [
     'attribute vec2 aOffset;','attribute vec4 aPhysA;','attribute vec4 aPhysB;','attribute vec2 aGridUV;',
+    'attribute vec3 aFlow;',
     'attribute float aIce;',
     '#define aElevNorm  aPhysA.x','#define aIsLand    aPhysA.y',
     '#define aRelief    aPhysA.z','#define aInvArea   aPhysA.w',
@@ -1096,46 +1099,43 @@ var TERRA_ICE_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     '  gH[1] = mix(MIN_H, MAX_H*0.88, pow(aRelief,0.7));',
     '  gC[1] = ramp3(relA,relB,relC,pow(aRelief,0.7));',
 
-    // 2: ocean currents. Height is the strength of the current and
-    // nothing else, so the map stands up into the shapes an atlas would
-    // name: the Antarctic Circumpolar right round the bottom, the
-    // equatorial jets, the Kuroshio, the Gulf Stream and the North
-    // Atlantic Drift reaching up towards Greenland.
+    // 2: ocean currents, as the overturning loop rather than as a day's
+    // velocity field. The measured flow is still here, dark and flat
+    // underneath, so the real gyres and jets show where they are; the
+    // conveyor is drawn on top of it as a raised ribbon.
     //
-    // An earlier version banded the water by phase along the flow. It
-    // streamed where the current ran straight and drew bullseyes in the
-    // middle of every gyre, which is not a bug that can be tuned away:
-    // a gyre closes on itself, so a coordinate that counts distance
-    // along the flow has to jump somewhere on the loop.
-    //
-    // So nothing is phased by position. A field of noise is dragged
-    // along the flow instead, and two copies of it, one cycle apart,
-    // are crossfaded so the reset happens where the two agree and there
-    // is no seam to see. The water moves; the map underneath does not.
+    // The wave that travels along the ribbon is phased by distance along
+    // the path, which is the thing an earlier version could not do. Off a
+    // measured field there is no such coordinate: a gyre closes on itself,
+    // so counting distance along the flow has to jump somewhere on the
+    // loop, and the jump showed up as a bullseye in the middle of every
+    // ocean. Along a drawn path the coordinate is simply the path, and
+    // each closed loop is given a whole number of crests, so the wave runs
+    // round it and meets itself without a seam.
     '  float sp = clamp(aCurSpd, 0.0, 1.0);',
-    '  float ang = aCurDir*6.2831853;',
-    '  vec2 dir = vec2(cos(ang), sin(ang));',
-    '  vec2 cpos = vec2(aOffset.x, aOffset.y);',
-    '  float ct = fract(uCurPhase*0.19);',
-    '  float drift = 11.0;',
-    '  float cn0 = cNoise((cpos - dir*(ct*drift))*0.34);',
-    '  float cn1 = cNoise((cpos - dir*((ct-1.0)*drift))*0.34);',
-    '  float shim = mix(cn0, cn1, ct);',
-    // Only the moving water shimmers, and never by much: the still
-    // middle of a basin has nothing to show and should stay still.
-    '  float mov = smoothstep(0.05, 0.40, sp);',
-    '  float glint = (shim-0.5)*mov;',
-    '  vec3 seaFloorC = mix(vec3(0.020,0.047,0.094), vec3(0.035,0.098,0.173), pow(clamp(1.0+aElevNorm,0.0,1.0),1.5));',
+    '  float fAmp = aFlow.x, fPh = aFlow.y, fWarm = aFlow.z;',
+    // A crest running along the ribbon, sharpened so the water reads as
+    // separate pulses travelling rather than as a corrugation.
+    '  float fw = sin(fPh*6.2831853 - uCurPhase*1.15);',
+    '  float pulse = pow(fw*0.5 + 0.5, 2.2);',
+    '  vec3 seaFloorC = mix(vec3(0.016,0.035,0.075), vec3(0.027,0.075,0.137), pow(clamp(1.0+aElevNorm,0.0,1.0),1.5));',
     '  vec3 landC = mix(vec3(0.157,0.169,0.176), vec3(0.267,0.263,0.243), pow(clamp(aElevNorm,0.0,1.0),0.6));',
-    '  float curH = MAX_H*(0.04 + 0.46*sp + 0.05*glint);',
-    '  gH[2] = aIsLand>0.5 ? MAX_H*0.09 : curH;',
-    // One unbroken gradient from the dark of a still basin to a pale
-    // crest, so neighbouring cells differ by a shade rather than by a
-    // line being there or not.
-    '  vec3 curC = mix(seaFloorC, vec3(0.094,0.373,0.596), smoothstep(0.16,0.50,sp));',
-    '  curC = mix(curC, vec3(0.310,0.706,0.855), smoothstep(0.35,0.75,sp));',
-    '  curC = mix(curC, vec3(0.780,0.945,1.0), smoothstep(0.70,1.0,sp));',
-    '  curC *= 1.0 + 0.30*glint;',
+    // The measured field, kept low and quiet so it reads as the ground the
+    // diagram is drawn on rather than as a competing picture.
+    '  vec3 baseC = mix(seaFloorC, vec3(0.063,0.180,0.294), smoothstep(0.16,0.72,sp));',
+    '  float baseH = MAX_H*(0.04 + 0.10*sp);',
+    // Cold water is a deep indigo, warm water runs orange through to a
+    // pale gold at the crest. Between them is the temperature of the water
+    // at that point on the loop, so the Gulf Stream arrives warm, loses its
+    // colour on the way to Greenland, and comes back south dark.
+    '  vec3 coldC = mix(vec3(0.086,0.204,0.451), vec3(0.318,0.612,0.878), pulse);',
+    '  vec3 warmC = mix(vec3(0.573,0.180,0.157), vec3(1.0,0.812,0.451), pulse);',
+    '  vec3 ribbonC = mix(coldC, warmC, smoothstep(0.18, 0.72, fWarm));',
+    // The ribbon stands above the sea it crosses, and breathes along its
+    // length as the crest goes by.
+    '  float ribH = MAX_H*fAmp*(0.30 + 0.30*pulse);',
+    '  gH[2] = aIsLand>0.5 ? MAX_H*0.09 : baseH + ribH;',
+    '  vec3 curC = mix(baseC, ribbonC, clamp(fAmp*(0.55 + 0.45*pulse), 0.0, 1.0));',
     '  gC[2] = aIsLand>0.5 ? mix(landC, vec3(0.808,0.851,0.878), smoothstep(0.15,0.7,aIce)) : curC;',
 
     // 3/4/5: population, density, growth
@@ -1346,6 +1346,176 @@ var TERRA_ICE_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     }
     geo.attributes.aPhysB.needsUpdate = true;
   })();
+
+  // ---------------------------------------------------------------
+  // The great conveyor, and the gyres.
+  //
+  // Everything else on this map is measured. This is not, and the panel
+  // says so: it is a schematic, drawn the way the textbooks draw it,
+  // because the thing it describes cannot be seen from above. The
+  // overturning people mean by the Greenland pump is a loop through the
+  // whole depth of the ocean, warm water running north along the top,
+  // sinking off Greenland and Iceland, and creeping back south along the
+  // bottom. A surface velocity field has no way to show the half of it
+  // that is two miles down.
+  //
+  // So the loop is drawn as a loop. Warm water is the colour of warm
+  // water and runs away from the equator, cold water is dark and runs
+  // back towards it, and the two meet where the water sinks. The one
+  // liberty taken is that the deep return is drawn beside the warm flow
+  // rather than beneath it, which is what a flat map forces on anyone who
+  // draws this.
+  //
+  // The route is the standard one: sinking in the Nordic and Labrador
+  // seas, south down the Atlantic as North Atlantic Deep Water, east
+  // around Antarctica in the Circumpolar Current, two branches turning
+  // north into the Indian and the Pacific, upwelling there, and the long
+  // warm return through the Indonesian passages and around South Africa
+  // into the Atlantic again.
+  // ---------------------------------------------------------------
+  // Each point is longitude, latitude, and how warm the water is there.
+  var OCEAN_PATHS = [
+    // The conveyor, as one closed loop. Six separate ribbons read as a
+    // tangle; a single unbroken circuit reads as the circle it is, and the
+    // crest can be followed the whole way round - north through the
+    // Atlantic warm, down its eastern side cold, east around Antarctica,
+    // north into the Pacific, and back west through Indonesia and around
+    // South Africa to where it started.
+    //
+    // The one place the loop crosses itself is the South Atlantic, where
+    // the cold water heading south meets the warm water coming north. That
+    // crossing is not a mistake in the drawing: in the ocean one of them is
+    // two miles beneath the other, and a flat map has nowhere to put that.
+    { closed:true, w:4.0, band:1.2, pts:[
+      // Caribbean into the Gulf Stream, warm.
+      [-79,24,1],[-76,29,1],[-71,33,1],[-63,38,1],[-52,43,0.98],[-40,47,0.94],
+      [-29,52,0.86],[-19,58,0.72],[-11,63,0.55],[-5,68,0.36],[1,71,0.18],
+      // The sinking ground off Greenland and Iceland, and the turn south.
+      [4,73,0.04],[-2,71,0],[-11,66,0],[-18,59,0],[-22,50,0],
+      // Cold, the length of the Atlantic, down its eastern side.
+      [-23,40,0],[-21,30,0],[-18,20,0],[-15,10,0],[-12,0,0],[-9,-10,0],
+      [-5,-20,0],[0,-30,0],[5,-40,0],[8,-48,0],
+      // East around Antarctica in the Circumpolar Current.
+      [30,-55,0.03],[60,-57,0.03],[90,-59,0.03],[120,-60,0.03],[150,-61,0.03],
+      [180,-61,0.03],[-155,-60,0.03],
+      // North into the Pacific, warming as it rises.
+      [-158,-48,0.14],[-166,-34,0.3],[-173,-20,0.45],[-178,-6,0.6],
+      [-172,8,0.72],[-162,20,0.83],[-152,29,0.92],
+      // West across the Pacific and through the Indonesian passages.
+      [-166,23,0.96],[-180,15,0.97],[163,8,0.99],[147,2,1],[133,-4,1],
+      // Across the Indian Ocean and round South Africa.
+      [119,-11,1],[101,-14,1],[83,-17,1],[65,-22,1],[49,-29,1],[37,-35,1],
+      [24,-37,0.99],[10,-36,0.96],
+      // Up the western side of the Atlantic, home.
+      [-6,-34,0.93],[-22,-30,0.93],[-35,-23,0.95],[-44,-13,0.96],
+      [-52,-3,0.98],[-59,7,1],[-68,14,1],[-76,20,1] ] },
+
+    // The five subtropical gyres. Thinner and quieter than the conveyor, so
+    // they read as the pattern each ocean keeps for itself rather than as
+    // part of the loop. Warm down the western side where the water runs
+    // away from the equator, cold up the eastern side where it comes back,
+    // which is why the Gulf Stream is warm and the Canary Current cold, and
+    // the same on both sides of every ocean.
+    { closed:true, w:2.1, band:0.58, pts:[
+      [-70,27,1],[-62,33,1],[-50,37,0.9],[-38,38,0.7],[-27,36,0.45],
+      [-20,31,0.2],[-19,25,0.1],[-25,20,0.12],[-38,18,0.3],[-52,20,0.55],[-62,23,0.85] ] },
+    { closed:true, w:2.1, band:0.58, pts:[
+      [-45,-27,1],[-48,-34,0.95],[-42,-39,0.8],[-31,-41,0.55],[-21,-39,0.3],
+      [-14,-35,0.12],[-12,-29,0.1],[-17,-24,0.2],[-26,-21,0.4],[-37,-23,0.7] ] },
+    { closed:true, w:2.1, band:0.58, pts:[
+      [141,28,1],[149,34,1],[161,38,0.9],[175,39,0.7],[-170,37,0.45],
+      [-159,33,0.2],[-153,28,0.1],[-157,23,0.12],[-170,21,0.3],[177,22,0.55],[158,24,0.85] ] },
+    { closed:true, w:2.1, band:0.58, pts:[
+      [156,-29,1],[160,-36,0.95],[171,-42,0.8],[-174,-44,0.6],[-150,-43,0.35],
+      [-124,-39,0.15],[-98,-32,0.1],[-96,-25,0.15],[-114,-22,0.35],[-140,-23,0.6],[169,-25,0.85] ] },
+    { closed:true, w:2.1, band:0.58, pts:[
+      [39,-33,1],[45,-40,0.95],[58,-44,0.8],[77,-44,0.55],[93,-40,0.3],
+      [105,-33,0.12],[109,-26,0.1],[99,-21,0.2],[82,-19,0.4],[62,-21,0.65],[48,-27,0.85] ] }
+  ];
+
+  // Painted on to the grid once, at load. Each path is walked at a fine
+  // step, and every cell within the ribbon's half width of that step keeps
+  // the nearest visit: how far along the loop it sits, and how warm the
+  // water is there. A cell claimed by two paths keeps whichever runs
+  // closer to it, so crossings resolve instead of averaging into mush.
+  var aFlow = new Float32Array(N * 3);   // amplitude, phase in turns, warmth
+  (function paintPaths(){
+    var best = new Float32Array(N);
+    for (var k = 0; k < N; k++) best[k] = 1e9;
+
+    function lerpLon(a, b, t){          // longitudes take the short way round
+      var d = ((b - a + 540) % 360) - 180;
+      return a + d*t;
+    }
+
+    for (var p = 0; p < OCEAN_PATHS.length; p++){
+      var path = OCEAN_PATHS[p], pts = path.pts, np = pts.length;
+      var segs = path.closed ? np : np-1;
+      var si, A, B, dLon, mLat, ddx, ddy, segLen;
+
+      // Measure it once, so the wave can be given a whole number of
+      // cycles. On a closed loop a fractional count leaves a visible step
+      // where the two ends meet.
+      var total = 0;
+      for (si = 0; si < segs; si++){
+        A = pts[si]; B = pts[(si+1) % np];
+        dLon = (((B[0]-A[0]) + 540) % 360) - 180;
+        mLat = (A[1]+B[1])*0.5;
+        ddx = dLon*Math.cos(mLat*Math.PI/180); ddy = B[1]-A[1];
+        total += Math.sqrt(ddx*ddx + ddy*ddy);
+      }
+      var cycles = Math.max(1, Math.round(total/11));   // a crest every 11 degrees
+      var run = 0;
+
+      for (si = 0; si < segs; si++){
+        A = pts[si]; B = pts[(si+1) % np];
+        dLon = (((B[0]-A[0]) + 540) % 360) - 180;
+        mLat = (A[1]+B[1])*0.5;
+        ddx = dLon*Math.cos(mLat*Math.PI/180); ddy = B[1]-A[1];
+        segLen = Math.sqrt(ddx*ddx + ddy*ddy);
+        var steps = Math.max(2, Math.ceil(segLen*4));
+
+        for (var st = 0; st < steps; st++){
+          var t = st/steps;
+          var lon = lerpLon(A[0], B[0], t), lat = A[1] + (B[1]-A[1])*t;
+          var temp = A[2] + (B[2]-A[2])*t;
+          var phase = ((run + segLen*t)/Math.max(total,0.001))*cycles;
+          phase -= Math.floor(phase);
+
+          // Stamp the neighbourhood. Longitude spreads with latitude, so
+          // the ribbon keeps its width on the ground rather than on the grid.
+          var w = path.w;
+          var cosL = Math.max(0.15, Math.cos(lat*Math.PI/180));
+          var wi = Math.ceil(w/cosL), wj = Math.ceil(w);
+          var ci = Math.floor(lon + 180), cj = Math.floor(90 - lat);
+          for (var dj = -wj; dj <= wj; dj++){
+            var jj = cj + dj; if (jj < 0 || jj >= ROWS) continue;
+            for (var di = -wi; di <= wi; di++){
+              var ii = ((ci + di) % COLS + COLS) % COLS;
+              var kk = jj*COLS + ii;
+              if (!seaMask[kk]) continue;
+              var cLon = ii - 180 + 0.5, cLat = 90 - jj - 0.5;
+              var gLon = ((cLon - lon + 540) % 360) - 180;
+              var gx = gLon*cosL, gy = cLat - lat;
+              var d = Math.sqrt(gx*gx + gy*gy);
+              if (d > w || d >= best[kk]) continue;
+              best[kk] = d;
+              var fall = 1 - d/w;
+              aFlow[kk*3]   = fall*fall*(3-2*fall) * path.band;   // smooth edges
+              aFlow[kk*3+1] = phase;
+              aFlow[kk*3+2] = temp;
+            }
+          }
+        }
+        run += segLen;
+      }
+    }
+  })();
+
+  // Registered late, because the ribbons have to be painted before there
+  // is anything to register. The geometry is not drawn until the first
+  // frame, so this is still in time.
+  geo.setAttribute('aFlow', new THREE.InstancedBufferAttribute(aFlow, 3));
 
   // ---------------------------------------------------------------
   // The cloud deck.
@@ -1621,8 +1791,8 @@ var TERRA_ICE_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
       rows:[{label:'Stejlhed',ramp:['#101b2b','#5d6b7d','#f2e6cd']}],
       ends:['fladt','','stejlt'], source:'afledt &middot; lokal højdeforskel i meter' },
     { id:'cur', label:'Havstrømme', shaderId:2, flow:true,
-      rows:[{label:'Fart',ramp:['#081b2e','#28909d','#e0faec']}],
-      ends:['stille','','hurtig'], source:'OSCAR / NOAA &middot; overfladestrømme, udjævnet til hovedstrømme' },
+      rows:[{label:'Vandet',ramp:['#163474','#519ce0','#ffcf73']}],
+      ends:['kold','','varm'], source:'Det store transportbånd &middot; skematisk, efter NOAA &middot; målt strømfelt: OSCAR' },
     { id:'pop', label:'Befolkning', shaderId:3, year:'pop', needsVertexTex:true,
       rows:[{label:'Mennesker',ramp:['#241234','#a13d63','#ffcf6b']}],
       ends:['tyndt','','tæt'], source:'Our World in Data &middot; Gapminder, HYDE, FN' },
@@ -1870,7 +2040,10 @@ var TERRA_ICE_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     // The travelling crest is left out: the raycast wants the standing
     // height of the column, not whichever part of the wave happens to be
     // passing, or the readout would jitter under a still cursor.
-    if (m===2) return isLandArr[k] ? MAX_H*0.09 : MAX_H*(0.04 + 0.46*aPhysB[k*4+2]);
+    // The standing part only. The travelling crest is left out so the
+    // readout does not jitter under a still cursor.
+    if (m===2) return isLandArr[k] ? MAX_H*0.09
+      : MAX_H*(0.04 + 0.10*aPhysB[k*4+2]) + MAX_H*aFlow[k*3]*0.45;
     if (m===6) return isLandArr[k]?MAX_H*0.4:MIN_H*0.5;
     var tl=TIMELINES.pop, fr=frameFor(tl.keys,currentYear);
     var lo=popTextureData[fr.low*N+k]/255, hi=popTextureData[Math.min(POP_FRAMES-1,fr.low+1)*N+k]/255;
@@ -1922,6 +2095,14 @@ var TERRA_ICE_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
       var compass=['Ø','NØ','N','NV','V','SV','S','SØ'][Math.round(deg/45)%8];
       rows+='<dt>fart</dt><dd>'+(cms/100).toFixed(2).replace('.',',')+' m/s</dd>';
       rows+='<dt>retning</dt><dd>mod '+compass+'</dd>';
+      // The measured field is what the two lines above report. If the
+      // cursor is also on one of the drawn ribbons, say so, and say
+      // which limb of the loop it is - but never put a temperature in
+      // degrees on it, because the schematic does not carry one.
+      if (aFlow[k*3] > 0.12){
+        var warm = aFlow[k*3+2];
+        rows+='<dt>transportb&aring;nd</dt><dd>'+(warm>0.6?'varm gren':warm<0.25?'kold gren':'undervejs')+'</dd>';
+      }
     } else if (m==='live'){
       // The coloured field is the ten degree grid; the tooltip asks about
       // this spot exactly, which is one location and costs almost nothing.
