@@ -331,6 +331,47 @@
     input[type=range]{ flex:1; width:auto; }
   }
 
+
+  /* ---------------- The landmark card ----------------
+     Sits in the middle of the top edge, above the map and out of the way
+     of the two panels in the corners. It is the only thing on the page
+     that appears without being asked for, so it stays quiet: no box, no
+     border, just the words over the world with enough of a shadow to
+     survive a pale ocean underneath. */
+  .event-card{
+    position:fixed; top:clamp(1.1rem,5vh,3.4rem); left:50%;
+    transform:translate(-50%,-0.5rem);
+    z-index:12; pointer-events:none; text-align:center;
+    opacity:0; transition:opacity .5s ease, transform .5s cubic-bezier(.22,.72,.24,1);
+    max-width:min(30rem,86vw);
+  }
+  .event-card.show{ transform:translate(-50%,0); }
+  .event-time{
+    font-family:var(--mono); font-size:0.66rem; letter-spacing:0.16em;
+    text-transform:uppercase; color:var(--accent);
+    text-shadow:0 1px 10px rgba(4,7,14,0.95);
+  }
+  .event-name{
+    margin-top:0.28rem;
+    font-size:clamp(1.05rem,2.6vw,1.6rem); line-height:1.22;
+    letter-spacing:-0.015em; color:var(--d-ink);
+    text-shadow:0 1px 3px rgba(4,7,14,0.9), 0 2px 22px rgba(4,7,14,0.85);
+  }
+  /* One beat as each landmark arrives, so a run of them does not read as
+     a single caption whose text keeps changing. */
+  @keyframes eventPulse{
+    0%   { opacity:0; letter-spacing:0.06em; }
+    38%  { opacity:1; letter-spacing:-0.015em; }
+    100% { opacity:1; letter-spacing:-0.015em; }
+  }
+  .event-card.pulse .event-name{ animation:eventPulse .72s cubic-bezier(.22,.72,.24,1) both; }
+  @media (max-width:760px){
+    .event-card{ top:clamp(0.9rem,3.5vh,2rem); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .event-card{ transition:none; }
+    .event-card.pulse .event-name{ animation:none; }
+  }
   @media (prefers-reduced-motion: reduce){
     #reader,#scrim,#tip,.ghost-btn,.hint{ transition:none; }
   }
@@ -352,6 +393,13 @@
       <span class="what"><a href="/Projects">Projekter</a> / Terra Through Time</span>
     </div>
     <div class="modebar panel-box" id="modebar" role="group" aria-label="What the map shows"></div>
+  </div>
+
+  <!-- Names whatever the playback has slowed down for. Empty and
+       invisible until a landmark is near. -->
+  <div class="event-card" id="eventcard" aria-live="polite">
+    <div class="event-time" id="event-time"></div>
+    <div class="event-name" id="event-name"></div>
   </div>
 
   <div class="hint" id="hint">træk for at flytte kortet &middot; scroll for at zoome &middot; shift+træk for at dreje</div>
@@ -409,6 +457,8 @@
 
     <h2>Moving between moments</h2>
     <p>Two kinds of change need two different treatments. Quantities, like population or current speed, are interpolated: any year between two records is a genuine blend of the two, so scrubbing the slider glides. Territory is not a quantity. Who holds a piece of ground is a category, and averaging two categories produces a state that never existed, so instead each cell hands over on its own offset within the interval. A hard switch becomes a border that sweeps across the ground.</p>
+    <p>Playback does not run at a constant rate. A timeline held to one speed treats two uneventful centuries exactly like the year the Western Empire fell, so instead it runs fast between the moments worth stopping for, eases down as one approaches, holds for a couple of seconds while its name is on screen, and picks the pace back up. The slowdown reaches much wider than the caption does, so the change of pace is gradual while the name itself stays punctuation rather than furniture. Parking the slider next to a landmark names it too, without playing anything.</p>
+    <p>The landmarks are chosen, not derived, and the dates are the conventional ones: the billions on the population clock, the rise and fall of states on the territory run, and on the drift the breakup of Pangaea, the opening of the South Atlantic, the impact that closed the Cretaceous, and the collision of India with Asia.</p>
 
     <h2>Getting around</h2>
     <p>The map behaves like a map rather than like a model on a turntable. <strong>Drag</strong> takes hold of the ground and moves it. <strong>Scroll</strong> zooms towards whatever is under the pointer, so you can put Australia in the middle of the screen and keep going until single columns fill it. <strong>Shift-drag</strong>, or the right or middle button, tilts and turns the view: flat overhead for reading the shapes, low and oblique for reading the heights. Arrow keys pan, plus and minus zoom, and <em>nulstil visning</em> puts everything back.</p>
@@ -1948,6 +1998,82 @@ var TERRA_TECT_RLE_B64="Rw0KUE8BBFAHAB5QPgEGUAkAJlAyAQhQBgAyUCcBCFAHADxQGAEMUAgA
   // snapshot now gets the same time on screen, and gets more of it than the
   // population years do, because a redrawn map takes longer to read than a
   // column that has grown slightly taller.
+
+  // ---------------------------------------------------------------
+  // Landmarks on the timelines.
+  //
+  // Running a timeline at a constant rate treats two hundred uneventful
+  // years exactly like the year the Western Empire fell. These are the
+  // moments worth stopping for: playback runs fast between them, eases
+  // down as one approaches, holds while its name is on screen, and picks
+  // the pace back up.
+  //
+  // Dates are the conventional ones and are given as the timeline reads
+  // them - calendar years for the two historical views, negative millions
+  // of years for the drift. Where a date is genuinely disputed, the label
+  // says so rather than pretending to a precision nobody has.
+  // ---------------------------------------------------------------
+  var TIMELINE_EVENTS = {
+    pop: [
+      { t:1804, name:'Den første milliard' },
+      { t:1845, name:'Den irske hungersnød' },
+      { t:1918, name:'Den spanske syge' },
+      { t:1927, name:'To milliarder' },
+      { t:1960, name:'Tre milliarder' },
+      { t:1974, name:'Fire milliarder' },
+      { t:1987, name:'Fem milliarder' },
+      { t:1999, name:'Seks milliarder' },
+      { t:2011, name:'Syv milliarder' },
+      { t:2022, name:'Otte milliarder' }
+    ],
+    emp: [
+      { t:-500, name:'Perserriget når sit største' },
+      { t:-323, name:'Alexander dør i Babylon' },
+      { t:-221, name:'Qin samler Kina' },
+      { t:-27,  name:'Det romerske kejserdømme' },
+      { t:117,  name:'Rom når sit største' },
+      { t:395,  name:'Romerriget deles' },
+      { t:476,  name:'Vestromerriget falder' },
+      { t:632,  name:'Den arabiske ekspansion' },
+      { t:800,  name:'Karl den Store kronet' },
+      { t:1206, name:'Djengis Khan samler steppen' },
+      { t:1279, name:'Mongolriget når sit største' },
+      { t:1453, name:'Konstantinopel falder' },
+      { t:1492, name:'Atlanten krydses' },
+      { t:1600, name:'Kompagnierne sejler ud' },
+      { t:1776, name:'De første kolonier river sig løs' },
+      { t:1884, name:'Berlinkonferencen deler Afrika' },
+      { t:1914, name:'Den Første Verdenskrig' },
+      { t:1945, name:'Den Anden Verdenskrig slutter' },
+      { t:1947, name:'Indien bliver frit' },
+      { t:1960, name:'Afrikas år' },
+      { t:1991, name:'Sovjetunionen opløses' }
+    ],
+    tect: [
+      { t:-252, name:'Den store død ved Perms slutning' },
+      { t:-250, name:'Pangaea samlet' },
+      { t:-201, name:'Pangaea begynder at revne' },
+      { t:-180, name:'Laurasia skilles fra Gondwana' },
+      { t:-140, name:'Sydatlanten åbner sig' },
+      { t:-88,  name:'Indien forlader Madagaskar' },
+      { t:-66,  name:'Nedslaget der lukkede Kridttiden' },
+      { t:-50,  name:'Indien rammer Asien' },
+      { t:-45,  name:'Australien slipper Antarktis' },
+      { t:-34,  name:'Antarktis fryser til' },
+      { t:-5,   name:'Middelhavet fyldes igen' },
+      { t:0,    name:'I dag' }
+    ]
+  };
+  // How near a landmark the playhead has to be before it starts easing
+  // down, in each timeline's own units, and how long it holds once it
+  // arrives. The spans are set by how crowded each timeline is: the
+  // empires run two and a half thousand years and can afford a wide
+  // approach, population only two hundred and would otherwise spend the
+  // whole run in slow motion.
+  var EVENT_SPAN = { pop:11, emp:45, tect:10 };
+  var EVENT_HOLD = 1.9;      // seconds held at a landmark
+  var EVENT_SLOW = 0.10;     // speed at a landmark, as a share of full
+
   var TIMELINES = {
     pop: { keys:POP_KEYS, min:1800, max:2023, playSeconds:26,
            setUniforms:function(low,frac){ uniforms.uPopLow.value=low; uniforms.uPopFrac.value=frac; } },
@@ -2034,6 +2160,75 @@ var TERRA_TECT_RLE_B64="Rw0KUE8BBFAHAB5QPgEGUAkAJlAyAQhQBgAyUCcBCFAHADxQGAEMUAgA
     if (tl && tl.fmt) return tl.fmt(y);
     y=Math.round(y); return y<0 ? Math.abs(y)+' f.Kr.' : String(y);
   }
+
+  // ---------------------------------------------------------------
+  // Pacing, and the card that names what the pacing stopped for.
+  // ---------------------------------------------------------------
+  var eventHold = 0;          // seconds still to hold at the current landmark
+  var eventFired = {};        // landmarks already visited on this pass
+  var eventShown = null;      // which landmark the card is currently naming
+
+  function eventsFor(mode){
+    return (mode && TIMELINE_EVENTS[mode.year]) || null;
+  }
+  // The nearest landmark to a point on the timeline, with the distance in
+  // that timeline's own units and how far through the approach we are:
+  // zero standing on it, one out beyond the span where it has no pull.
+  function nearestEvent(mode, year){
+    var list = eventsFor(mode); if (!list) return null;
+    var span = EVENT_SPAN[mode.year] || 1;
+    var best = null, bd = 1e18;
+    for (var i = 0; i < list.length; i++){
+      var d = Math.abs(year - list[i].t);
+      if (d < bd){ bd = d; best = list[i]; }
+    }
+    if (!best) return null;
+    return { ev:best, dist:bd, k:Math.min(1, bd/span), span:span };
+  }
+  // Full speed away from a landmark, easing to a crawl on top of one. The
+  // curve is a smoothstep so the change of pace is itself gradual - a
+  // sudden drop into slow motion reads as a stutter, not as emphasis.
+  function playbackRate(mode, year){
+    var n = nearestEvent(mode, year);
+    if (!n) return 1;
+    var s = n.k*n.k*(3 - 2*n.k);
+    return EVENT_SLOW + (1 - EVENT_SLOW)*s;
+  }
+
+  var cardEl = document.getElementById('eventcard');
+  var cardTimeEl = document.getElementById('event-time');
+  var cardNameEl = document.getElementById('event-name');
+  function updateEventCard(mode, year){
+    if (!cardEl) return;
+    var n = nearestEvent(mode, year);
+    // The slowdown reaches wide so the change of pace is gentle; the card
+    // comes up much later and on a tighter band. Tying the two together
+    // left the name on screen almost continuously through the crowded
+    // end of the empires run, which makes it furniture rather than
+    // punctuation.
+    var vis = n ? 1 - Math.min(1, Math.max(0, (n.k - 0.22)/0.30)) : 0;
+    if (eventHold > 0) vis = 1;
+    if (!n || vis <= 0.01){
+      cardEl.classList.remove('show','pulse');
+      eventShown = null;
+      return;
+    }
+    if (eventShown !== n.ev){
+      eventShown = n.ev;
+      cardNameEl.textContent = n.ev.name;
+      cardTimeEl.textContent = fmtYear(n.ev.t);
+      // Restart the highlight so each landmark gets its own beat.
+      cardEl.classList.remove('pulse');
+      void cardEl.offsetWidth;
+      cardEl.classList.add('pulse');
+    }
+    cardEl.classList.add('show');
+    cardEl.style.opacity = vis.toFixed(3);
+  }
+  // A pass over the timeline starts with nothing visited, so looping or
+  // jumping back plays the landmarks again.
+  function resetEvents(){ eventFired = {}; eventHold = 0; eventShown = null;
+    if (cardEl){ cardEl.classList.remove('show','pulse'); } }
 
   function setYear(year){
     var tl = TIMELINES[currentMode.year];
@@ -2374,19 +2569,55 @@ var TERRA_TECT_RLE_B64="Rw0KUE8BBFAHAB5QPgEGUAkAJlAyAQhQBgAyUCcBCFAHADxQGAEMUAgA
       var tl=TIMELINES[currentMode.year];
       var floor=Math.max(tl.min, currentMode.minYear||tl.min);
       var pFloor=framePosOfYear(tl.keys, floor), pMax=tl.keys.length-1;
-      var p=framePosOfYear(tl.keys, currentYear) + dt*((pMax-pFloor)/tl.playSeconds);
-      // Reaching the end and snapping back to the start rewrites the whole
-      // map in a single frame, which was by some way the most violent thing
-      // on screen and carried no meaning. The loop instead sinks the columns,
-      // moves the year while nothing is standing, and builds back up.
-      if (p >= pMax && !looping){ looping = true; revealTarget = 0; }
-      else if (!looping) setYear(yearAtFramePos(tl.keys, p));
+      // Held on a landmark: the clock stops while its name is on screen,
+      // then the run picks up again.
+      if (eventHold > 0){
+        eventHold -= dt;
+      } else {
+        var yNow = currentYear;
+        var step = dt*((pMax-pFloor)/tl.playSeconds)*playbackRate(currentMode, yNow);
+        var p = framePosOfYear(tl.keys, yNow) + step;
+        var yNext = yearAtFramePos(tl.keys, Math.min(p, pMax));
+        // Did this step carry the playhead over a landmark it has not
+        // stopped at yet? Testing the interval rather than the distance
+        // means a landmark cannot be skipped by a long frame.
+        var list = TIMELINE_EVENTS[currentMode.year];
+        if (list){
+          for (var ei = 0; ei < list.length; ei++){
+            var et = list[ei].t;
+            if (eventFired[et]) continue;
+            if (et > yNow - 1e-9 && et <= yNext + 1e-9){
+              eventFired[et] = 1;
+              // Land exactly on it, so the map on screen is the one the
+              // card is naming rather than a year either side of it.
+              setYear(et);
+              eventHold = EVENT_HOLD;
+              yNext = null;
+              break;
+            }
+          }
+        }
+        if (yNext !== null){
+          // Reaching the end and snapping back to the start rewrites the
+          // whole map in a single frame, which was by some way the most
+          // violent thing on screen and carried no meaning. The loop
+          // instead sinks the columns, moves the year while nothing is
+          // standing, and builds back up.
+          if (p >= pMax && !looping){ looping = true; revealTarget = 0; }
+          else if (!looping) setYear(yNext);
+        }
+      }
     }
     if (looping && revealState <= 0.001){
       var tlL = TIMELINES[currentMode.year];
       if (tlL) setYear(Math.max(tlL.min, currentMode.minYear || tlL.min));
       revealTarget = 1; looping = false;
+      resetEvents();
     }
+    // The card follows the year whether or not anything is playing, so
+    // parking the slider on a landmark names it too.
+    if (currentMode.year) updateEventCard(currentMode, currentYear);
+    else if (cardEl) cardEl.classList.remove('show','pulse');
 
     // The sun keeps moving whichever view is on, so a switch back to it
     // never shows a stale sky. At rate one this is the real position now;
