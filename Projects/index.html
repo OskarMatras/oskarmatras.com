@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Projekter · Oskar Matras</title>
-<meta name="description" content="Sideprojekter af Oskar Matras: eksperimenter med data, 3D-rendering og interaktion.">
+<title data-da="Projekter · Oskar Matras" data-en="Projects · Oskar Matras">Projekter · Oskar Matras</title>
+<meta name="description" content="Sideprojekter af Oskar Matras: eksperimenter med data, 3D-rendering og interaktion." data-da-content="Sideprojekter af Oskar Matras: eksperimenter med data, 3D-rendering og interaktion." data-en-content="Side projects by Oskar Matras: experiments with data, 3D rendering and interaction.">
 <link rel="canonical" href="https://OskarMatras.com/Projects">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -86,6 +86,19 @@
   header.site .wrap{
     display:flex; align-items:center; justify-content:space-between;
     padding:18px 28px; gap:16px; flex-wrap:wrap;
+  }
+  /* The language switch sits in the header itself rather than inside
+     the nav, so it survives the nav collapsing to a hamburger. On a
+     phone it sits immediately left of that hamburger; on a wide screen
+     it follows the brand and the links run on after it. */
+  .nav-lang{ flex:none; margin-left:auto; order:1; font-size:0.92rem; }
+  @media (max-width:760px){ .nav-toggle{ order:2; margin-left:10px; } }
+  /* The header row is 880px wide and the links already fill most of it,
+     so making room for the switch means tightening the gap between them
+     rather than letting the row wrap into two. */
+  @media (min-width:761px){
+    .nav-lang{ order:3; margin-left:0; font-size:0.82rem; }
+    header.site nav.main{ gap:18px; }
   }
   .brand{
     font-family:var(--serif); font-weight:600; font-size:1.05rem;
@@ -288,17 +301,18 @@
 <header class="site">
   <div class="wrap">
     <a class="brand" href="/">Oskar Matras</a>
-    <button class="nav-toggle" id="nav-toggle" aria-label="Åbn menu" aria-expanded="false" aria-controls="main-nav">
+    <span class="nav-lang" data-lang-switch></span>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Åbn menu" data-da-aria-label="Åbn menu" data-en-aria-label="Open menu" aria-expanded="false" aria-controls="main-nav">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
     </button>
     <nav class="main" id="main-nav">
-      <a href="/#om">Om</a>
-      <a href="/#erfaring">Erfaring</a>
-      <a href="/#praktik">Praktik</a>
-      <a href="/#uddannelse">Uddannelse</a>
-      <a href="/#kompetencer">Kompetencer</a>
-      <a href="/Projects" class="current">Projekter</a>
-      <a href="/#kontakt">Kontakt</a>
+      <a href="/#om" data-da="Om" data-en="About">Om</a>
+      <a href="/#erfaring" data-da="Erfaring" data-en="Experience">Erfaring</a>
+      <a href="/#praktik" data-da="Praktik" data-en="Placements">Praktik</a>
+      <a href="/#uddannelse" data-da="Uddannelse" data-en="Education">Uddannelse</a>
+      <a href="/#kompetencer" data-da="Kompetencer" data-en="Skills">Kompetencer</a>
+      <a href="/Projects" class="current" data-da="Projekter" data-en="Projects">Projekter</a>
+      <a href="/#kontakt" data-da="Kontakt" data-en="Contact">Kontakt</a>
     </nav>
   </div>
 </header>
@@ -306,9 +320,9 @@
 <main>
   <section class="hero">
     <div class="wrap">
-      <span class="eyebrow">Sideprojekter</span>
-      <h1>Projekter</h1>
-      <p class="lead">En samling af ting jeg bygger ved siden af. Mest eksperimenter med data, 3D-rendering og interaktion. Listen vokser.</p>
+      <span class="eyebrow" data-da="Sideprojekter" data-en="Side projects">Sideprojekter</span>
+      <h1 data-da="Projekter" data-en="Projects">Projekter</h1>
+      <p class="lead" data-da="En samling af ting jeg bygger ved siden af. Mest eksperimenter med data, 3D-rendering og interaktion. Listen vokser." data-en="A collection of things I build on the side. Mostly experiments with data, 3D rendering and interaction. The list is growing.">En samling af ting jeg bygger ved siden af. Mest eksperimenter med data, 3D-rendering og interaktion. Listen vokser.</p>
     </div>
   </section>
 
@@ -321,21 +335,22 @@
             <!-- Above the fold and the whole point of the card, so it loads
                  eagerly rather than lazily. -->
             <img src="/Projects/terra-preview.jpg" width="1120" height="480" decoding="async" fetchpriority="high"
-                 alt="Verdenskortet gengivet som tusindvis af 3D-søjler, farvet efter højde og havdybde.">
-            <span class="badge">Interaktiv</span>
+                 alt="Verdenskortet gengivet som tusindvis af 3D-søjler, farvet efter højde og havdybde." data-da-alt="Verdenskortet gengivet som tusindvis af 3D-søjler, farvet efter højde og havdybde." data-en-alt="The world map rendered as thousands of 3D columns, coloured by elevation and ocean depth.">
+            <span class="badge" data-da="Interaktiv" data-en="Interactive">Interaktiv</span>
           </div>
           <div class="card-body">
-            <span class="tag">Datavisualisering &middot; WebGL</span>
+            <span class="tag" data-da="Datavisualisering &middot; WebGL" data-en="Data visualisation &middot; WebGL">Datavisualisering &middot; WebGL</span>
             <h3>Terra Through Time</h3>
-            <p>Et verdenskort bygget af 64.800 animerede 3D-søjler: reel højde og havdybde, stiliserede tidevand, og global befolkningsvækst fra 1800 til i dag.</p>
-            <span class="go">Åbn projekt <span class="arrow">→</span></span>
+            <p data-da="Et verdenskort bygget af 64.800 animerede 3D-søjler. Ti visninger af den samme klode: højde og havdybde i rigtige meter, havets kredsløb, befolkning og tæthed fra 1800 til i dag, riger fra 500 f.Kr., sollys i realtid, skydække lige nu, og kontinenternes vandring fra Pangaea til nu."
+               data-en="A world map built from 64,800 animated 3D columns. Ten views of the same globe: elevation and ocean depth in real metres, the overturning circulation of the sea, population and density from 1800 to today, empires from 500 BC, sunlight in real time, cloud cover right now, and the continents drifting from Pangaea to the present.">Et verdenskort bygget af 64.800 animerede 3D-søjler. Ti visninger af den samme klode: højde og havdybde i rigtige meter, havets kredsløb, befolkning og tæthed fra 1800 til i dag, riger fra 500 f.Kr., sollys i realtid, skydække lige nu, og kontinenternes vandring fra Pangaea til nu.</p>
+            <span class="go"><span data-da="Åbn projekt" data-en="Open project">Åbn projekt</span> <span class="arrow">→</span></span>
           </div>
         </a>
 
         <div class="card soon">
           <div class="mark">✳</div>
-          <h3>Næste projekt</h3>
-          <p>Der er mere på vej. Flere datasæt på det samme kort, og et par ting der ikke ligner kort overhovedet.</p>
+          <h3 data-da="Næste projekt" data-en="Next project">Næste projekt</h3>
+          <p data-da="Der er mere på vej. Flere datasæt på det samme kort, og et par ting der ikke ligner kort overhovedet." data-en="More is on the way. Further datasets on the same map, and a couple of things that do not look like maps at all.">Der er mere på vej. Flere datasæt på det samme kort, og et par ting der ikke ligner kort overhovedet.</p>
         </div>
 
       </div>
@@ -514,5 +529,6 @@
   })();
 </script>
 
+<script src="/i18n.js" defer></script>
 </body>
 </html>

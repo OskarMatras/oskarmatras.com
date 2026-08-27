@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Oskar Matras · CV</title>
-<meta name="description" content="Oskar Matras · CV og profil.">
+<meta name="description" content="Oskar Matras · CV og profil." data-da-content="Oskar Matras · CV og profil." data-en-content="Oskar Matras · CV and profile.">
 <link rel="canonical" href="https://OskarMatras.com/">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -62,6 +62,19 @@
     flex-wrap:wrap;
   }
   .brand{font-family:'Fraunces', serif; font-weight:600; font-size:1.05rem; text-decoration:none; letter-spacing:-0.01em; flex-shrink:0;}
+  /* The language switch sits in the header itself rather than inside
+     the nav, so it survives the nav collapsing to a hamburger. On a
+     phone it sits immediately left of that hamburger; on a wide screen
+     it follows the brand and the links run on after it. */
+  .nav-lang{ flex:none; margin-left:auto; order:1; font-size:0.92rem; }
+  @media (max-width:760px){ .nav-toggle{ order:2; margin-left:10px; } }
+  /* The header row is 880px wide and the links already fill most of it,
+     so making room for the switch means tightening the gap between them
+     rather than letting the row wrap into two. */
+  @media (min-width:761px){
+    .nav-lang{ order:3; margin-left:0; font-size:0.82rem; }
+    header.site nav.main{ gap:18px; }
+  }
   /* Nav scrolls horizontally within its own box instead of ever forcing the
      page itself to grow wider than the viewport, the classic cause of
      mobile browsers letting you pinch-zoom out into empty space. Below
@@ -391,17 +404,18 @@
 <header class="site">
   <div class="wrap">
     <a class="brand" href="#top">Oskar Matras</a>
-    <button class="nav-toggle" id="nav-toggle" aria-label="Åbn menu" aria-expanded="false" aria-controls="main-nav">
+    <span class="nav-lang" data-lang-switch></span>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Åbn menu" data-da-aria-label="Åbn menu" data-en-aria-label="Open menu" aria-expanded="false" aria-controls="main-nav">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
     </button>
     <nav class="main" id="main-nav">
-      <a href="#om">Om</a>
-      <a href="#erfaring">Erfaring</a>
-      <a href="#praktik">Praktik</a>
-      <a href="#uddannelse">Uddannelse</a>
-      <a href="#kompetencer">Kompetencer</a>
-      <a href="/Projects">Projekter</a>
-      <a href="#kontakt">Kontakt</a>
+      <a href="#om" data-da="Om" data-en="About">Om</a>
+      <a href="#erfaring" data-da="Erfaring" data-en="Experience">Erfaring</a>
+      <a href="#praktik" data-da="Praktik" data-en="Placements">Praktik</a>
+      <a href="#uddannelse" data-da="Uddannelse" data-en="Education">Uddannelse</a>
+      <a href="#kompetencer" data-da="Kompetencer" data-en="Skills">Kompetencer</a>
+      <a href="/Projects" data-da="Projekter" data-en="Projects">Projekter</a>
+      <a href="#kontakt" data-da="Kontakt" data-en="Contact">Kontakt</a>
     </nav>
   </div>
 </header>
@@ -411,17 +425,19 @@
   <!-- HERO -->
   <section class="hero">
     <div class="wrap">
-      <span class="eyebrow">Student 2026 · STX Mat/Fys &amp; Bioteknologi</span>
+      <span class="eyebrow" data-da="Student 2026 · STX Mat/Fys &amp; Bioteknologi" data-en="Class of 2026 · Upper secondary, Maths/Physics &amp; Biotechnology">Student 2026 · STX Mat/Fys &amp; Bioteknologi</span>
       <h1>Oskar Matras</h1>
-      <p class="lead">
+      <p class="lead"
+         data-da="Jeg er student fra Vordingborg Gymnasium (STX, Mat/Fys &amp; Bioteknologi) og arbejder i dag som lead server-tekniker og AI-specialist hos startuppet FoodVoice. Jeg har stiftet fysikforeningen FysFolk og skrevet en artikel til Aktuel Naturvidenskab i samarbejde med Aarhus Universitet. Jeg trives med kundekontakt, teknisk problemløsning og at formidle naturvidenskab videre."
+         data-en="I finished upper secondary school at Vordingborg Gymnasium (maths/physics and biotechnology) and now work as lead server technician and AI specialist at the startup FoodVoice. I founded the physics association FysFolk and wrote an article for Aktuel Naturvidenskab in collaboration with Aarhus University. I enjoy client contact, solving technical problems and passing science on to other people.">
         Jeg er student fra Vordingborg Gymnasium (STX, Mat/Fys &amp; Bioteknologi) og arbejder i dag som
         lead server-tekniker og AI-specialist hos startuppet FoodVoice. Jeg har stiftet fysikforeningen
         FysFolk og skrevet en artikel til Aktuel Naturvidenskab i samarbejde med Aarhus Universitet.
         Jeg trives med kundekontakt, teknisk problemløsning og at formidle naturvidenskab videre.
       </p>
       <div class="cta-row">
-        <a class="btn primary" href="#kontakt">Kontakt mig</a>
-        <a class="btn ghost" href="#erfaring">Se erfaring ↓</a>
+        <a class="btn primary" href="#kontakt" data-da="Kontakt mig" data-en="Get in touch">Kontakt mig</a>
+        <a class="btn ghost" href="#erfaring" data-da="Se erfaring ↓" data-en="See experience ↓">Se erfaring ↓</a>
       </div>
     </div>
   </section>
@@ -430,21 +446,21 @@
   <section class="block alt" id="om">
     <div class="wrap">
       <div class="section-head">
-        <span class="num">Lige nu</span>
-        <h2>Det jeg beskæftiger mig med</h2>
+        <span class="num" data-da="Lige nu" data-en="Right now">Lige nu</span>
+        <h2 data-da="Det jeg beskæftiger mig med" data-en="What I am doing">Det jeg beskæftiger mig med</h2>
       </div>
       <div class="cards">
         <div class="card">
           <span class="tag">Startup</span>
           <h3>FoodVoice</h3>
-          <p>Lead server-tekniker og AI-specialist. Står for kundekontakt og er ansigtet udadtil for firmaet.</p>
-          <div class="period">2026–nu</div>
+          <p data-da="Lead server-tekniker og AI-specialist. Står for kundekontakt og er ansigtet udadtil for firmaet." data-en="Lead server technician and AI specialist. I handle client contact and am the company's public face.">Lead server-tekniker og AI-specialist. Står for kundekontakt og er ansigtet udadtil for firmaet.</p>
+          <div class="period" data-da="2026–nu" data-en="2026–present">2026–nu</div>
         </div>
         <div class="card">
-          <span class="tag">Forening · Stifter</span>
+          <span class="tag" data-da="Forening · Stifter" data-en="Association · Founder">Forening · Stifter</span>
           <h3>FysFolk</h3>
-          <p>Stiftet forening for fysik-interesserede unge. Stadig et lille hobbyprojekt ved siden af.</p>
-          <div class="period">2026–nu</div>
+          <p data-da="Stiftet forening for fysik-interesserede unge. Stadig et lille hobbyprojekt ved siden af." data-en="An association I founded for young people interested in physics. Still a small side project.">Stiftet forening for fysik-interesserede unge. Stadig et lille hobbyprojekt ved siden af.</p>
+          <div class="period" data-da="2026–nu" data-en="2026–present">2026–nu</div>
         </div>
       </div>
     </div>
@@ -454,48 +470,48 @@
   <section class="block" id="erfaring">
     <div class="wrap">
       <div class="section-head">
-        <span class="num">Erfaring</span>
-        <h2>Erhvervserfaring</h2>
+        <span class="num" data-da="Erfaring" data-en="Experience">Erfaring</span>
+        <h2 data-da="Erhvervserfaring" data-en="Work experience">Erhvervserfaring</h2>
       </div>
       <div class="timeline">
         <div class="titem">
           <div class="dot"></div>
           <div class="content">
-            <div class="role">Lead server-tekniker &amp; AI-specialist</div>
-            <div class="org">FoodVoice (Startup)</div>
-            <div class="period">2026–nu</div>
-            <p>Ansvarlig for kundekontakt og fungerer som firmaets udadvendte ansigt, samtidig med teknisk drift og AI-relateret arbejde.</p>
+            <div class="role" data-da="Lead server-tekniker &amp; AI-specialist" data-en="Lead server technician &amp; AI specialist">Lead server-tekniker &amp; AI-specialist</div>
+            <div class="org" data-da="FoodVoice (Startup)" data-en="FoodVoice (startup)">FoodVoice (Startup)</div>
+            <div class="period" data-da="2026–nu" data-en="2026–present">2026–nu</div>
+            <p data-da="Ansvarlig for kundekontakt og fungerer som firmaets udadvendte ansigt, samtidig med teknisk drift og AI-relateret arbejde." data-en="Responsible for client contact and the company's public face, alongside technical operations and AI work.">Ansvarlig for kundekontakt og fungerer som firmaets udadvendte ansigt, samtidig med teknisk drift og AI-relateret arbejde.</p>
           </div>
         </div>
         <div class="titem">
           <div class="dot"></div>
           <div class="content">
-            <div class="role">Tjener, take away &amp; lagerorganisering</div>
+            <div class="role" data-da="Tjener, take away &amp; lagerorganisering" data-en="Waiter, takeaway &amp; stock organisation">Tjener, take away &amp; lagerorganisering</div>
             <div class="org">Dhaba</div>
-            <div class="period">2024 (sommerferiejob)</div>
-            <p>Betjening af gæster, take away-ekspedition og organisering af lager.</p>
+            <div class="period" data-da="2024 (sommerferiejob)" data-en="2024 (summer job)">2024 (sommerferiejob)</div>
+            <p data-da="Betjening af gæster, take away-ekspedition og organisering af lager." data-en="Serving guests, handling takeaway orders and organising the stockroom.">Betjening af gæster, take away-ekspedition og organisering af lager.</p>
           </div>
         </div>
         <div class="titem">
           <div class="dot"></div>
           <div class="content">
-            <div class="role">Sælger → salgsoplæring</div>
+            <div class="role" data-da="Sælger → salgsoplæring" data-en="Sales → sales training">Sælger → salgsoplæring</div>
             <div class="org">LeadDoubler</div>
             <div class="period">2023–2024</div>
-            <p>Startede som sælger og gik videre til at stå for oplæring af nye sælgere.</p>
+            <p data-da="Startede som sælger og gik videre til at stå for oplæring af nye sælgere." data-en="Started in sales and went on to train new salespeople.">Startede som sælger og gik videre til at stå for oplæring af nye sælgere.</p>
           </div>
         </div>
       </div>
 
       <div class="section-head" style="margin-top:56px;">
-        <span class="num">Skriftligt arbejde</span>
-        <h2>Publikation</h2>
+        <span class="num" data-da="Skriftligt arbejde" data-en="Written work">Skriftligt arbejde</span>
+        <h2 data-da="Publikation" data-en="Publication">Publikation</h2>
       </div>
       <div class="feature-card">
         <span class="tag">Aktuel Naturvidenskab</span>
-        <h3>"Europas Vigtigste Maskine Laver 50.000 Supernovaer I Sekundet"</h3>
-        <p>Forfatter af artiklen, udgivet i samarbejde med Aarhus Universitet.</p>
-        <div class="period">18. oktober 2026</div>
+        <h3 data-da="&quot;Europas Vigtigste Maskine Laver 50.000 Supernovaer I Sekundet&quot;" data-en="&quot;Europe&#39;s most important machine makes 50,000 supernovae a second&quot;">"Europas Vigtigste Maskine Laver 50.000 Supernovaer I Sekundet"</h3>
+        <p data-da="Forfatter af artiklen, udgivet i samarbejde med Aarhus Universitet." data-en="Author of the article, published in collaboration with Aarhus University.">Forfatter af artiklen, udgivet i samarbejde med Aarhus Universitet.</p>
+        <div class="period" data-da="18. oktober 2026" data-en="18 October 2026">18. oktober 2026</div>
       </div>
     </div>
   </section>
@@ -504,26 +520,26 @@
   <section class="block alt" id="praktik">
     <div class="wrap">
       <div class="section-head">
-        <span class="num">Praktik</span>
-        <h2>Praktikforløb</h2>
+        <span class="num" data-da="Praktik" data-en="Placements">Praktik</span>
+        <h2 data-da="Praktikforløb" data-en="Work placements">Praktikforløb</h2>
       </div>
       <div class="timeline">
         <div class="titem">
           <div class="dot"></div>
           <div class="content">
-            <div class="role">Borgmesterpraktik</div>
-            <div class="org">Vordingborg Kommune</div>
-            <div class="period">1 uge</div>
-            <p>Fulgtes med borgmesteren til møder og arrangementer. Modtog en anbefaling fra borgmesteren efter forløbet.</p>
+            <div class="role" data-da="Borgmesterpraktik" data-en="Placement with the mayor">Borgmesterpraktik</div>
+            <div class="org" data-da="Vordingborg Kommune" data-en="Vordingborg Municipality">Vordingborg Kommune</div>
+            <div class="period" data-da="1 uge" data-en="1 week">1 uge</div>
+            <p data-da="Fulgtes med borgmesteren til møder og arrangementer. Modtog en anbefaling fra borgmesteren efter forløbet." data-en="Shadowed the mayor at meetings and events, and was given a recommendation afterwards.">Fulgtes med borgmesteren til møder og arrangementer. Modtog en anbefaling fra borgmesteren efter forløbet.</p>
           </div>
         </div>
         <div class="titem">
           <div class="dot"></div>
           <div class="content">
-            <div class="role">Børnehavepraktik</div>
-            <div class="org">Pædagogisk praktik</div>
-            <div class="period">1 uge</div>
-            <p>Arbejdede som pædagog i en uge. En af de hyggeligste oplevelser jeg har haft. Fik en hjemmemalet kop af et af børnene.</p>
+            <div class="role" data-da="Børnehavepraktik" data-en="Placement in a kindergarten">Børnehavepraktik</div>
+            <div class="org" data-da="Pædagogisk praktik" data-en="Childcare placement">Pædagogisk praktik</div>
+            <div class="period" data-da="1 uge" data-en="1 week">1 uge</div>
+            <p data-da="Arbejdede som pædagog i en uge. En af de hyggeligste oplevelser jeg har haft. Fik en hjemmemalet kop af et af børnene." data-en="Spent a week working as a childcare assistant. One of the loveliest things I have done. One of the children gave me a hand-painted mug.">Arbejdede som pædagog i en uge. En af de hyggeligste oplevelser jeg har haft. Fik en hjemmemalet kop af et af børnene.</p>
           </div>
         </div>
       </div>
@@ -534,17 +550,17 @@
   <section class="block" id="uddannelse">
     <div class="wrap">
       <div class="section-head">
-        <span class="num">Uddannelse</span>
-        <h2>Skolegang</h2>
+        <span class="num" data-da="Uddannelse" data-en="Education">Uddannelse</span>
+        <h2 data-da="Skolegang" data-en="Schooling">Skolegang</h2>
       </div>
       <div class="timeline">
         <div class="titem">
           <div class="dot"></div>
           <div class="content">
-            <div class="role">STX, Mat/Fys og Bioteknologi-linje</div>
+            <div class="role" data-da="STX, Mat/Fys og Bioteknologi-linje" data-en="Upper secondary (STX), Maths/Physics and Biotechnology">STX, Mat/Fys og Bioteknologi-linje</div>
             <div class="org">Vordingborg Gymnasium og HF</div>
             <div class="period">2023–2026</div>
-            <p>Startede årgang 2023/2024, blev student i 2026.</p>
+            <p data-da="Startede årgang 2023/2024, blev student i 2026." data-en="Started with the 2023/24 year group and graduated in 2026.">Startede årgang 2023/2024, blev student i 2026.</p>
           </div>
         </div>
       </div>
@@ -555,19 +571,19 @@
   <section class="block alt" id="kompetencer">
     <div class="wrap">
       <div class="section-head">
-        <span class="num">Kompetencer</span>
-        <h2>Hvad jeg kan</h2>
+        <span class="num" data-da="Kompetencer" data-en="Skills">Kompetencer</span>
+        <h2 data-da="Hvad jeg kan" data-en="What I can do">Hvad jeg kan</h2>
       </div>
       <div class="chips">
-        <span class="chip">Kundekontakt</span>
-        <span class="chip">Salg &amp; salgsoplæring</span>
-        <span class="chip">AI &amp; teknologi</span>
-        <span class="chip">Server-drift/teknik</span>
-        <span class="chip">Naturvidenskab (mat/fys/bioteknologi)</span>
-        <span class="chip">Skriftlig formidling</span>
-        <span class="chip">Foreningsarbejde &amp; stiftelse</span>
-        <span class="chip">Pædagogik</span>
-        <span class="chip">Serviceorienteret</span>
+        <span class="chip" data-da="Kundekontakt" data-en="Client contact">Kundekontakt</span>
+        <span class="chip" data-da="Salg &amp; salgsoplæring" data-en="Sales &amp; sales training">Salg &amp; salgsoplæring</span>
+        <span class="chip" data-da="AI &amp; teknologi" data-en="AI &amp; technology">AI &amp; teknologi</span>
+        <span class="chip" data-da="Server-drift/teknik" data-en="Server operations">Server-drift/teknik</span>
+        <span class="chip" data-da="Naturvidenskab (mat/fys/bioteknologi)" data-en="Science (maths, physics, biotechnology)">Naturvidenskab (mat/fys/bioteknologi)</span>
+        <span class="chip" data-da="Skriftlig formidling" data-en="Written communication">Skriftlig formidling</span>
+        <span class="chip" data-da="Foreningsarbejde &amp; stiftelse" data-en="Founding and running an association">Foreningsarbejde &amp; stiftelse</span>
+        <span class="chip" data-da="Pædagogik" data-en="Childcare">Pædagogik</span>
+        <span class="chip" data-da="Serviceorienteret" data-en="Service-minded">Serviceorienteret</span>
       </div>
     </div>
   </section>
@@ -576,10 +592,10 @@
   <section class="block" id="kontakt">
     <div class="wrap">
       <div class="contact-box">
-        <h2>Lad os tale sammen</h2>
-        <p>Har du en opgave, et job eller bare lyst til at sige hej? Skriv eller ring til mig; telefon foretrækkes.</p>
+        <h2 data-da="Lad os tale sammen" data-en="Let us talk">Lad os tale sammen</h2>
+        <p data-da="Har du en opgave, et job eller bare lyst til at sige hej? Skriv eller ring til mig; telefon foretrækkes." data-en="Have a task, a job, or just want to say hello? Write or call me; I prefer the phone.">Har du en opgave, et job eller bare lyst til at sige hej? Skriv eller ring til mig; telefon foretrækkes.</p>
         <div class="cta-row">
-          <a class="btn primary" href="tel:+4561607471">Ring: 61 60 74 71</a>
+          <a class="btn primary" href="tel:+4561607471" data-da="Ring: 61 60 74 71" data-en="Call: 61 60 74 71">Ring: 61 60 74 71</a>
           <a class="btn ghost" href="mailto:Oskarstanislav@gmail.com">Oskarstanislav@gmail.com</a>
         </div>
       </div>
@@ -864,5 +880,6 @@
   })();
 </script>
 
+<script src="/i18n.js" defer></script>
 </body>
 </html>

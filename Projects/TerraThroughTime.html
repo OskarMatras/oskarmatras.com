@@ -3,8 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Terra Through Time · Oskar Matras</title>
-<meta name="description" content="Et verdenskort bygget af 64.800 animerede 3D-søjler: højde, terræn, tidevand og befolkning fra 1800 til i dag.">
+<title data-da="Terra Through Time · Oskar Matras" data-en="Terra Through Time · Oskar Matras">Terra Through Time · Oskar Matras</title>
+<script src="/i18n.js" defer></script>
+<meta name="description" content="Et verdenskort bygget af 64.800 animerede 3D-søjler: ti visninger af den samme klode, fra havets kredsløb til kontinenternes vandring." data-da-content="Et verdenskort bygget af 64.800 animerede 3D-søjler: ti visninger af den samme klode, fra havets kredsløb til kontinenternes vandring." data-en-content="A world map built from 64,800 animated 3D columns: ten views of the same globe, from the ocean conveyor to continental drift.">
 <link rel="canonical" href="https://OskarMatras.com/Projects/TerraThroughTime">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -381,7 +382,7 @@
 
 <section id="stage">
   <canvas id="gl"></canvas>
-  <div class="stage-loading" id="loading">loading world data&hellip;</div>
+  <div class="stage-loading" id="loading" data-da="henter verdensdata…" data-en="loading world data…">henter verdensdata…</div>
 </section>
 
 <div id="tip" role="status" aria-live="polite"></div>
@@ -390,9 +391,9 @@
   <div class="hud-top">
     <div class="idbar panel-box">
       <a class="who" href="/">Oskar Matras</a>
-      <span class="what"><a href="/Projects">Projekter</a> / Terra Through Time</span>
+      <span class="what"><a href="/Projects" data-da="Projekter" data-en="Projects">Projekter</a> / Terra Through Time <span class="idbar-lang" data-lang-switch></span></span>
     </div>
-    <div class="modebar panel-box" id="modebar" role="group" aria-label="What the map shows"></div>
+    <div class="modebar panel-box" id="modebar" role="group" aria-label="Hvad kortet viser" data-da-aria-label="Hvad kortet viser" data-en-aria-label="What the map shows"></div>
   </div>
 
   <!-- Names whatever the playback has slowed down for. Empty and
@@ -402,28 +403,28 @@
     <div class="event-name" id="event-name"></div>
   </div>
 
-  <div class="hint" id="hint">træk for at flytte kortet &middot; scroll for at zoome &middot; shift+træk for at dreje</div>
+  <div class="hint" id="hint" data-da="træk for at flytte kortet · scroll for at zoome · shift+træk for at dreje" data-en="drag to move the map · scroll to zoom · shift-drag to tilt">træk for at flytte kortet &middot; scroll for at zoome &middot; shift+træk for at dreje</div>
 
   <div class="hud-bottom">
     <div class="legend panel-box" id="legend"></div>
     <div class="controls">
       <div class="hud-tools">
-        <button class="ghost-btn" id="resetview" type="button">nulstil visning</button>
-        <button class="ghost-btn" id="openreader" type="button" aria-expanded="false" aria-controls="reader">om projektet</button>
+        <button class="ghost-btn" id="resetview" type="button" data-da="nulstil visning" data-en="reset view">nulstil visning</button>
+        <button class="ghost-btn" id="openreader" type="button" aria-expanded="false" aria-controls="reader" data-da="om projektet" data-en="about this project">om projektet</button>
       </div>
       <div class="control-group panel-box" data-for="sun">
-        <button class="icon-btn" id="sunnow" type="button" aria-label="Tilbage til nu" title="Tilbage til nu">&#8635;</button>
+        <button class="icon-btn" id="sunnow" type="button" aria-label="Tilbage til nu" title="Tilbage til nu" data-da-aria-label="Tilbage til nu" data-en-aria-label="Back to now" data-da-title="Tilbage til nu" data-en-title="Back to now">&#8635;</button>
         <span class="val" id="sunrateVal">realtid</span>
-        <input type="range" id="sunrate" min="0" max="5.6" step="0.05" value="0" aria-label="Time rate">
+        <input type="range" id="sunrate" min="0" max="5.6" step="0.05" value="0" aria-label="Tidshastighed" data-da-aria-label="Tidshastighed" data-en-aria-label="Time rate">
       </div>
       <div class="control-group panel-box" data-for="flow">
-        strøm <span class="val" id="speedVal">1.0&times;</span>
-        <input type="range" id="speed" min="0.1" max="4" step="0.1" value="1.0" aria-label="Flow animation speed">
+        <span data-da="strøm" data-en="flow">strøm</span> <span class="val" id="speedVal">1.0&times;</span>
+        <input type="range" id="speed" min="0.1" max="4" step="0.1" value="1.0" aria-label="Strømmens hastighed" data-da-aria-label="Strømmens hastighed" data-en-aria-label="Flow animation speed">
       </div>
       <div class="control-group panel-box" data-for="pop">
-        <button class="icon-btn" id="playPause" type="button" aria-label="Afspil">&#9654;</button>
+        <button class="icon-btn" id="playPause" type="button" aria-label="Afspil" data-da-aria-label="Afspil" data-en-aria-label="Play">&#9654;</button>
         <span class="val" id="yearVal">1800</span>
-        <input type="range" id="year" min="1800" max="2023" step="1" value="1800" aria-label="Year">
+        <input type="range" id="year" min="1800" max="2023" step="1" value="1800" aria-label="År" data-da-aria-label="År" data-en-aria-label="Year">
       </div>
     </div>
   </div>
@@ -431,65 +432,115 @@
 
 <div id="scrim"></div>
 
-<aside id="reader" aria-label="Om projektet" aria-hidden="true">
+<aside id="reader" aria-label="Om projektet" data-da-aria-label="Om projektet" data-en-aria-label="About this project" aria-hidden="true">
   <div class="reader-inner">
-    <button class="reader-close" id="closereader" type="button" aria-label="Luk">&times;</button>
+    <button class="reader-close" id="closereader" type="button" aria-label="Luk" data-da-aria-label="Luk" data-en-aria-label="Close">&times;</button>
     <p class="kicker">Terra Through Time &middot; vol. 1</p>
-    <h1>A world made of columns</h1>
+    <h1 data-da="En verden af søjler" data-en="A world made of columns">A world made of columns</h1>
 
-    <p>Sixty-four thousand eight hundred columns, one for every degree of latitude and longitude, standing in for the surface of the earth. Switch what they're showing and the whole field reads itself again. Every view is measured data: nothing here is invented to look good.</p>
+    <p data-da="Fireogtres tusind otte hundrede søjler, én for hver grad af bredde og længde, sat i stedet for jordens overflade. Skift hvad de viser, og hele feltet læser sig selv forfra. Hver visning er målte data: intet her er opdigtet for at se godt ud."
+       data-en="Sixty-four thousand eight hundred columns, one for every degree of latitude and longitude, standing in for the surface of the earth. Switch what they're showing and the whole field reads itself again. Every view is measured data: nothing here is invented to look good.">Sixty-four thousand eight hundred columns, one for every degree of latitude and longitude, standing in for the surface of the earth. Switch what they're showing and the whole field reads itself again. Every view is measured data: nothing here is invented to look good.</p>
 
-    <h2>The ten views</h2>
-    <p><strong>Højde</strong> is elevation in real metres, land and sea floor alike, from the same global model that feeds most web maps. Permanent ice comes from its own layer rather than from the height, so Greenland and Antarctica are drawn as ice instead of as brown upland, and the open sea carries a slow swell. <strong>Terræn</strong> measures how sharply the ground changes rather than how high it sits, so mountain chains, coastlines and the mid-ocean ridges stand out while plains and abyssal basins stay flat.</p>
-    <p><strong>Havstrømme</strong> is the one view here that is drawn rather than measured, and it is drawn because the thing it shows cannot be photographed. What people mean by the Greenland pump is a single loop running through the entire depth of the ocean: warm water travelling north along the surface of the Atlantic, giving up its heat to the sky over Europe, growing cold and salty and heavy enough off Greenland and Iceland to sink two miles, and then creeping back south along the sea floor. No map of the surface can show the half of it that is underneath. So the loop is drawn as a loop.</p>
-    <p>Follow one crest and you can go round the whole circuit. It leaves the Caribbean warm, runs up the eastern seaboard as the Gulf Stream and across to Europe, cools all the way, and turns dark where it sinks off Greenland. It comes back down the eastern side of the Atlantic cold, joins the Antarctic Circumpolar Current and travels east under Africa, Australia and South America, turns north into the Pacific and warms as it rises, and then returns west through the Indonesian passages, across the Indian Ocean, round South Africa and up into the Atlantic to where it started. A cubic metre of water takes something like a thousand years to make that trip.</p>
-    <p>Warm water is warm-coloured and always running away from the equator; cold water is dark and running back towards it. The same rule draws the five subtropical gyres, thinner and quieter beneath the conveyor: each ocean turns its own wheel, warm up the western side and cold down the eastern, which is why the Gulf Stream is warm and the Canary Current cold, why the Kuroshio is warm and the California Current cold, and so on in every basin on both sides of the equator.</p>
-    <p>Two things to be straight about. The loop appears to cross itself in the South Atlantic, where the cold water going south meets the warm water coming north. That is not a mistake in the drawing: in the ocean one of them is two miles beneath the other, and a flat map has nowhere to put that. And the ribbons are a schematic, positioned by hand from the standard published route, not a measurement. The measurement is still there underneath them — the dim blue field is the real, filtered surface velocity, so the ribbons can be checked against the water they are drawn over.</p>
-    <p><strong>Befolkning</strong> turns height into headcount from 1800 to today. <strong>Tæthed</strong> divides that by how much ground a cell actually covers, since a one-degree cell near the poles is a fraction of the size of one at the equator. strong> shows not the total but how fast it is growing: the population figures are stored as logarithms, so the step from one decade to the next is a ratio rather than a difference, and what is drawn is the rate of increase. That is where the demographic transition becomes visible as it moves across the world./strong> shows the change since the previous decade rather than the total, which is where the demographic transition becomes visible as it moves across the world.</p>
-    <p><strong>Riger</strong> runs from 500 BC to 2010. Each cell is coloured by whichever state held it, and stands as tall as that state was large at the time, so empires rise and subside as they gain and lose ground. Rome is worth watching: two cells at 323 BC, forty-nine by 200 BC, then the whole Mediterranean.</p>
-    <p><strong>Kontinenter</strong> is the only view where the ground itself moves. Every other view on this page stands on the modern coastline; this one runs from 250 million years ago to the present, and the coastline is whatever it was at the time, so columns rise where there was land and sink where there was ocean. At the far end of the slider the continents are gathered into Pangaea with one ocean wrapped round the rest of the planet, and from about 180 million years ago it comes apart: the Atlantic opens as a narrow sea between what will be Brazil and what will be west Africa and widens ever after, North America pulls away from Europe with Greenland caught between them, and Australia stays pinned to Antarctica until the last fifty million years.</p>
-    <p>Every landmass keeps its colour for the whole 250 million years, so a piece of ground can be followed from Pangaea to now. The one to watch is India, in magenta. It sits at 47 degrees south for the first hundred million years, is still at 36 south at 100 Ma, and has crossed the equator by 50 Ma — the fastest long journey any continent has made, ending in the collision that is still lifting the Himalaya today. Point at any land and the readout gives the latitude it stood at then and the latitude it stands at now.</p>
-    <p>Two things to keep in mind. Land near the poles is enormously exaggerated, as it is on every rectangular map: the Cretaceous Arctic really does carry land almost to the pole in this model, but it covers far less ground than the bar across the top of the screen suggests. And the sea floor drawn underneath is the modern one, kept deliberately dark, because the ocean crust of 200 million years ago has long since been pulled back down into the mantle and no map can show it.</p>
+    <h2 data-da="De ti visninger" data-en="The ten views">The ten views</h2>
 
-    <p><strong>Sollys</strong> is the only view that is not a stored grid. The position of the sun is worked out from the clock and the earth's orbit, the same arithmetic behind any sunrise table, and the map is lit accordingly: height is insolation, the share of a sunbeam a patch of ground actually catches, and the colour runs through the real twilight steps down to eighteen degrees below the horizon. It moves in real time. The slider runs the clock forward instead, from a day in a few seconds to a year in a couple of minutes, which is where the tilt of the earth shows itself as the lit band slides north and south.</p>
+    <p data-da-html="&lt;strong&gt;Højde&lt;/strong&gt; er højde i rigtige meter, land og havbund på én gang, fra den samme globale model som ligger under de fleste netkort. Permanent is kommer fra sit eget lag i stedet for fra højden, så Grønland og Antarktis er tegnet som is og ikke som brunt højland, og det åbne hav bærer en langsom dønning. &lt;strong&gt;Terræn&lt;/strong&gt; måler hvor brat jorden skifter i stedet for hvor højt den ligger, så bjergkæder, kyster og de midtoceaniske rygge træder frem, mens sletter og dybhavsbassiner bliver flade."
+       data-en-html="&lt;strong&gt;Elevation&lt;/strong&gt; is height in real metres, land and sea floor alike, from the same global model that feeds most web maps. Permanent ice comes from its own layer rather than from the height, so Greenland and Antarctica are drawn as ice instead of as brown upland, and the open sea carries a slow swell. &lt;strong&gt;Terrain&lt;/strong&gt; measures how sharply the ground changes rather than how high it sits, so mountain chains, coastlines and the mid-ocean ridges stand out while plains and abyssal basins stay flat."><strong>Elevation</strong> is height in real metres, land and sea floor alike, from the same global model that feeds most web maps. Permanent ice comes from its own layer rather than from the height, so Greenland and Antarctica are drawn as ice instead of as brown upland, and the open sea carries a slow swell. <strong>Terrain</strong> measures how sharply the ground changes rather than how high it sits, so mountain chains, coastlines and the mid-ocean ridges stand out while plains and abyssal basins stay flat.</p>
 
-    <p><strong>Skydække</strong> is the only view that leaves the page to get its data. It asks Open-Meteo what the sky is doing at this moment on a ten degree grid and hangs the answer as a translucent deck above the world, with the ground darkened where the deck is thick, because a cloud that stops light reaching the sea is the same cloud that is bright from above. Tilt the view and the deck stands off the map. The answer is kept for half an hour. Ten degrees is coarse: it is enough for the shape of the weather, the cloud belt along the equator and the clear subtropical highs, and not enough for a particular sky. Pointing at a place asks about that place exactly, and reports cloud, temperature, wind and the sunlight actually reaching the ground.</p>
+    <p data-da-html="&lt;strong&gt;Havstrømme&lt;/strong&gt; er den ene visning her der er tegnet frem for målt, og den er tegnet fordi det den viser ikke kan fotograferes. Det folk mener med Grønlandspumpen er ét kredsløb gennem hele havets dybde: varmt vand der løber nordpå langs Atlanterhavets overflade, afgiver sin varme til himlen over Europa, bliver koldt og salt og tungt nok ud for Grønland og Island til at synke tre kilometer, og derefter kryber sydpå igen langs havbunden. Intet kort over overfladen kan vise den halvdel der ligger nedenunder. Så kredsløbet er tegnet som et kredsløb."
+       data-en-html="&lt;strong&gt;Ocean currents&lt;/strong&gt; is the one view here that is drawn rather than measured, and it is drawn because the thing it shows cannot be photographed. What people mean by the Greenland pump is a single loop running through the entire depth of the ocean: warm water travelling north along the surface of the Atlantic, giving up its heat to the sky over Europe, growing cold and salty and heavy enough off Greenland and Iceland to sink two miles, and then creeping back south along the sea floor. No map of the surface can show the half of it that is underneath. So the loop is drawn as a loop."><strong>Ocean currents</strong> is the one view here that is drawn rather than measured, and it is drawn because the thing it shows cannot be photographed. What people mean by the Greenland pump is a single loop running through the entire depth of the ocean: warm water travelling north along the surface of the Atlantic, giving up its heat to the sky over Europe, growing cold and salty and heavy enough off Greenland and Iceland to sink two miles, and then creeping back south along the sea floor. No map of the surface can show the half of it that is underneath. So the loop is drawn as a loop.</p>
 
-    <h2>Moving between moments</h2>
-    <p>Two kinds of change need two different treatments. Quantities, like population or current speed, are interpolated: any year between two records is a genuine blend of the two, so scrubbing the slider glides. Territory is not a quantity. Who holds a piece of ground is a category, and averaging two categories produces a state that never existed, so instead each cell hands over on its own offset within the interval. A hard switch becomes a border that sweeps across the ground.</p>
-    <p>Playback does not run at a constant rate. A timeline held to one speed treats two uneventful centuries exactly like the year the Western Empire fell, so instead it runs fast between the moments worth stopping for, eases down as one approaches, holds for a couple of seconds while its name is on screen, and picks the pace back up. The slowdown reaches much wider than the caption does, so the change of pace is gradual while the name itself stays punctuation rather than furniture. Parking the slider next to a landmark names it too, without playing anything.</p>
-    <p>The landmarks are chosen, not derived, and the dates are the conventional ones: the billions on the population clock, the rise and fall of states on the territory run, and on the drift the breakup of Pangaea, the opening of the South Atlantic, the impact that closed the Cretaceous, and the collision of India with Asia.</p>
+    <p data-da="Følg én bølgetop, og du kan komme hele vejen rundt. Den forlader Caribien varm, løber op langs USAs østkyst som Golfstrømmen og videre over mod Europa, køler af hele vejen, og bliver mørk hvor den synker ud for Grønland. Den kommer tilbage ned langs Atlanterhavets østside kold, slutter sig til Den Antarktiske Cirkumpolarstrøm og rejser østpå under Afrika, Australien og Sydamerika, drejer nordpå ind i Stillehavet og varmes op mens den stiger, og vender så vestpå gennem de indonesiske stræder, over Det Indiske Ocean, rundt om Sydafrika og op i Atlanterhavet til der hvor den startede. En kubikmeter vand er omkring tusind år om den tur."
+       data-en="Follow one crest and you can go round the whole circuit. It leaves the Caribbean warm, runs up the eastern seaboard as the Gulf Stream and across to Europe, cools all the way, and turns dark where it sinks off Greenland. It comes back down the eastern side of the Atlantic cold, joins the Antarctic Circumpolar Current and travels east under Africa, Australia and South America, turns north into the Pacific and warms as it rises, and then returns west through the Indonesian passages, across the Indian Ocean, round South Africa and up into the Atlantic to where it started. A cubic metre of water takes something like a thousand years to make that trip.">Follow one crest and you can go round the whole circuit. It leaves the Caribbean warm, runs up the eastern seaboard as the Gulf Stream and across to Europe, cools all the way, and turns dark where it sinks off Greenland. It comes back down the eastern side of the Atlantic cold, joins the Antarctic Circumpolar Current and travels east under Africa, Australia and South America, turns north into the Pacific and warms as it rises, and then returns west through the Indonesian passages, across the Indian Ocean, round South Africa and up into the Atlantic to where it started. A cubic metre of water takes something like a thousand years to make that trip.</p>
 
-    <h2>Getting around</h2>
-    <p>The map behaves like a map rather than like a model on a turntable. <strong>Drag</strong> takes hold of the ground and moves it. <strong>Scroll</strong> zooms towards whatever is under the pointer, so you can put Australia in the middle of the screen and keep going until single columns fill it. <strong>Shift-drag</strong>, or the right or middle button, tilts and turns the view: flat overhead for reading the shapes, low and oblique for reading the heights. Arrow keys pan, plus and minus zoom, and <em>nulstil visning</em> puts everything back.</p>
-    <p>The opening framing fills the window rather than floating the world in the middle of it, which means the far east and west of the Pacific sit just off the edges. They are one drag away.</p>
+    <p data-da="Varmt vand har en varm farve og løber altid væk fra ækvator; koldt vand er mørkt og løber tilbage mod den. Den samme regel tegner de fem subtropiske hvirvler, tyndere og mere stilfærdige under transportbåndet: hvert ocean drejer sit eget hjul, varmt op ad vestsiden og koldt ned ad østsiden, og det er derfor Golfstrømmen er varm og Kanariestrømmen kold, Kuroshio varm og Californiastrømmen kold, og sådan i hvert bassin på begge sider af ækvator."
+       data-en="Warm water is warm-coloured and always running away from the equator; cold water is dark and running back towards it. The same rule draws the five subtropical gyres, thinner and quieter beneath the conveyor: each ocean turns its own wheel, warm up the western side and cold down the eastern, which is why the Gulf Stream is warm and the Canary Current cold, why the Kuroshio is warm and the California Current cold, and so on in every basin on both sides of the equator.">Warm water is warm-coloured and always running away from the equator; cold water is dark and running back towards it. The same rule draws the five subtropical gyres, thinner and quieter beneath the conveyor: each ocean turns its own wheel, warm up the western side and cold down the eastern, which is why the Gulf Stream is warm and the Canary Current cold, why the Kuroshio is warm and the California Current cold, and so on in every basin on both sides of the equator.</p>
 
-    <h2>Hovering</h2>
-    <p>Point anywhere and the map reports what it knows about that cell: elevation in metres, current speed and heading, the country and its population for the selected year, or the state that held the ground and how far it reached.</p>
+    <p data-da="To ting skal siges lige ud. Kredsløbet ser ud til at krydse sig selv i Sydatlanten, hvor det kolde vand på vej sydpå møder det varme på vej nordpå. Det er ikke en fejl i tegningen: i havet ligger det ene tre kilometer under det andet, og et fladt kort har ingen steder at gøre af det. Og båndene er et skema, lagt i hånden efter den gængse offentliggjorte rute, ikke en måling. Målingen ligger stadig under dem — det svage blå felt er den virkelige, filtrerede overfladestrøm, så tegningen kan holdes op mod det vand den er tegnet hen over."
+       data-en="Two things to be straight about. The loop appears to cross itself in the South Atlantic, where the cold water going south meets the warm water coming north. That is not a mistake in the drawing: in the ocean one of them is two miles beneath the other, and a flat map has nowhere to put that. And the ribbons are a schematic, positioned by hand from the standard published route, not a measurement. The measurement is still there underneath them — the dim blue field is the real, filtered surface velocity, so the ribbons can be checked against the water they are drawn over.">Two things to be straight about. The loop appears to cross itself in the South Atlantic, where the cold water going south meets the warm water coming north. That is not a mistake in the drawing: in the ocean one of them is two miles beneath the other, and a flat map has nowhere to put that. And the ribbons are a schematic, positioned by hand from the standard published route, not a measurement. The measurement is still there underneath them — the dim blue field is the real, filtered surface velocity, so the ribbons can be checked against the water they are drawn over.</p>
 
-    <div class="reader-sources">
+    <p data-da-html="&lt;strong&gt;Befolkning&lt;/strong&gt; gør højde til hovedtal fra 1800 til i dag. &lt;strong&gt;Tæthed&lt;/strong&gt; deler det med hvor meget jord en celle faktisk dækker, eftersom en celle på én grad nær polerne er en brøkdel af størrelsen på én ved ækvator. &lt;strong&gt;Vækst&lt;/strong&gt; viser ikke totalen, men hvor hurtigt den vokser: befolkningstallene er gemt som logaritmer, så skridtet fra ét årti til det næste er et forhold snarere end en forskel, og det der tegnes er væksttakten. Det er der den demografiske overgang bliver synlig, mens den bevæger sig hen over verden."
+       data-en-html="&lt;strong&gt;Population&lt;/strong&gt; turns height into headcount from 1800 to today. &lt;strong&gt;Density&lt;/strong&gt; divides that by how much ground a cell actually covers, since a one-degree cell near the poles is a fraction of the size of one at the equator. &lt;strong&gt;Growth&lt;/strong&gt; shows not the total but how fast it is growing: the population figures are stored as logarithms, so the step from one decade to the next is a ratio rather than a difference, and what is drawn is the rate of increase. That is where the demographic transition becomes visible as it moves across the world."><strong>Population</strong> turns height into headcount from 1800 to today. <strong>Density</strong> divides that by how much ground a cell actually covers, since a one-degree cell near the poles is a fraction of the size of one at the equator. <strong>Growth</strong> shows not the total but how fast it is growing: the population figures are stored as logarithms, so the step from one decade to the next is a ratio rather than a difference, and what is drawn is the rate of increase. That is where the demographic transition becomes visible as it moves across the world.</p>
+
+    <p data-da-html="&lt;strong&gt;Riger&lt;/strong&gt; løber fra 500 f.Kr. til 2010. Hver celle er farvet efter hvilken stat der holdt den, og står så høj som den stat var stor på det tidspunkt, så riger rejser sig og synker igen i takt med at de vinder og taber jord. Rom er værd at holde øje med: to celler i 323 f.Kr., niogfyrre i 200 f.Kr., og derefter hele Middelhavet."
+       data-en-html="&lt;strong&gt;Empires&lt;/strong&gt; runs from 500 BC to 2010. Each cell is coloured by whichever state held it, and stands as tall as that state was large at the time, so empires rise and subside as they gain and lose ground. Rome is worth watching: two cells at 323 BC, forty-nine by 200 BC, then the whole Mediterranean."><strong>Empires</strong> runs from 500 BC to 2010. Each cell is coloured by whichever state held it, and stands as tall as that state was large at the time, so empires rise and subside as they gain and lose ground. Rome is worth watching: two cells at 323 BC, forty-nine by 200 BC, then the whole Mediterranean.</p>
+
+    <p data-da-html="&lt;strong&gt;Kontinenter&lt;/strong&gt; er den eneste visning hvor jorden selv flytter sig. Alle andre visninger på siden står på den nuværende kystlinje; denne løber fra 250 millioner år siden og frem til nu, og kystlinjen er den der var dengang, så søjler rejser sig hvor der var land og synker hvor der var hav. I den fjerne ende af skyderen er kontinenterne samlet i Pangaea med ét ocean viklet om resten af kloden, og fra omkring 180 millioner år siden går det fra hinanden: Atlanterhavet åbner sig som et smalt hav mellem det der bliver Brasilien og det der bliver Vestafrika og bliver bredere lige siden, Nordamerika trækker sig væk fra Europa med Grønland fanget imellem, og Australien bliver hængende ved Antarktis indtil de sidste halvtreds millioner år."
+       data-en-html="&lt;strong&gt;Continents&lt;/strong&gt; is the only view where the ground itself moves. Every other view on this page stands on the modern coastline; this one runs from 250 million years ago to the present, and the coastline is whatever it was at the time, so columns rise where there was land and sink where there was ocean. At the far end of the slider the continents are gathered into Pangaea with one ocean wrapped round the rest of the planet, and from about 180 million years ago it comes apart: the Atlantic opens as a narrow sea between what will be Brazil and what will be west Africa and widens ever after, North America pulls away from Europe with Greenland caught between them, and Australia stays pinned to Antarctica until the last fifty million years."><strong>Continents</strong> is the only view where the ground itself moves. Every other view on this page stands on the modern coastline; this one runs from 250 million years ago to the present, and the coastline is whatever it was at the time, so columns rise where there was land and sink where there was ocean. At the far end of the slider the continents are gathered into Pangaea with one ocean wrapped round the rest of the planet, and from about 180 million years ago it comes apart: the Atlantic opens as a narrow sea between what will be Brazil and what will be west Africa and widens ever after, North America pulls away from Europe with Greenland caught between them, and Australia stays pinned to Antarctica until the last fifty million years.</p>
+
+    <p data-da="Hver landmasse beholder sin farve i alle 250 millioner år, så et stykke jord kan følges fra Pangaea til nu. Den der er værd at holde øje med er Indien, i magenta. Det ligger på 47 grader sydlig bredde i de første hundrede millioner år, er stadig på 36 syd ved 100 Ma, og har krydset ækvator ved 50 Ma — den hurtigste lange rejse noget kontinent har foretaget, og den ender i det sammenstød der stadig løfter Himalaya i dag. Peg på et hvilket som helst land, og aflæsningen giver den bredde det stod på dengang og den bredde det står på nu."
+       data-en="Every landmass keeps its colour for the whole 250 million years, so a piece of ground can be followed from Pangaea to now. The one to watch is India, in magenta. It sits at 47 degrees south for the first hundred million years, is still at 36 south at 100 Ma, and has crossed the equator by 50 Ma — the fastest long journey any continent has made, ending in the collision that is still lifting the Himalaya today. Point at any land and the readout gives the latitude it stood at then and the latitude it stands at now.">Every landmass keeps its colour for the whole 250 million years, so a piece of ground can be followed from Pangaea to now. The one to watch is India, in magenta. It sits at 47 degrees south for the first hundred million years, is still at 36 south at 100 Ma, and has crossed the equator by 50 Ma — the fastest long journey any continent has made, ending in the collision that is still lifting the Himalaya today. Point at any land and the readout gives the latitude it stood at then and the latitude it stands at now.</p>
+
+    <p data-da="To ting at have med. Land nær polerne er voldsomt overdrevet, som det er på ethvert rektangulært kort: den kridttidige Arktis bærer virkelig land næsten helt til polen i denne model, men det dækker langt mindre jord end bjælken øverst på skærmen lader ane. Og havbunden der er tegnet nedenunder er den nuværende, holdt bevidst mørk, fordi havbundsskorpen fra for 200 millioner år siden for længst er trukket ned i kappen igen, og intet kort kan vise den."
+       data-en="Two things to keep in mind. Land near the poles is enormously exaggerated, as it is on every rectangular map: the Cretaceous Arctic really does carry land almost to the pole in this model, but it covers far less ground than the bar across the top of the screen suggests. And the sea floor drawn underneath is the modern one, kept deliberately dark, because the ocean crust of 200 million years ago has long since been pulled back down into the mantle and no map can show it.">Two things to keep in mind. Land near the poles is enormously exaggerated, as it is on every rectangular map: the Cretaceous Arctic really does carry land almost to the pole in this model, but it covers far less ground than the bar across the top of the screen suggests. And the sea floor drawn underneath is the modern one, kept deliberately dark, because the ocean crust of 200 million years ago has long since been pulled back down into the mantle and no map can show it.</p>
+
+    <p data-da-html="&lt;strong&gt;Sollys&lt;/strong&gt; er den eneste visning der ikke er et gemt gitter. Solens position regnes ud fra uret og jordens bane, den samme aritmetik der ligger bag enhver soltabel, og kortet lyses op derefter: højde er indstråling, den andel af en solstråle et stykke jord faktisk fanger, og farven går gennem de rigtige tusmørketrin ned til atten grader under horisonten. Den bevæger sig i realtid. Skyderen kører i stedet uret fremad, fra et døgn på nogle få sekunder til et år på et par minutter, og det er der jordens hældning viser sig, når det oplyste bånd glider nordpå og sydpå."
+       data-en-html="&lt;strong&gt;Sunlight&lt;/strong&gt; is the only view that is not a stored grid. The position of the sun is worked out from the clock and the earth's orbit, the same arithmetic behind any sunrise table, and the map is lit accordingly: height is insolation, the share of a sunbeam a patch of ground actually catches, and the colour runs through the real twilight steps down to eighteen degrees below the horizon. It moves in real time. The slider runs the clock forward instead, from a day in a few seconds to a year in a couple of minutes, which is where the tilt of the earth shows itself as the lit band slides north and south."><strong>Sunlight</strong> is the only view that is not a stored grid. The position of the sun is worked out from the clock and the earth's orbit, the same arithmetic behind any sunrise table, and the map is lit accordingly: height is insolation, the share of a sunbeam a patch of ground actually catches, and the colour runs through the real twilight steps down to eighteen degrees below the horizon. It moves in real time. The slider runs the clock forward instead, from a day in a few seconds to a year in a couple of minutes, which is where the tilt of the earth shows itself as the lit band slides north and south.</p>
+
+    <p data-da-html="&lt;strong&gt;Skydække&lt;/strong&gt; er den eneste visning der forlader siden for at hente sine data. Den spørger Open-Meteo hvad himlen gør lige nu på et gitter på ti grader og hænger svaret op som et gennemskinneligt dæk over verden, med jorden formørket hvor dækket er tykt, fordi en sky der standser lys på vej ned til havet er den samme sky der er lys ovenfra. Vip visningen, og dækket står fri af kortet. Svaret gemmes en halv time. Ti grader er groft: det er nok til vejrets form, skybæltet langs ækvator og de klare subtropiske højtryk, og ikke nok til en bestemt himmel. At pege på et sted spørger om præcis det sted, og melder skydække, temperatur, vind og det sollys der faktisk når jorden."
+       data-en-html="&lt;strong&gt;Cloud cover&lt;/strong&gt; is the only view that leaves the page to get its data. It asks Open-Meteo what the sky is doing at this moment on a ten degree grid and hangs the answer as a translucent deck above the world, with the ground darkened where the deck is thick, because a cloud that stops light reaching the sea is the same cloud that is bright from above. Tilt the view and the deck stands off the map. The answer is kept for half an hour. Ten degrees is coarse: it is enough for the shape of the weather, the cloud belt along the equator and the clear subtropical highs, and not enough for a particular sky. Pointing at a place asks about that place exactly, and reports cloud, temperature, wind and the sunlight actually reaching the ground."><strong>Cloud cover</strong> is the only view that leaves the page to get its data. It asks Open-Meteo what the sky is doing at this moment on a ten degree grid and hangs the answer as a translucent deck above the world, with the ground darkened where the deck is thick, because a cloud that stops light reaching the sea is the same cloud that is bright from above. Tilt the view and the deck stands off the map. The answer is kept for half an hour. Ten degrees is coarse: it is enough for the shape of the weather, the cloud belt along the equator and the clear subtropical highs, and not enough for a particular sky. Pointing at a place asks about that place exactly, and reports cloud, temperature, wind and the sunlight actually reaching the ground.</p>
+
+    <h2 data-da="At bevæge sig mellem øjeblikke" data-en="Moving between moments">Moving between moments</h2>
+
+    <p data-da="To slags forandring kræver to forskellige greb. Størrelser, som befolkning eller strømhastighed, bliver interpoleret: et hvilket som helst år mellem to målinger er en ægte blanding af de to, så skyderen glider. Territorium er ikke en størrelse. Hvem der holder et stykke jord er en kategori, og at midle to kategorier giver en stat der aldrig fandtes, så i stedet skifter hver celle på sit eget tidspunkt inde i intervallet. Et hårdt skift bliver til en grænse der fejer hen over jorden."
+       data-en="Two kinds of change need two different treatments. Quantities, like population or current speed, are interpolated: any year between two records is a genuine blend of the two, so scrubbing the slider glides. Territory is not a quantity. Who holds a piece of ground is a category, and averaging two categories produces a state that never existed, so instead each cell hands over on its own offset within the interval. A hard switch becomes a border that sweeps across the ground.">Two kinds of change need two different treatments. Quantities, like population or current speed, are interpolated: any year between two records is a genuine blend of the two, so scrubbing the slider glides. Territory is not a quantity. Who holds a piece of ground is a category, and averaging two categories produces a state that never existed, so instead each cell hands over on its own offset within the interval. A hard switch becomes a border that sweeps across the ground.</p>
+
+    <p data-da="Afspilningen kører ikke med fast hastighed. En tidslinje holdt på én fart behandler to begivenhedsløse århundreder præcis som det år Vestromerriget faldt, så i stedet løber den hurtigt mellem de øjeblikke der er værd at standse ved, sænker farten når et nærmer sig, holder et par sekunder mens navnet står på skærmen, og tager farten op igen. Opbremsningen rækker meget bredere end teksten gør, så skiftet i tempo er gradvist, mens selve navnet forbliver tegnsætning frem for møblement. At parkere skyderen ved siden af et holdepunkt navngiver det også, uden at afspille noget."
+       data-en="Playback does not run at a constant rate. A timeline held to one speed treats two uneventful centuries exactly like the year the Western Empire fell, so instead it runs fast between the moments worth stopping for, eases down as one approaches, holds for a couple of seconds while its name is on screen, and picks the pace back up. The slowdown reaches much wider than the caption does, so the change of pace is gradual while the name itself stays punctuation rather than furniture. Parking the slider next to a landmark names it too, without playing anything.">Playback does not run at a constant rate. A timeline held to one speed treats two uneventful centuries exactly like the year the Western Empire fell, so instead it runs fast between the moments worth stopping for, eases down as one approaches, holds for a couple of seconds while its name is on screen, and picks the pace back up. The slowdown reaches much wider than the caption does, so the change of pace is gradual while the name itself stays punctuation rather than furniture. Parking the slider next to a landmark names it too, without playing anything.</p>
+
+    <p data-da="Holdepunkterne er valgt, ikke udledt, og datoerne er de gængse: milliarderne på befolkningsuret, staternes opgang og fald på territorieturen, og på kontinentdriften Pangaeas opbrud, Sydatlantens åbning, nedslaget der lukkede Kridttiden, og Indiens sammenstød med Asien."
+       data-en="The landmarks are chosen, not derived, and the dates are the conventional ones: the billions on the population clock, the rise and fall of states on the territory run, and on the drift the breakup of Pangaea, the opening of the South Atlantic, the impact that closed the Cretaceous, and the collision of India with Asia.">The landmarks are chosen, not derived, and the dates are the conventional ones: the billions on the population clock, the rise and fall of states on the territory run, and on the drift the breakup of Pangaea, the opening of the South Atlantic, the impact that closed the Cretaceous, and the collision of India with Asia.</p>
+
+    <h2 data-da="At komme rundt" data-en="Getting around">Getting around</h2>
+
+    <p data-da-html="Kortet opfører sig som et kort og ikke som en model på en drejeskive. &lt;strong&gt;Træk&lt;/strong&gt; tager fat i jorden og flytter den. &lt;strong&gt;Scroll&lt;/strong&gt; zoomer ind mod det der er under markøren, så du kan sætte Australien midt på skærmen og blive ved indtil enkelte søjler fylder den. &lt;strong&gt;Shift-træk&lt;/strong&gt;, eller højre eller midterste knap, vipper og drejer visningen: fladt ovenfra for at læse formerne, lavt og skråt for at læse højderne. Piletaster panorerer, plus og minus zoomer, og &lt;em&gt;nulstil visning&lt;/em&gt; sætter det hele tilbage."
+       data-en-html="The map behaves like a map rather than like a model on a turntable. &lt;strong&gt;Drag&lt;/strong&gt; takes hold of the ground and moves it. &lt;strong&gt;Scroll&lt;/strong&gt; zooms towards whatever is under the pointer, so you can put Australia in the middle of the screen and keep going until single columns fill it. &lt;strong&gt;Shift-drag&lt;/strong&gt;, or the right or middle button, tilts and turns the view: flat overhead for reading the shapes, low and oblique for reading the heights. Arrow keys pan, plus and minus zoom, and &lt;em&gt;reset view&lt;/em&gt; puts everything back.">The map behaves like a map rather than like a model on a turntable. <strong>Drag</strong> takes hold of the ground and moves it. <strong>Scroll</strong> zooms towards whatever is under the pointer, so you can put Australia in the middle of the screen and keep going until single columns fill it. <strong>Shift-drag</strong>, or the right or middle button, tilts and turns the view: flat overhead for reading the shapes, low and oblique for reading the heights. Arrow keys pan, plus and minus zoom, and <em>reset view</em> puts everything back.</p>
+
+    <p data-da="Den indledende indramning viser hele verden frem for at fylde vinduet, så både øst og vest for Stillehavet er med fra begyndelsen."
+       data-en="The opening framing shows the whole world rather than filling the window, so the far east and west of the Pacific are both there from the start.">The opening framing shows the whole world rather than filling the window, so the far east and west of the Pacific are both there from the start.</p>
+
+    <h2 data-da="At pege" data-en="Hovering">Hovering</h2>
+
+    <p data-da="Peg et hvilket som helst sted, og kortet melder hvad det ved om den celle: højde i meter, strømmens fart og retning, landet og dets befolkning i det valgte år, eller den stat der holdt jorden og hvor langt den rakte."
+       data-en="Point anywhere and the map reports what it knows about that cell: elevation in metres, current speed and heading, the country and its population for the selected year, or the state that held the ground and how far it reached.">Point anywhere and the map reports what it knows about that cell: elevation in metres, current speed and heading, the country and its population for the selected year, or the state that held the ground and how far it reached.</p>
+
+    <div class="reader-sources"
+      data-da-html="&lt;strong&gt;Kilder&lt;/strong&gt;&lt;br&gt;
+      Højde, land og havbund: Terrain Tiles på AWS, den åbne globale model samlet af SRTM, GMTED2010 og ETOPO1. Nedsamplet til dette gitter på én grad; værdierne er meter.&lt;br&gt;&lt;br&gt;
+      Permanent is og gletsjere: Natural Earth 1:110m, holdt som sit eget lag så Antarktis og Grønland tegnes som is og ikke som brunt højland i samme højde som Tibet.&lt;br&gt;&lt;br&gt;
+      Havstrømme, feltet nedenunder: OSCAR (Ocean Surface Current Analysis Real-time, NOAA/NASA), ét femdøgnsmiddel centreret om 31. januar 2014, nedsamplet til dette gitter på én grad og derefter lavpasfiltreret her — otte gennemløb af et tre-gange-tre-middel, tæt på en gaussisk udglatning over fem grader. Filteret ved hvor landet er, eftersom det at midle en hastighed hen over en kystlinje ville opfinde vand der løber gennem Afrika, og det midler vektorer som vektorer, så en hvirvels modsatrettede arme ophæver hinanden og forsvinder, mens en sammenhængende strøm overlever hvert gennemløb. Dækningen stopper ved 80&amp;deg; nord og syd, og tynder ud et godt stykke før det overalt hvor kilden maskerer havis.&lt;br&gt;&lt;br&gt;
+      Transportbåndet og hvirvlerne tegnet oven på det: et skema, og det eneste på dette kort der ikke er målt. Ruten er den gængse, beskrevet af NOAAs Ocean Service og af Britannica, efter Broeckers transportbånd: nedsynkning i Nordhavet og Labradorhavet, sydpå ned gennem Atlanten som nordatlantisk dybvand, østpå rundt om Antarktis, nordpå ind i Stillehavet, opvælling, og den varme retur gennem de indonesiske stræder og rundt om Sydafrika. Vendepunkter er lagt i hånden langs den rute og langs de fem subtropiske hvirvler. Positionerne er vejledende, på samme måde som enhver offentliggjort udgave af dette diagram er vejledende; det er kredsløbets form der er pointen, ikke koordinaterne. Den vandrende bølgetop får et helt antal svingninger rundt om hvert lukket kredsløb, så den møder sig selv uden et spring.&lt;br&gt;&lt;br&gt;
+      Befolkning, og tallene per land ved pegning: Our World in Datas lange befolkningsserie, som blander Gapminder, HYDE og FN.&lt;br&gt;&lt;br&gt;
+      Kontinentdrift: GPlates Web Service (EarthByte, University of Sydney), som rekonstruerer sit kystliniesæt gennem rotationsmodellen MULLER2019 for hver fem millioner år fra 250 Ma til nu. Hver landcelle er mærket med den nutidige landmasse den bliver til, fundet ved at føre et gitter på 337 nutidige punkter tilbage gennem de samme rotationer og give hver celle det nærmeste af dem, hvilket er det der lader et kontinent beholde sin farve mens det rejser. Kontrolleret mod det kendte før det kom ind: Indien lander på 47&amp;deg; syd ved 250 Ma og 36&amp;deg; syd ved 100 Ma, krydser ækvator ved 50 Ma og ankommer på 24&amp;deg; nord, og Antarktis forlader aldrig polen.&lt;br&gt;&lt;br&gt;
+      Historisk territorium: historical-basemaps, efter Nüsslis Euratlas og efterfølgere, samplet på enogtyve tidspunkter mellem 500 f.Kr. og 2010. Grænser før den moderne tid er tilnærmede af natur, og de underliggende kort siger det selv.&lt;br&gt;&lt;br&gt;
+      Nutidige landegrænser, brugt til navnene ved pegning: Natural Earth 1:110m.&lt;br&gt;&lt;br&gt;
+      Live vejr: &lt;a href='https://open-meteo.com/'&gt;Open-Meteo&lt;/a&gt;, under CC BY 4.0. Én forespørgsel på 648 punkter til det globale felt, gemt en halv time, og enkeltpunktsforespørgsler for det der er under markøren. Grænsen der former dette er længden på en URL: en forespørgsel kan bære omkring 650 koordinater, og at affyre flere af den slags på én gang bliver afvist.&lt;br&gt;&lt;br&gt;
+      Sollys: beregnet, ikke gemt. Standard lavpræcisions solposition, god til omkring en hundrededel grad af deklination i århundreder på begge sider af år 2000. Kontrolleret mod offentliggjorte tider før det kom ind: København ved sommersolhverv giver 04:26 og 21:58 lokal tid mod offentliggjorte 04:26 og 21:58, Sydney 07:01 og 16:54, og middagshøjden i København i december lander på 10,89 grader mod lærebogens 10,88. Det er klarvejrsgeometri: hvor solen er, ikke hvad vejret gør.&lt;br&gt;&lt;br&gt;
+      Befolkning er holdt på en logaritmisk skala: hver celle gemmer 34,5 gange titalslogaritmen af de mennesker der står på den, hvilket er det der lader ét kort bære både Bangladesh og Sahara uden at den ene forsvinder. Alt nedstrøms respekterer det. Tæthed dividerer med celleareal, hvilket på en logaritme betyder at trække fra frem for at gange, og Vækst trækker ét årti fra det næste, hvilket på en logaritme er et forhold og derfor læses som en væksttakt. Begge visninger er strakt ud over det interval data faktisk fylder frem for fra nul, fordi ingen beboet celle er i nærheden af nul. Udledt her frem for målt særskilt: Terræn (lokal højdeforskel), Tæthed (befolkning over celleareal efter cosinus til bredden) og Vækst. Et lands befolkning er fordelt jævnt over dets landceller, så Tæthed sammenligner lande frem for byer.&lt;br&gt;&lt;br&gt;
+      Én redaktionel beslutning: territoriekilden omdøber Rom efterhånden som forfatningen skifter, så Rom, Den Romerske Republik og Romerriget får én farve for at holde udvidelsen læsbar. Alle andre stater farves ud fra deres eget navn."
+      data-en-html="&lt;strong&gt;Sources&lt;/strong&gt;&lt;br&gt;
+      Elevation, land and sea floor: Terrain Tiles on AWS, the open global model assembled from SRTM, GMTED2010 and ETOPO1. Sampled to this one-degree grid; values are metres.&lt;br&gt;&lt;br&gt;
+      Permanent ice and glaciers: Natural Earth 1:110m, kept as its own layer so Antarctica and Greenland are drawn as ice rather than as brown upland at the same height as Tibet.&lt;br&gt;&lt;br&gt;
+      Ocean currents, the field underneath: OSCAR (Ocean Surface Current Analysis Real-time, NOAA/NASA), a single five-day mean centred on 31 January 2014, sampled to this one-degree grid and then low-pass filtered here — eight passes of a three-by-three average, close to a Gaussian of five degrees. The filter knows where the land is, since averaging a velocity across a coastline would invent water moving through Africa, and it averages vectors as vectors, so the opposing arms of an eddy cancel and vanish while a coherent stream survives every pass. Coverage stops at 80&amp;deg; north and south, and thins well before that wherever the source masks sea ice.&lt;br&gt;&lt;br&gt;
+      The conveyor and the gyres drawn over it: a schematic, and the only thing on this map that is not measured. The route is the standard one described by NOAA's Ocean Service and by Britannica, after Broecker's conveyor: sinking in the Nordic and Labrador seas, south down the Atlantic as North Atlantic Deep Water, east around Antarctica, north into the Pacific, upwelling, and the warm return through the Indonesian passages and around South Africa. Waypoints are placed by hand along that route and along the five subtropical gyres. Positions are indicative, in the way every published version of this diagram is indicative; the shape of the circuit is the point, not the coordinates. The travelling crest is given a whole number of cycles around each closed loop, so it meets itself without a step.&lt;br&gt;&lt;br&gt;
+      Population, and the per-country figures on hover: Our World in Data's long-run population series, which blends Gapminder, HYDE and the UN.&lt;br&gt;&lt;br&gt;
+      Continental drift: the GPlates Web Service (EarthByte, University of Sydney), reconstructing its coastline set through the MULLER2019 rotation model at every five million years from 250 Ma to the present. Each land cell is tagged with the modern landmass it becomes, worked out by carrying a lattice of 337 present-day points back through the same rotations and giving every cell the nearest one, which is what lets a continent hold its colour while it travels. Checked against what is known before it went in: India comes out at 47&amp;deg; south at 250 Ma and 36&amp;deg; south at 100 Ma, crosses the equator by 50 Ma and arrives at 24&amp;deg; north, and Antarctica never leaves the pole.&lt;br&gt;&lt;br&gt;
+      Historical territory: historical-basemaps, after Nüssli's Euratlas and successors, sampled at twenty-one dates between 500 BC and 2010. Borders before the modern era are approximate by nature, and the underlying maps say so.&lt;br&gt;&lt;br&gt;
+      Modern country boundaries, used for the hover labels: Natural Earth 1:110m.&lt;br&gt;&lt;br&gt;
+      Live weather: &lt;a href='https://open-meteo.com/'&gt;Open-Meteo&lt;/a&gt;, licensed CC BY 4.0. One request of 648 points for the global field, cached for half an hour, and single-point requests for whatever is under the pointer. The limit that shapes this is the length of a URL: a request can carry roughly 650 coordinates, and firing several such requests at once is refused.&lt;br&gt;&lt;br&gt;
+      Sunlight: computed, not stored. Standard low-precision solar position, good to about a hundredth of a degree of declination for centuries either side of 2000. Checked against published times before it went in: Copenhagen on the June solstice comes out 04:26 and 21:58 local against a published 04:26 and 21:58, Sydney 07:01 and 16:54, and midday altitude at Copenhagen in December lands on 10.89 degrees against a textbook 10.88. It is clear-sky geometry: where the sun is, not what the weather is doing.&lt;br&gt;&lt;br&gt;
+      Population is held on a logarithmic scale: each cell stores 34.5 times the base-ten logarithm of the people standing on it, which is what lets a map carry Bangladesh and the Sahara at once without one of them vanishing. Everything downstream respects that. Density divides by cell area, which on a logarithm means subtracting rather than multiplying, and Growth subtracts one decade from the next, which on a logarithm is a ratio and so reads as a rate of growth. Both views are stretched across the range the data actually occupies rather than from zero, because no inhabited cell is anywhere near zero. Derived here rather than measured separately: Terrain (local spread of elevation), Density (population over cosine-of-latitude cell area) and Growth. Country population is spread evenly across that country's land cells, so Density compares countries rather than cities.&lt;br&gt;&lt;br&gt;
+      One editorial decision: the territory source renames Rome as its constitution changes, so Rome, the Roman Republic and the Roman Empire are given a single colour to keep the expansion readable. Every other state is coloured from its own name.">
       <strong>Sources</strong><br>
-      Elevation, land and sea floor: Terrain Tiles on AWS, the open global model assembled from SRTM, GMTED2010 and ETOPO1. Sampled to this one-degree grid; values are metres.<br><br>
-      Permanent ice and glaciers: Natural Earth 1:110m, kept as its own layer so Antarctica and Greenland are drawn as ice rather than as brown upland at the same height as Tibet.<br><br>
-      Ocean currents, the field underneath: OSCAR (Ocean Surface Current Analysis Real-time, NOAA/NASA), a single five-day mean centred on 31 January 2014, sampled to this one-degree grid and then low-pass filtered here — eight passes of a three-by-three average, close to a Gaussian of five degrees. The filter knows where the land is, since averaging a velocity across a coastline would invent water moving through Africa, and it averages vectors as vectors, so the opposing arms of an eddy cancel and vanish while a coherent stream survives every pass. Coverage stops at 80&deg; north and south, and thins well before that wherever the source masks sea ice.<br><br>
-      The conveyor and the gyres drawn over it: a schematic, and the only thing on this map that is not measured. The route is the standard one described by NOAA's Ocean Service and by Britannica, after Broecker's conveyor: sinking in the Nordic and Labrador seas, south down the Atlantic as North Atlantic Deep Water, east around Antarctica, north into the Pacific, upwelling, and the warm return through the Indonesian passages and around South Africa. Waypoints are placed by hand along that route and along the five subtropical gyres. Positions are indicative, in the way every published version of this diagram is indicative; the shape of the circuit is the point, not the coordinates. The travelling crest is given a whole number of cycles around each closed loop, so it meets itself without a step.<br><br>
-      Population, and the per-country figures on hover: Our World in Data's long-run population series, which blends Gapminder, HYDE and the UN.<br><br>
-      Continental drift: the GPlates Web Service (EarthByte, University of Sydney), reconstructing its coastline set through the MULLER2019 rotation model at every five million years from 250 Ma to the present. Each land cell is tagged with the modern landmass it becomes, worked out by carrying a lattice of 337 present-day points back through the same rotations and giving every cell the nearest one, which is what lets a continent hold its colour while it travels. Checked against what is known before it went in: India comes out at 47&deg; south at 250 Ma and 36&deg; south at 100 Ma, crosses the equator by 50 Ma and arrives at 24&deg; north, and Antarctica never leaves the pole.<br><br>
-      Historical territory: historical-basemaps, after Nüssli's Euratlas and successors, sampled at twenty-one dates between 500 BC and 2010. Borders before the modern era are approximate by nature, and the underlying maps say so.<br><br>
-      Modern country boundaries, used for the hover labels: Natural Earth 1:110m.<br><br>
-      Live weather: <a href="https://open-meteo.com/">Open-Meteo</a>, licensed CC BY 4.0. One request of 648 points for the global field, cached for half an hour, and single-point requests for whatever is under the pointer. The limit that shapes this is the length of a URL: a request can carry roughly 650 coordinates, and firing several such requests at once is refused.<br><br>
-      Sunlight: computed, not stored. Standard low-precision solar position, good to about a hundredth of a degree of declination for centuries either side of 2000. Checked against published times before it went in: Copenhagen on the June solstice comes out 04:26 and 21:58 local against a published 04:26 and 21:58, Sydney 07:01 and 16:54, and midday altitude at Copenhagen in December lands on 10.89 degrees against a textbook 10.88. It is clear-sky geometry: where the sun is, not what the weather is doing.<br><br>
-      Population is held on a logarithmic scale: each cell stores 34.5 times the base-ten logarithm of the people standing on it, which is what lets a map carry Bangladesh and the Sahara at once without one of them vanishing. Everything downstream respects that. Density divides by cell area, which on a logarithm means subtracting rather than multiplying, and V&aelig;kst subtracts one decade from the next, which on a logarithm is a ratio and so reads as a rate of growth. Both views are stretched across the range the data actually occupies rather than from zero, because no inhabited cell is anywhere near zero. Derived here rather than measured separately: Terræn (local spread of elevation), Tæthed (population over cosine-of-latitude cell area) and Vækst (difference between consecutive decades). Country population is spread evenly across that country's land cells, so Tæthed compares countries rather than cities.<br><br>
-      One editorial decision: the territory source renames Rome as its constitution changes, so Rome, the Roman Republic and the Roman Empire are given a single colour to keep the expansion readable. Every other state is coloured from its own name.
+      Elevation, land and sea floor: Terrain Tiles on AWS, the open global model assembled from SRTM, GMTED2010 and ETOPO1. Sampled to this one-degree grid; values are metres.
     </div>
 
     <nav class="reader-nav">
-      <a href="/Projects">Alle projekter</a>
-      <a href="/">Forside</a>
-      <a href="/#kontakt">Kontakt</a>
+      <a href="/Projects" data-da="Alle projekter" data-en="All projects">Alle projekter</a>
+      <a href="/" data-da="Forside" data-en="Home">Forside</a>
+      <a href="/#kontakt" data-da="Kontakt" data-en="Contact">Kontakt</a>
     </nav>
 
-    <p class="reader-foot">Bygget med three.js: ét instanced draw call, GPU-drevet højde og farve.<br>&copy; <span id="year-stamp"></span> Oskar Matras.</p>
+    <p class="reader-foot"><span data-da="Bygget med three.js: ét instanced draw call, GPU-drevet højde og farve." data-en="Built with three.js: one instanced draw call, height and colour driven on the GPU.">Bygget med three.js: ét instanced draw call, GPU-drevet højde og farve.</span><br>&copy; <span id="year-stamp"></span> Oskar Matras.</p>
   </div>
 </aside>
 <script>
@@ -1957,37 +2008,129 @@ var TERRA_TECT_RLE_B64="Rw0KUE8BBFAHAB5QPgEGUAkAJlAyAQhQBgAyUCcBCFAHADxQGAEMUAgA
   // ---------------------------------------------------------------
   // Modes
   // ---------------------------------------------------------------
+
+  // ---------------------------------------------------------------
+  // Words.
+  //
+  // The markup gets its two languages from data attributes, which
+  // /i18n.js swaps. Everything drawn by this file - the mode bar, the
+  // legend, the readout under the cursor, the captions on the timelines
+  // - has to look its words up instead, which is what this is for.
+  //
+  // t() reads whichever language is current at the moment it is called,
+  // so nothing needs to be cached and nothing goes stale; the whole HUD
+  // is simply drawn again when the language changes.
+  // ---------------------------------------------------------------
+  function curLang(){ return (window.I18N && window.I18N.lang) || 'da'; }
+  // Picks a language out of a {da,en} pair. Passes plain strings and
+  // arrays of pairs through, so a value can be given once when it is the
+  // same in both - place names, mostly.
+  function L(v){
+    if (v == null) return v;
+    if (typeof v === 'string') return v;
+    if (v.da !== undefined || v.en !== undefined) { var l = curLang(); return v[l] !== undefined ? v[l] : v.da; }
+    return v;
+  }
+  var STR = {
+    live_loading: { da:'henter fra Open-Meteo…', en:'asking Open-Meteo…' },
+    unsupported:  { da:'Kræver vertex-teksturer, som denne enhed ikke understøtter.',
+                    en:'Needs vertex textures, which this device does not support.' },
+    realtime:     { da:'realtid', en:'real time' },
+    play:         { da:'Afspil', en:'Play' },
+    pause:        { da:'Pause', en:'Pause' },
+    sea:          { da:'Hav', en:'Sea' },
+    land:         { da:'Land', en:'Land' },
+    stateless:    { da:'Uden fast styre', en:'No settled state' },
+    fetching:     { da:'henter…', en:'fetching…' },
+    // Row labels in the readout under the cursor.
+    d_elev:       { da:'højde', en:'elevation' },
+    d_spread:     { da:'spænd', en:'spread' },
+    d_speed:      { da:'fart', en:'speed' },
+    d_heading:    { da:'retning', en:'heading' },
+    d_conveyor:   { da:'transportbånd', en:'conveyor' },
+    d_cloud:      { da:'skydække', en:'cloud' },
+    d_temp:       { da:'temperatur', en:'temperature' },
+    d_wind:       { da:'vind', en:'wind' },
+    d_rad:        { da:'indstråling', en:'sunlight' },
+    d_sunalt:     { da:'solhøjde', en:'sun altitude' },
+    d_year:       { da:'år', en:'year' },
+    d_extent:     { da:'udstrækning', en:'extent' },
+    d_cells:      { da:'felter', en:'cells' },
+    d_time:       { da:'tid', en:'time' },
+    d_latThen:    { da:'bredde da', en:'latitude then' },
+    d_latNow:     { da:'bredde nu', en:'latitude now' },
+    d_position:   { da:'position', en:'position' },
+    d_people:     { da:'mennesker', en:'people' },
+    // Which limb of the conveyor the cursor is on.
+    warmBranch:   { da:'varm gren', en:'warm branch' },
+    coldBranch:   { da:'kold gren', en:'cold branch' },
+    midBranch:    { da:'undervejs', en:'in transit' },
+    // The twilight steps, which are named things rather than adjectives.
+    tw_day:       { da:'dag', en:'day' },
+    tw_civil:     { da:'borgerligt tusmørke', en:'civil twilight' },
+    tw_naut:      { da:'nautisk tusmørke', en:'nautical twilight' },
+    tw_astro:     { da:'astronomisk tusmørke', en:'astronomical twilight' },
+    tw_night:     { da:'nat', en:'night' },
+    // Deep time and the calendar.
+    today:        { da:'i dag', en:'today' },
+    maAgo:        { da:'mio. år siden', en:'million years ago' },
+    bc:           { da:'f.Kr.', en:'BC' }
+  };
+  function t(k){ var e = STR[k]; return e ? L(e) : k; }
+  // Compass points, and the letters for the hemispheres, differ between
+  // the two languages: east is Ø in Danish and E in English.
+  function compass8(deg){
+    var da = ['Ø','NØ','N','NV','V','SV','S','SØ'];
+    var en = ['E','NE','N','NW','W','SW','S','SE'];
+    return (curLang() === 'en' ? en : da)[Math.round(deg/45)%8];
+  }
+  function ns(lat){ return lat >= 0 ? 'N' : 'S'; }
+  function ew(lon){ return lon >= 0 ? (curLang()==='en'?'E':'Ø') : (curLang()==='en'?'W':'V'); }
+  // Thousands separators follow the language, not the visitor's locale,
+  // so the number under the cursor matches the words beside it.
+  function numLoc(){ return curLang()==='en' ? 'en-GB' : 'da-DK'; }
+  function fmtNum(n){ return Number(n).toLocaleString(numLoc()); }
   var MODES = [
-    { id:'elev', label:'Højde', shaderId:0,
-      rows:[{label:'Havbund',ramp:['#081326','#165a79','#a9dbe1']},{label:'Land',ramp:['#2e5a36','#9d834a','#f5f3ee']}],
-      ends:['dybhav','kyst','bjerg'], source:'Terrain Tiles (AWS) &middot; SRTM, GMTED, ETOPO1' },
-    { id:'relief', label:'Terræn', shaderId:1,
-      rows:[{label:'Stejlhed',ramp:['#101b2b','#5d6b7d','#f2e6cd']}],
-      ends:['fladt','','stejlt'], source:'afledt &middot; lokal højdeforskel i meter' },
-    { id:'cur', label:'Havstrømme', shaderId:2, flow:true,
-      rows:[{label:'Vandet',ramp:['#163474','#519ce0','#ffcf73']}],
-      ends:['kold','','varm'], source:'Det store transportbånd &middot; skematisk, efter NOAA &middot; målt strømfelt: OSCAR' },
-    { id:'pop', label:'Befolkning', shaderId:3, year:'pop', needsVertexTex:true,
-      rows:[{label:'Mennesker',ramp:['#241234','#a13d63','#ffcf6b']}],
-      ends:['tyndt','','tæt'], source:'Our World in Data &middot; Gapminder, HYDE, FN' },
-    { id:'dens', label:'Tæthed', shaderId:4, year:'pop', needsVertexTex:true,
-      rows:[{label:'Per areal',ramp:['#1b1030','#4d6bb3','#9fe8ff']}],
-      ends:['tomt','','tætpakket'], source:'afledt &middot; befolkning per arealenhed' },
-    { id:'growth', label:'Vækst', shaderId:5, year:'pop', minYear:1810, needsVertexTex:true,
-      rows:[{label:'Tilvækst',ramp:['#12210f','#4f9b3f','#f4ff9b']}],
-      ends:['ingen','','hurtigst'], source:'afledt &middot; ændring siden forrige årti' },
-    { id:'emp', label:'Riger', shaderId:6, year:'emp', needsVertexTex:true,
-      rows:[{label:'Udstrækning',ramp:['#2a3550','#7d6bb0','#f0e3a8']}],
-      ends:['lille','','stort rige'], source:'historical-basemaps &middot; Nüssli / Ouředníček' },
-    { id:'tect', label:'Kontinenter', shaderId:9, year:'tect', needsVertexTex:true,
-      rows:[{label:'Landmasse',ramp:['#db7c3a','#c65cc4','#48bab2']}],
-      ends:['Pangaea','','i dag'], source:'GPlates &middot; MULLER2019 pladerekonstruktion' },
-    { id:'sun', label:'Sollys', shaderId:7, sun:true,
-      rows:[{label:'Solhøjde',ramp:['#080e1d','#251f51','#f28c44','#fff6da']}],
-      ends:['nat','tusmørke','middag'], source:'beregnet &middot; solens position lige nu' },
-    { id:'live', label:'Skydække', shaderId:8, live:true,
-      rows:[{label:'Skyer',ramp:['#0b1b32','#738ca1','#f6f9fc']}],
-      ends:['klart','','overskyet'], source:'Open-Meteo &middot; live, 5° net' }
+    { id:'elev', label:{da:'Højde',en:'Elevation'}, shaderId:0,
+      rows:[{label:{da:'Havbund',en:'Sea floor'},ramp:['#081326','#165a79','#a9dbe1']},{label:{da:'Land',en:'Land'},ramp:['#2e5a36','#9d834a','#f5f3ee']}],
+      ends:{da:['dybhav','kyst','bjerg'],en:['deep sea','coast','mountain']},
+      source:{da:'Terrain Tiles (AWS) &middot; SRTM, GMTED, ETOPO1',en:'Terrain Tiles (AWS) &middot; SRTM, GMTED, ETOPO1'} },
+    { id:'relief', label:{da:'Terræn',en:'Terrain'}, shaderId:1,
+      rows:[{label:{da:'Stejlhed',en:'Ruggedness'},ramp:['#101b2b','#5d6b7d','#f2e6cd']}],
+      ends:{da:['fladt','','stejlt'],en:['flat','','steep']},
+      source:{da:'afledt &middot; lokal højdeforskel i meter',en:'derived &middot; local spread of elevation, in metres'} },
+    { id:'cur', label:{da:'Havstrømme',en:'Ocean currents'}, shaderId:2, flow:true,
+      rows:[{label:{da:'Vandet',en:'The water'},ramp:['#163474','#519ce0','#ffcf73']}],
+      ends:{da:['kold','','varm'],en:['cold','','warm']},
+      source:{da:'Det store transportbånd &middot; skematisk, efter NOAA &middot; målt strømfelt: OSCAR',en:'The great conveyor &middot; schematic, after NOAA &middot; measured field: OSCAR'} },
+    { id:'pop', label:{da:'Befolkning',en:'Population'}, shaderId:3, year:'pop', needsVertexTex:true,
+      rows:[{label:{da:'Mennesker',en:'People'},ramp:['#241234','#a13d63','#ffcf6b']}],
+      ends:{da:['tyndt','','tæt'],en:['sparse','','dense']},
+      source:{da:'Our World in Data &middot; Gapminder, HYDE, FN',en:'Our World in Data &middot; Gapminder, HYDE, UN'} },
+    { id:'dens', label:{da:'Tæthed',en:'Density'}, shaderId:4, year:'pop', needsVertexTex:true,
+      rows:[{label:{da:'Per areal',en:'Per unit area'},ramp:['#1b1030','#4d6bb3','#9fe8ff']}],
+      ends:{da:['tomt','','tætpakket'],en:['empty','','crowded']},
+      source:{da:'afledt &middot; befolkning per arealenhed',en:'derived &middot; population over cell area'} },
+    { id:'growth', label:{da:'Vækst',en:'Growth'}, shaderId:5, year:'pop', minYear:1810, needsVertexTex:true,
+      rows:[{label:{da:'Tilvækst',en:'Rate of increase'},ramp:['#12210f','#4f9b3f','#f4ff9b']}],
+      ends:{da:['ingen','','hurtigst'],en:['none','','fastest']},
+      source:{da:'afledt &middot; væksttakt siden forrige årti',en:'derived &middot; rate of growth since the previous decade'} },
+    { id:'emp', label:{da:'Riger',en:'Empires'}, shaderId:6, year:'emp', needsVertexTex:true,
+      rows:[{label:{da:'Udstrækning',en:'Extent'},ramp:['#2a3550','#7d6bb0','#f0e3a8']}],
+      ends:{da:['lille','','stort rige'],en:['small','','large state']},
+      source:{da:'historical-basemaps &middot; Nüssli / Ouředníček',en:'historical-basemaps &middot; Nüssli / Ouředníček'} },
+    { id:'tect', label:{da:'Kontinenter',en:'Continents'}, shaderId:9, year:'tect', needsVertexTex:true,
+      rows:[{label:{da:'Landmasse',en:'Landmass'},ramp:['#db7c3a','#c65cc4','#48bab2']}],
+      ends:{da:['Pangaea','','i dag'],en:['Pangaea','','today']},
+      source:{da:'GPlates &middot; MULLER2019 pladerekonstruktion',en:'GPlates &middot; MULLER2019 plate reconstruction'} },
+    { id:'sun', label:{da:'Sollys',en:'Sunlight'}, shaderId:7, sun:true,
+      rows:[{label:{da:'Solhøjde',en:'Sun altitude'},ramp:['#080e1d','#251f51','#f28c44','#fff6da']}],
+      ends:{da:['nat','tusmørke','middag'],en:['night','twilight','noon']},
+      source:{da:'beregnet &middot; solens position lige nu',en:'computed &middot; the sun where it is now'} },
+    { id:'live', label:{da:'Skydække',en:'Cloud cover'}, shaderId:8, live:true,
+      rows:[{label:{da:'Skyer',en:'Cloud'},ramp:['#0b1b32','#738ca1','#f6f9fc']}],
+      ends:{da:['klart','','overskyet'],en:['clear','','overcast']},
+      source:{da:'Open-Meteo &middot; live, 5° net',en:'Open-Meteo &middot; live, 5° grid'} }
   ];
   function modeById(id){ for (var i=0;i<MODES.length;i++) if (MODES[i].id===id) return MODES[i]; return MODES[0]; }
 
@@ -2015,55 +2158,73 @@ var TERRA_TECT_RLE_B64="Rw0KUE8BBFAHAB5QPgEGUAkAJlAyAQhQBgAyUCcBCFAHADxQGAEMUAgA
   // ---------------------------------------------------------------
   var TIMELINE_EVENTS = {
     pop: [
-      { t:1804, name:'Den første milliard' },
-      { t:1845, name:'Den irske hungersnød' },
-      { t:1918, name:'Den spanske syge' },
-      { t:1927, name:'To milliarder' },
-      { t:1960, name:'Tre milliarder' },
-      { t:1974, name:'Fire milliarder' },
-      { t:1987, name:'Fem milliarder' },
-      { t:1999, name:'Seks milliarder' },
-      { t:2011, name:'Syv milliarder' },
-      { t:2022, name:'Otte milliarder' }
+      { t:1804, name:{da:'Den første milliard',en:'The first billion'} },
+      { t:1845, name:{da:'Den irske hungersnød',en:'The Irish famine'} },
+      { t:1918, name:{da:'Den spanske syge',en:'The influenza pandemic'} },
+      { t:1927, name:{da:'To milliarder',en:'Two billion'} },
+      { t:1960, name:{da:'Tre milliarder',en:'Three billion'} },
+      { t:1974, name:{da:'Fire milliarder',en:'Four billion'} },
+      { t:1987, name:{da:'Fem milliarder',en:'Five billion'} },
+      { t:1999, name:{da:'Seks milliarder',en:'Six billion'} },
+      { t:2011, name:{da:'Syv milliarder',en:'Seven billion'} },
+      { t:2022, name:{da:'Otte milliarder',en:'Eight billion'} }
     ],
     emp: [
-      { t:-500, name:'Perserriget når sit største' },
-      { t:-323, name:'Alexander dør i Babylon' },
-      { t:-221, name:'Qin samler Kina' },
-      { t:-27,  name:'Det romerske kejserdømme' },
-      { t:117,  name:'Rom når sit største' },
-      { t:395,  name:'Romerriget deles' },
-      { t:476,  name:'Vestromerriget falder' },
-      { t:632,  name:'Den arabiske ekspansion' },
-      { t:800,  name:'Karl den Store kronet' },
-      { t:1206, name:'Djengis Khan samler steppen' },
-      { t:1279, name:'Mongolriget når sit største' },
-      { t:1453, name:'Konstantinopel falder' },
-      { t:1492, name:'Atlanten krydses' },
-      { t:1600, name:'Kompagnierne sejler ud' },
-      { t:1776, name:'De første kolonier river sig løs' },
-      { t:1884, name:'Berlinkonferencen deler Afrika' },
-      { t:1914, name:'Den Første Verdenskrig' },
-      { t:1945, name:'Den Anden Verdenskrig slutter' },
-      { t:1947, name:'Indien bliver frit' },
-      { t:1960, name:'Afrikas år' },
-      { t:1991, name:'Sovjetunionen opløses' }
+      { t:-500, name:{da:'Perserriget når sit største',en:'Persia at its greatest'} },
+      { t:-323, name:{da:'Alexander dør i Babylon',en:'Alexander dies at Babylon'} },
+      { t:-221, name:{da:'Qin samler Kina',en:'Qin unifies China'} },
+      { t:-27,  name:{da:'Det romerske kejserdømme',en:'The Roman Empire begins'} },
+      { t:117,  name:{da:'Rom når sit største',en:'Rome at its greatest'} },
+      { t:395,  name:{da:'Romerriget deles',en:'The Roman Empire splits'} },
+      { t:476,  name:{da:'Vestromerriget falder',en:'The Western Empire falls'} },
+      { t:632,  name:{da:'Den arabiske ekspansion',en:'The Arab expansion'} },
+      { t:800,  name:{da:'Karl den Store kronet',en:'Charlemagne crowned'} },
+      { t:1206, name:{da:'Djengis Khan samler steppen',en:'Genghis Khan unites the steppe'} },
+      { t:1279, name:{da:'Mongolriget når sit største',en:'The Mongol Empire at its greatest'} },
+      { t:1453, name:{da:'Konstantinopel falder',en:'Constantinople falls'} },
+      { t:1492, name:{da:'Atlanten krydses',en:'The Atlantic is crossed'} },
+      { t:1600, name:{da:'Kompagnierne sejler ud',en:'The trading companies sail'} },
+      { t:1776, name:{da:'De første kolonier river sig løs',en:'The first colonies break away'} },
+      { t:1884, name:{da:'Berlinkonferencen deler Afrika',en:'Berlin partitions Africa'} },
+      { t:1914, name:{da:'Den Første Verdenskrig',en:'The First World War'} },
+      { t:1945, name:{da:'Den Anden Verdenskrig slutter',en:'The Second World War ends'} },
+      { t:1947, name:{da:'Indien bliver frit',en:'India becomes independent'} },
+      { t:1960, name:{da:'Afrikas år',en:'The Year of Africa'} },
+      { t:1991, name:{da:'Sovjetunionen opløses',en:'The Soviet Union dissolves'} }
     ],
     tect: [
-      { t:-252, name:'Den store død ved Perms slutning' },
-      { t:-250, name:'Pangaea samlet' },
-      { t:-201, name:'Pangaea begynder at revne' },
-      { t:-180, name:'Laurasia skilles fra Gondwana' },
-      { t:-140, name:'Sydatlanten åbner sig' },
-      { t:-88,  name:'Indien forlader Madagaskar' },
-      { t:-66,  name:'Nedslaget der lukkede Kridttiden' },
-      { t:-50,  name:'Indien rammer Asien' },
-      { t:-45,  name:'Australien slipper Antarktis' },
-      { t:-34,  name:'Antarktis fryser til' },
-      { t:-5,   name:'Middelhavet fyldes igen' },
-      { t:0,    name:'I dag' }
+      { t:-252, name:{da:'Den store død ved Perms slutning',en:'The great dying at the end of the Permian'} },
+      { t:-250, name:{da:'Pangaea samlet',en:'Pangaea assembled'} },
+      { t:-201, name:{da:'Pangaea begynder at revne',en:'Pangaea begins to rift'} },
+      { t:-180, name:{da:'Laurasia skilles fra Gondwana',en:'Laurasia parts from Gondwana'} },
+      { t:-140, name:{da:'Sydatlanten åbner sig',en:'The South Atlantic opens'} },
+      { t:-88,  name:{da:'Indien forlader Madagaskar',en:'India leaves Madagascar'} },
+      { t:-66,  name:{da:'Nedslaget der lukkede Kridttiden',en:'The impact that closed the Cretaceous'} },
+      { t:-50,  name:{da:'Indien rammer Asien',en:'India collides with Asia'} },
+      { t:-45,  name:{da:'Australien slipper Antarktis',en:'Australia lets go of Antarctica'} },
+      { t:-34,  name:{da:'Antarktis fryser til',en:'Antarctica freezes over'} },
+      { t:-5,   name:{da:'Middelhavet fyldes igen',en:'The Mediterranean refills'} },
+      { t:0,    name:{da:'I dag',en:'Today'} }
     ]
   };
+  // The nine landmasses, named in both languages. The data ships with the
+  // Danish names; these sit alongside it rather than replacing it.
+  var TECT_NAMES = {
+    'hav':{da:'Hav',en:'Sea'},
+    'Nordamerika':{da:'Nordamerika',en:'North America'},
+    'Sydamerika':{da:'Sydamerika',en:'South America'},
+    'Europa':{da:'Europa',en:'Europe'},
+    'Afrika':{da:'Afrika',en:'Africa'},
+    'Asien':{da:'Asien',en:'Asia'},
+    'Indien':{da:'Indien',en:'India'},
+    'Australien':{da:'Australien',en:'Australia'},
+    'Antarktis':{da:'Antarktis',en:'Antarctica'},
+    'Grønland':{da:'Grønland',en:'Greenland'}
+  };
+  function tectName(id){
+    var raw = TERRA_TECT_CONTS[id];
+    return TECT_NAMES[raw] ? L(TECT_NAMES[raw]) : raw;
+  }
   // How near a landmark the playhead has to be before it starts easing
   // down, in each timeline's own units, and how long it holds once it
   // arrives. The spans are set by how crowded each timeline is: the
@@ -2086,7 +2247,7 @@ var TERRA_TECT_RLE_B64="Rw0KUE8BBFAHAB5QPgEGUAkAJlAyAQhQBgAyUCcBCFAHADxQGAEMUAgA
     // that stand five million apart.
     tect: { keys:TECT_KEYS, min:-250, max:0, playSeconds:62, fmt:function(y){
               var ma = Math.round(-y);
-              return ma <= 0 ? 'i dag' : ma + ' mio. �r siden'; },
+              return ma <= 0 ? t('today') : ma + ' ' + t('maAgo'); },
            setUniforms:function(low,frac){ uniforms.uTectLow.value=low; uniforms.uTectFrac.value=frac; } }
   };
   // Position along the keyframe list, as a float, converted back to a year.
@@ -2121,20 +2282,20 @@ var TERRA_TECT_RLE_B64="Rw0KUE8BBFAHAB5QPgEGUAkAJlAyAQhQBgAyUCcBCFAHADxQGAEMUAgA
   function renderLegend(mode){
     var html='';
     for (var i=0;i<mode.rows.length;i++)
-      html+='<div class="legend-row"><span class="legend-label">'+mode.rows[i].label+
+      html+='<div class="legend-row"><span class="legend-label">'+L(mode.rows[i].label)+
             '</span><span class="legend-bar" style="background:linear-gradient(90deg,'+mode.rows[i].ramp.join(',')+')"></span></div>';
     if (mode.ends){ html+='<div class="legend-ends">';
-      for (var k=0;k<mode.ends.length;k++) html+='<span>'+mode.ends[k]+'</span>';
+      for (var k=0;k<L(mode.ends).length;k++) html+='<span>'+L(mode.ends)[k]+'</span>';
       html+='</div>'; }
     if (mode.sun || mode.live) html+='<div class="legend-live" id="legend-live"></div>';
-    legendEl.innerHTML = html+'<div class="legend-src">'+mode.source+'</div>';
+    legendEl.innerHTML = html+'<div class="legend-src">'+L(mode.source)+'</div>';
     liveEl = document.getElementById('legend-live');
     if (mode.live) refreshLiveNote();
   }
   var liveEl = null;
   function refreshLiveNote(){
     if (!liveEl || !currentMode || !currentMode.live) return;
-    if (liveState === 'loading') liveEl.textContent = 'henter fra Open-Meteo…';
+    if (liveState === 'loading') liveEl.textContent = t('live_loading');
     else if (liveState === 'error') liveEl.textContent = 'kunne ikke hente live-data';
     else if (liveState === 'ready') liveEl.textContent = (liveStamp ? liveStamp.replace('T',' ')+' UTC' : 'live') + ' · 10° net';
     else liveEl.textContent = '';
@@ -2146,7 +2307,7 @@ var TERRA_TECT_RLE_B64="Rw0KUE8BBFAHAB5QPgEGUAkAJlAyAQhQBgAyUCcBCFAHADxQGAEMUAgA
     liveEl.textContent = pad2(d.getUTCHours())+':'+pad2(d.getUTCMinutes())+' UTC · '+
       d.getUTCDate()+'/'+(d.getUTCMonth()+1)+' · sol over '+
       Math.abs(s.decDeg).toFixed(1)+'°'+(s.decDeg>=0?'N':'S')+' '+
-      Math.abs(s.lonDeg).toFixed(1)+'°'+(s.lonDeg>=0?'Ø':'V');
+      Math.abs(s.lonDeg).toFixed(1)+'°'+ew(s.lonDeg);
   }
 
   var yearInput=document.getElementById('year'), yearVal=document.getElementById('yearVal');
@@ -2158,7 +2319,7 @@ var TERRA_TECT_RLE_B64="Rw0KUE8BBFAHAB5QPgEGUAkAJlAyAQhQBgAyUCcBCFAHADxQGAEMUAgA
   function fmtYear(y){
     var tl = currentMode && TIMELINES[currentMode.year];
     if (tl && tl.fmt) return tl.fmt(y);
-    y=Math.round(y); return y<0 ? Math.abs(y)+' f.Kr.' : String(y);
+    y=Math.round(y); return y<0 ? Math.abs(y)+' '+t('bc') : String(y);
   }
 
   // ---------------------------------------------------------------
@@ -2215,7 +2376,7 @@ var TERRA_TECT_RLE_B64="Rw0KUE8BBFAHAB5QPgEGUAkAJlAyAQhQBgAyUCcBCFAHADxQGAEMUAgA
     }
     if (eventShown !== n.ev){
       eventShown = n.ev;
-      cardNameEl.textContent = n.ev.name;
+      cardNameEl.textContent = L(n.ev.name);
       cardTimeEl.textContent = fmtYear(n.ev.t);
       // Restart the highlight so each landmark gets its own beat.
       cardEl.classList.remove('pulse');
@@ -2277,8 +2438,8 @@ var TERRA_TECT_RLE_B64="Rw0KUE8BBFAHAB5QPgEGUAkAJlAyAQhQBgAyUCcBCFAHADxQGAEMUAgA
     for (var i=0;i<MODES.length;i++){
       var m=MODES[i], off=(m.needsVertexTex && !supportsPop);
       html+='<button class="mode-btn'+(i===0?' is-active':'')+'" data-mode="'+m.id+'" type="button" aria-pressed="'+(i===0?'true':'false')+'"'+
-            (off?' disabled title="Kræver vertex-teksturer, som denne enhed ikke understøtter." style="opacity:0.35;cursor:not-allowed"':'')+
-            '>'+m.label+'</button>';
+            (off?' disabled title="'+t('unsupported')+'" style="opacity:0.35;cursor:not-allowed"':'')+
+            '>'+L(m.label)+'</button>';
     }
     modebarEl.innerHTML=html;
     modebarEl.addEventListener('click', function(e){
@@ -2304,7 +2465,7 @@ var TERRA_TECT_RLE_B64="Rw0KUE8BBFAHAB5QPgEGUAkAJlAyAQhQBgAyUCcBCFAHADxQGAEMUAgA
   var sunRateInput = document.getElementById('sunrate');
   var sunRateVal = document.getElementById('sunrateVal');
   function describeRate(r){
-    if (r < 2) return 'realtid';
+    if (r < 2) return t('realtime');
     if (r*1 < 3600) return '1 sek = ' + Math.round(r) + ' sek';
     if (r < 86400) return '1 sek = ' + (r/3600).toFixed(r<36000?1:0) + ' timer';
     return '1 sek = ' + (r/86400).toFixed(r<864000?1:0) + ' dage';
@@ -2324,13 +2485,13 @@ var TERRA_TECT_RLE_B64="Rw0KUE8BBFAHAB5QPgEGUAkAJlAyAQhQBgAyUCcBCFAHADxQGAEMUAgA
     if (sunRateInput){ sunRateInput.value = 0; sunRate = 1; sunRateVal.textContent = describeRate(1); }
   });
   yearInput.addEventListener('input', function(){
-    playing=false; playBtn.classList.remove('is-playing'); playBtn.innerHTML='&#9654;';
+    playing=false; playBtn.classList.remove('is-playing'); playBtn.innerHTML='&#9654;'; playBtn.setAttribute('aria-label', t('play'));
     setYear(parseFloat(yearInput.value)); hideTip();
   });
   playBtn.addEventListener('click', function(){
     playing=!playing;
     playBtn.classList.toggle('is-playing',playing);
-    playBtn.innerHTML = playing?'&#10074;&#10074;':'&#9654;';
+    playBtn.innerHTML = playing?'&#10074;&#10074;':'&#9654;'; playBtn.setAttribute('aria-label', playing?t('pause'):t('play'));
   });
 
   // ---------------------------------------------------------------
@@ -2420,8 +2581,8 @@ var TERRA_TECT_RLE_B64="Rw0KUE8BBFAHAB5QPgEGUAkAJlAyAQhQBgAyUCcBCFAHADxQGAEMUAgA
     var rows='', lat=(90-(aGridUV[k*2+1]+0.5)), lon=(-180+(aGridUV[k*2]+0.5));
     var m=currentMode.id;
     if (m==='elev' || m==='relief'){
-      rows+='<dt>højde</dt><dd>'+(elevM[k]>=0?'+':'')+elevM[k].toLocaleString('da-DK')+' m</dd>';
-      if (m==='relief') rows+='<dt>spænd</dt><dd>'+Math.round(reliefM[k]).toLocaleString('da-DK')+' m</dd>';
+      rows+='<dt>'+t('d_elev')+'</dt><dd>'+(elevM[k]>=0?'+':'')+fmtNum(elevM[k])+' m</dd>';
+      if (m==='relief') rows+='<dt>'+t('d_spread')+'</dt><dd>'+fmtNum(Math.round(reliefM[k]))+' m</dd>';
     } else if (m==='cur'){
       if (!seaMask[k]) return null;
       // Report the filtered field, not the raw one, so the number under
@@ -2429,16 +2590,16 @@ var TERRA_TECT_RLE_B64="Rw0KUE8BBFAHAB5QPgEGUAkAJlAyAQhQBgAyUCcBCFAHADxQGAEMUAgA
       // raw field a cell could read half a metre a second from an eddy
       // that the view no longer shows at all.
       var cms=curSpd[k]*100, deg=Math.round(((Math.atan2(curV[k],curU[k])*180/Math.PI)+360)%360);
-      var compass=['Ø','NØ','N','NV','V','SV','S','SØ'][Math.round(deg/45)%8];
-      rows+='<dt>fart</dt><dd>'+(cms/100).toFixed(2).replace('.',',')+' m/s</dd>';
-      rows+='<dt>retning</dt><dd>mod '+compass+'</dd>';
+      var compass=compass8(deg);
+      rows+='<dt>'+t('d_speed')+'</dt><dd>'+(cms/100).toFixed(2).replace('.',',')+' m/s</dd>';
+      rows+='<dt>'+t('d_heading')+'</dt><dd>'+(curLang()==='en'?'towards ':'mod ')+compass+'</dd>';
       // The measured field is what the two lines above report. If the
       // cursor is also on one of the drawn ribbons, say so, and say
       // which limb of the loop it is - but never put a temperature in
       // degrees on it, because the schematic does not carry one.
       if (aFlow[k*3] > 0.12){
         var warm = aFlow[k*3+2];
-        rows+='<dt>transportb&aring;nd</dt><dd>'+(warm>0.6?'varm gren':warm<0.25?'kold gren':'undervejs')+'</dd>';
+        rows+='<dt>'+t('d_conveyor')+'</dt><dd>'+(warm>0.6?t('warmBranch'):warm<0.25?t('coldBranch'):t('midBranch'))+'</dd>';
       }
     } else if (m==='live'){
       // The coloured field is the ten degree grid; the tooltip asks about
@@ -2446,12 +2607,12 @@ var TERRA_TECT_RLE_B64="Rw0KUE8BBFAHAB5QPgEGUAkAJlAyAQhQBgAyUCcBCFAHADxQGAEMUAgA
       var pt = livePointGet(lat, lon);
       if (!pt) livePointRequest(lat, lon);
       if (!pt || pt.failed){
-        rows+='<dt>skydække</dt><dd>'+(pt && pt.failed ? '–' : 'henter…')+'</dd>';
+        rows+='<dt>'+t('d_cloud')+'</dt><dd>'+(pt && pt.failed ? '–' : t('fetching'))+'</dd>';
       } else {
-        rows+='<dt>skydække</dt><dd>'+pt.cloud+' %</dd>';
+        rows+='<dt>'+t('d_cloud')+'</dt><dd>'+pt.cloud+' %</dd>';
         if (pt.temp != null) rows+='<dt>temperatur</dt><dd>'+pt.temp.toFixed(1).replace('.',',')+' °C</dd>';
         if (pt.wind != null) rows+='<dt>vind</dt><dd>'+pt.wind.toFixed(1).replace('.',',')+' m/s</dd>';
-        if (pt.rad != null) rows+='<dt>indstråling</dt><dd>'+Math.round(pt.rad)+' W/m²</dd>';
+        if (pt.rad != null) rows+='<dt>'+t('d_rad')+'</dt><dd>'+Math.round(pt.rad)+' W/m²</dd>';
       }
     } else if (m==='sun'){
       var tms = sunNow();
@@ -2459,9 +2620,9 @@ var TERRA_TECT_RLE_B64="Rw0KUE8BBFAHAB5QPgEGUAkAJlAyAQhQBgAyUCcBCFAHADxQGAEMUAgA
       var sp2 = solarPosition(tms);
       // Local apparent solar time: noon is when the sun crosses this meridian.
       var lst = ((lon - sp2.lonDeg + 180)/15 + 24) % 24;
-      var state = alt > -0.833 ? 'dag' : (alt > -6 ? 'borgerligt tusmørke'
-                : (alt > -12 ? 'nautisk tusmørke' : (alt > -18 ? 'astronomisk tusmørke' : 'nat')));
-      rows+='<dt>solhøjde</dt><dd>'+(alt>=0?'+':'')+alt.toFixed(1)+'°</dd>';
+      var state = alt > -0.833 ? t('tw_day') : (alt > -6 ? t('tw_civil')
+                : (alt > -12 ? t('tw_naut') : (alt > -18 ? t('tw_astro') : t('tw_night'))));
+      rows+='<dt>'+t('d_sunalt')+'</dt><dd>'+(alt>=0?'+':'')+alt.toFixed(1)+'°</dd>';
       rows+='<dt>soltid</dt><dd>'+pad2(Math.floor(lst))+':'+pad2(Math.floor((lst%1)*60))+'</dd>';
       rows+='<dt>tilstand</dt><dd>'+state+'</dd>';
     } else if (m==='tect'){
@@ -2470,8 +2631,8 @@ var TERRA_TECT_RLE_B64="Rw0KUE8BBFAHAB5QPgEGUAkAJlAyAQhQBgAyUCcBCFAHADxQGAEMUAgA
       var tlt=TIMELINES.tect, frt=frameFor(tlt.keys,currentYear);
       var ft=frt.frac>=0.5?Math.min(TECT_FRAMES-1,frt.low+1):frt.low;
       var cid=tectGrids[ft][k], ageMa=TERRA_TECT_AGES[ft];
-      rows+='<dt>tid</dt><dd>'+(ageMa?ageMa+' mio. �r siden':'i dag')+'</dd>';
-      if (!cid) return {rows:rows, head:{flag:'', name:'Hav'}};
+      rows+='<dt>'+t('d_time')+'</dt><dd>'+(ageMa? ageMa+' '+t('maAgo') : t('today'))+'</dd>';
+      if (!cid) return {rows:rows, head:{flag:'', name:t('sea')}};
       // How far this piece of ground still has to travel, in degrees of
       // latitude, which is the number that makes India remarkable.
       var lat0=90-Math.floor(k/COLS)-0.5;
@@ -2481,18 +2642,18 @@ var TERRA_TECT_RLE_B64="Rw0KUE8BBFAHAB5QPgEGUAkAJlAyAQhQBgAyUCcBCFAHADxQGAEMUAgA
       var here=0, hc=0, gf=tectGrids[ft];
       for (var q2=0;q2<N;q2++) if (gf[q2]===cid){ here+=90-Math.floor(q2/COLS)-0.5; hc++; }
       if (hc) here/=hc;
-      rows+='<dt>bredde da</dt><dd>'+here.toFixed(0)+'�</dd>';
-      if (nowLat!==null) rows+='<dt>bredde nu</dt><dd>'+nowLat.toFixed(0)+'�</dd>';
-      return {rows:rows, head:{flag:'', name:TERRA_TECT_CONTS[cid]}};
+      rows+='<dt>'+t('d_latThen')+'</dt><dd>'+here.toFixed(0)+'°</dd>';
+      if (nowLat!==null) rows+='<dt>'+t('d_latNow')+'</dt><dd>'+nowLat.toFixed(0)+'°</dd>';
+      return {rows:rows, head:{flag:'', name:tectName(cid)}};
     } else if (m==='emp'){
       var tl=TIMELINES.emp, fr=frameFor(tl.keys,currentYear);
       var f=fr.frac>=0.5?Math.min(EMP_FRAMES-1,fr.low+1):fr.low;
       var id=empGrids[f][k];
-      if (!id) return {rows:'<dt>år</dt><dd>'+fmtYear(tl.keys[f])+'</dd>', head:{flag:'',name:'Uden fast styre'}};
+      if (!id) return {rows:'<dt>'+t('d_year')+'</dt><dd>'+fmtYear(tl.keys[f])+'</dd>', head:{flag:'',name:t('stateless')}};
       var nm=TERRA_EMP_NAMES[id-1], cells=empExtent[f][id]||0;
-      rows+='<dt>år</dt><dd>'+fmtYear(tl.keys[f])+'</dd>';
-      rows+='<dt>udstrækning</dt><dd>'+cells.toLocaleString('da-DK')+' felter</dd>';
-      rows+='<dt>højde</dt><dd>'+(elevM[k]>=0?'+':'')+elevM[k].toLocaleString('da-DK')+' m</dd>';
+      rows+='<dt>'+t('d_year')+'</dt><dd>'+fmtYear(tl.keys[f])+'</dd>';
+      rows+='<dt>'+t('d_extent')+'</dt><dd>'+fmtNum(cells)+' '+t('d_cells')+'</dd>';
+      rows+='<dt>'+t('d_elev')+'</dt><dd>'+(elevM[k]>=0?'+':'')+fmtNum(elevM[k])+' m</dd>';
       return {rows:rows, head:{flag:'', name:nm}};
     } else {
       var ci=countryGrid[k];
@@ -2509,8 +2670,8 @@ var TERRA_TECT_RLE_B64="Rw0KUE8BBFAHAB5QPgEGUAkAJlAyAQhQBgAyUCcBCFAHADxQGAEMUAgA
       if (share>=0) rows+='<dt>af verden</dt><dd>'+(share<1?share.toFixed(2):share.toFixed(1)).replace('.',',')+' %</dd>';
       return {rows:rows, head:{flag:flagOf(ent[1]), name:ent[0]}};
     }
-    rows+='<dt>position</dt><dd>'+Math.abs(lat).toFixed(1)+'°'+(lat>=0?'N':'S')+' '+Math.abs(lon).toFixed(1)+'°'+(lon>=0?'Ø':'V')+'</dd>';
-    var ci2=countryGrid[k], head={flag:'',name:isLandArr[k]?'Land':'Hav'};
+    rows+='<dt>'+t('d_position')+'</dt><dd>'+Math.abs(lat).toFixed(1)+'°'+ns(lat)+' '+Math.abs(lon).toFixed(1)+'°'+ew(lon)+'</dd>';
+    var ci2=countryGrid[k], head={flag:'',name:isLandArr[k]?t('land'):t('sea')};
     if (ci2 && TERRA_COUNTRIES[ci2-1]) head={flag:flagOf(TERRA_COUNTRIES[ci2-1][1]), name:TERRA_COUNTRIES[ci2-1][0]};
     return {rows:rows, head:head};
   }
@@ -2647,6 +2808,25 @@ var TERRA_TECT_RLE_B64="Rw0KUE8BBFAHAB5QPgEGUAkAJlAyAQhQBgAyUCcBCFAHADxQGAEMUAgA
     requestAnimationFrame(tick);
   }
   if (loadingEl) requestAnimationFrame(function(){ loadingEl.classList.add('hidden'); });
+
+  // Everything this file draws in words is redrawn when the language
+  // changes. The map itself never has to be touched: no geometry, no
+  // texture and no uniform carries a language.
+  document.addEventListener('langchange', function(){
+    var btns = modebarEl.querySelectorAll('.mode-btn');
+    for (var i = 0; i < btns.length && i < MODES.length; i++) btns[i].textContent = L(MODES[i].label);
+    renderLegend(currentMode);
+    yearVal.textContent = fmtYear(currentYear);
+    speedVal.textContent = uniforms.uCurSpeed.value.toFixed(1) + '×';
+    playBtn.setAttribute('aria-label', playing ? t('pause') : t('play'));
+    if (currentMode.sun) updateSunReadout();
+    // The card is rebuilt from scratch rather than translated in place,
+    // since its text is only ever set when the landmark changes.
+    eventShown = null;
+    // A readout under a cursor that has not moved would otherwise keep
+    // the old language until the pointer does.
+    hideTip();
+  });
   requestAnimationFrame(tick);
 })();
 </script>
