@@ -1,6 +1,0 @@
-# Cloudflare Pages response headers.
-# The game is plain ES modules that change together. Without this, Pages
-# lets browsers keep CSS and JS for 4 hours, so an update shows up late
-# or half-applied. Revalidating is cheap: unchanged files return 304.
-/Projects/BalatroXTicTacToe/*
-  Cache-Control: public, max-age=0, must-revalidate
