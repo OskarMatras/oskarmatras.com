@@ -301,8 +301,8 @@ fs.mkdirSync(OUT, { recursive: true });
       ${plateSvg(c.id, 'terrain')}
       <span class="plate-num">${num}</span>
       <span class="plate-body">
-        <span class="plate-count">${c.repos.length} <span data-da="repos" data-en="repos">repos</span></span>
-        <strong class="plate-title" data-da="${esc(c.da)}" data-en="${esc(c.en)}">${esc(c.da)}</strong>
+        <span class="plate-count">${c.repos.length} <span>repos</span></span>
+        <strong class="plate-title">${esc(c.en)}</strong>
         <span class="plate-when">When ${esc(c.when)}.</span>
       </span>
     </a>`;
@@ -330,8 +330,8 @@ fs.mkdirSync(OUT, { recursive: true });
           <span class="badges">${badges}</span>
         </div>
         <p class="what">${esc(r.what)}</p>
-        <p class="use"><b data-da="Brug når" data-en="Use when">Use when</b> ${esc(r.use)}</p>
-        ${r.notFor ? `<p class="not"><b data-da="Ikke til" data-en="Not for">Not for</b> ${esc(r.notFor)}</p>` : ''}
+        <p class="use"><b>Use when</b> ${esc(r.use)}</p>
+        ${r.notFor ? `<p class="not"><b>Not for</b> ${esc(r.notFor)}</p>` : ''}
         <div class="repo-foot">
           <span class="stats">${meta2}</span>
           <span class="tags">${r.tags.map(t => `<span class="tag-chip">${esc(t)}</span>`).join('')}</span>
@@ -342,14 +342,14 @@ fs.mkdirSync(OUT, { recursive: true });
       <div class="cat-head">
         ${plateSvg(c.id, 'terrain mini')}
         <div class="cat-titles">
-          <span class="cat-num">${num} · <span data-da="Kort-plade" data-en="Plate">Plate</span></span>
-          <h2 data-da="${esc(c.da)}" data-en="${esc(c.en)}">${esc(c.da)}</h2>
-          <p class="cat-blurb" data-da="${esc(c.blurbDa)}" data-en="${esc(c.blurbEn)}">${esc(c.blurbDa)}</p>
+          <span class="cat-num">${num} · <span>Plate</span></span>
+          <h2>${esc(c.en)}</h2>
+          <p class="cat-blurb">${esc(c.blurbEn)}</p>
         </div>
       </div>
       <div class="router">
-        <p><b data-da="Brug den når" data-en="Reach for it when">Reach for it when</b> ${esc(c.when)}.</p>
-        <p><b data-da="Beslutningsregel" data-en="Decision rule">Decision rule</b> ${esc(c.rule)}</p>
+        <p><b>Reach for it when</b> ${esc(c.when)}.</p>
+        <p><b>Decision rule</b> ${esc(c.rule)}</p>
       </div>
       <div class="repos">
 ${repos}

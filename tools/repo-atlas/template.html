@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="da">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title data-da="Repo Atlas · Oskar Matras" data-en="Repo Atlas · Oskar Matras">Repo Atlas · Oskar Matras</title>
-<meta name="description" content="Et håndplukket bibliotek af open source-repos ordnet efter opgave, skrevet til mennesker og AI-modeller." data-da-content="Et håndplukket bibliotek af open source-repos ordnet efter opgave, skrevet til mennesker og AI-modeller." data-en-content="A hand-picked library of open-source repositories indexed by task, written for people and AI models.">
+<title>Repo Atlas · Oskar Matras</title>
+<meta name="description" content="A hand-picked library of open-source repositories indexed by task, written for people and AI models.">
 <link rel="canonical" href="@BASE@/">
 <link rel="alternate" type="text/plain" href="llms.txt" title="llms.txt">
 <link rel="alternate" type="text/markdown" href="atlas.md" title="atlas.md">
@@ -287,18 +287,17 @@
 <header class="site" id="site-header">
   <div class="wrap">
     <a class="brand" href="/">Oskar Matras</a>
-    <span class="nav-lang" data-lang-switch></span>
-    <button class="nav-toggle" id="nav-toggle" aria-label="Åbn menu" data-da-aria-label="Åbn menu" data-en-aria-label="Open menu" aria-expanded="false" aria-controls="main-nav">
+    <button class="nav-toggle" id="nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="main-nav">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
     </button>
     <nav class="main" id="main-nav">
-      <a href="/#om" data-da="Om" data-en="About">Om</a>
-      <a href="/#erfaring" data-da="Erfaring" data-en="Experience">Erfaring</a>
-      <a href="/#praktik" data-da="Praktik" data-en="Placements">Praktik</a>
-      <a href="/#uddannelse" data-da="Uddannelse" data-en="Education">Uddannelse</a>
-      <a href="/#kompetencer" data-da="Kompetencer" data-en="Skills">Kompetencer</a>
-      <a href="/Projects" class="current" data-da="Projekter" data-en="Projects">Projekter</a>
-      <a href="/#kontakt" data-da="Kontakt" data-en="Contact">Kontakt</a>
+      <a href="/#om">About</a>
+      <a href="/#erfaring">Experience</a>
+      <a href="/#praktik">Placements</a>
+      <a href="/#uddannelse">Education</a>
+      <a href="/#kompetencer">Skills</a>
+      <a href="/Projects" class="current">Projects</a>
+      <a href="/#kontakt">Contact</a>
     </nav>
   </div>
 </header>
@@ -306,16 +305,15 @@
 <main>
   <section class="hero">
     <div class="wrap">
-      <a class="crumb" href="/Projects"><span aria-hidden="true">←</span> <span data-da="Alle projekter" data-en="All projects">Alle projekter</span></a>
-      <span class="eyebrow" data-da="Et bibliotek over værktøjer" data-en="A library of tools">Et bibliotek over værktøjer</span>
+      <a class="crumb" href="/Projects"><span aria-hidden="true">←</span> <span>All projects</span></a>
+      <span class="eyebrow">A library of tools</span>
       <h1>Repo <em>Atlas</em></h1>
-      <p class="lead" data-da="Et lille, håndplukket kort over open source-repos på GitHub, ordnet efter hvad de hjælper dig med at få gjort. Kun værktøjer der lader dig gøre noget, du ikke kunne før."
-         data-en="A small, hand-picked map of open-source repositories on GitHub, organised by the job they help you finish. Only tools that let you do something you could not do before.">Et lille, håndplukket kort over open source-repos på GitHub, ordnet efter hvad de hjælper dig med at få gjort. Kun værktøjer der lader dig gøre noget, du ikke kunne før.</p>
+      <p class="lead">A small, hand-picked map of open-source repositories on GitHub, organised by the job they help you finish. Only tools that let you do something you could not do before.</p>
       <div class="stats">
-        <div><b>@TOTAL@</b><span data-da="Repos" data-en="Repos">Repos</span></div>
-        <div><b>@CATS@</b><span data-da="Plader" data-en="Plates">Plader</span></div>
-        <div><b>@PICKS@</b><span data-da="Standardvalg" data-en="Default picks">Standardvalg</span></div>
-        <div><b>@DATE@</b><span data-da="Senest tjekket" data-en="Last verified">Senest tjekket</span></div>
+        <div><b>@TOTAL@</b><span>Repos</span></div>
+        <div><b>@CATS@</b><span>Plates</span></div>
+        <div><b>@PICKS@</b><span>Default picks</span></div>
+        <div><b>@DATE@</b><span>Last verified</span></div>
       </div>
     </div>
   </section>
@@ -325,14 +323,12 @@
       <label class="search">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.5" y2="16.5"></line></svg>
         <input id="q" type="search" autocomplete="off" spellcheck="false"
-               aria-label="Search the atlas" data-da-aria-label="Søg i atlasset" data-en-aria-label="Search the atlas"
-               placeholder="Beskriv opgaven: fx scrape en hjemmeside, læs en PDF…"
-               data-da-placeholder="Beskriv opgaven: fx scrape en hjemmeside, læs en PDF…"
-               data-en-placeholder="Describe the task: e.g. scrape a website, read a PDF…">
+               aria-label="Search the atlas"
+               placeholder="Describe the task: e.g. scrape a website, read a PDF…">
         <kbd aria-hidden="true">/</kbd>
       </label>
-      <button class="toggle" id="f-pick" type="button" aria-pressed="false">★ <span data-da="Kun standardvalg" data-en="Picks only">Kun standardvalg</span></button>
-      <button class="toggle" id="f-official" type="button" aria-pressed="false"><span data-da="Kun officielle" data-en="Official only">Kun officielle</span></button>
+      <button class="toggle" id="f-pick" type="button" aria-pressed="false">★ <span>Picks only</span></button>
+      <button class="toggle" id="f-official" type="button" aria-pressed="false"><span>Official only</span></button>
       <span class="count" id="count" aria-live="polite"></span>
     </div>
   </div>
@@ -342,38 +338,37 @@
       <div class="ai-in">
         <div>
           <span class="tag">robots welcome</span>
-          <h2 id="ai-h" data-da="Bygget til AI-modeller også" data-en="Built for AI models too">Bygget til AI-modeller også</h2>
-          <p data-da="Hver post siger hvad repoet er, hvornår du skal række ud efter det, og hvornår ikke. Siden er almindelig HTML, så den kan læses uden JavaScript, og de samme data findes som tekst, markdown og JSON."
-             data-en="Every entry says what the repo is, when to reach for it and when not to. The page is plain HTML, readable without JavaScript, and the same data exists as text, markdown and JSON.">Hver post siger hvad repoet er, hvornår du skal række ud efter det, og hvornår ikke. Siden er almindelig HTML, så den kan læses uden JavaScript, og de samme data findes som tekst, markdown og JSON.</p>
+          <h2 id="ai-h">Built for AI models too</h2>
+          <p>Every entry says what the repo is, when to reach for it and when not to. The page is plain HTML, readable without JavaScript, and the same data exists as text, markdown and JSON.</p>
           <ol class="steps">
-            <li data-da="Find kategorien der passer til opgaven." data-en="Match the task to a category.">Find kategorien der passer til opgaven.</li>
-            <li data-da="Tag et PICK-repo, og læs “Ikke til” først." data-en="Take a PICK entry and read “Not for” first.">Tag et PICK-repo, og læs “Ikke til” først.</li>
-            <li data-da="Tjek aktivitet, licens og kildekode, før du kører noget." data-en="Check activity, licence and source before you run anything.">Tjek aktivitet, licens og kildekode, før du kører noget.</li>
+            <li>Match the task to a category.</li>
+            <li>Take a PICK entry and read “Not for” first.</li>
+            <li>Check activity, licence and source before you run anything.</li>
           </ol>
         </div>
         <div class="eps">
           <div class="ep">
             <code>llms.txt</code>
-            <a class="mini" href="llms.txt" data-da="Åbn" data-en="Open">Åbn</a>
-            <button class="mini" type="button" data-copy="@BASE@/llms.txt" data-da="Kopiér" data-en="Copy">Kopiér</button>
-            <span class="d" data-da="Start her. Reglerne og hele indekset i én fil." data-en="Start here. The rules plus the whole index in one file.">Start her. Reglerne og hele indekset i én fil.</span>
+            <a class="mini" href="llms.txt">Open</a>
+            <button class="mini" type="button" data-copy="@BASE@/llms.txt">Copy</button>
+            <span class="d">Start here. The rules plus the whole index in one file.</span>
           </div>
           <div class="ep">
             <code>atlas.md</code>
-            <a class="mini" href="atlas.md" data-da="Åbn" data-en="Open">Åbn</a>
-            <button class="mini" type="button" data-copy="@BASE@/atlas.md" data-da="Kopiér" data-en="Copy">Kopiér</button>
-            <span class="d" data-da="Det hele med stjerner, sprog og licens." data-en="Everything, with stars, language and licence.">Det hele med stjerner, sprog og licens.</span>
+            <a class="mini" href="atlas.md">Open</a>
+            <button class="mini" type="button" data-copy="@BASE@/atlas.md">Copy</button>
+            <span class="d">Everything, with stars, language and licence.</span>
           </div>
           <div class="ep">
             <code>atlas.json</code>
-            <a class="mini" href="atlas.json" data-da="Åbn" data-en="Open">Åbn</a>
-            <button class="mini" type="button" data-copy="@BASE@/atlas.json" data-da="Kopiér" data-en="Copy">Kopiér</button>
-            <span class="d" data-da="Struktureret, til filtrering efter tag og kategori." data-en="Structured, for filtering by tag and category.">Struktureret, til filtrering efter tag og kategori.</span>
+            <a class="mini" href="atlas.json">Open</a>
+            <button class="mini" type="button" data-copy="@BASE@/atlas.json">Copy</button>
+            <span class="d">Structured, for filtering by tag and category.</span>
           </div>
           <div class="snippet">
-            <small data-da="Indsæt i CLAUDE.md eller en system-prompt" data-en="Paste into CLAUDE.md or a system prompt">Indsæt i CLAUDE.md eller en system-prompt</small>
+            <small>Paste into CLAUDE.md or a system prompt</small>
             <code>When a task needs a library, tool or MCP server, read @BASE@/llms.txt first and prefer entries marked PICK.</code>
-            <button class="mini" type="button" data-copy="When a task needs a library, tool or MCP server, read @BASE@/llms.txt first and prefer entries marked PICK." data-da="Kopiér" data-en="Copy">Kopiér</button>
+            <button class="mini" type="button" data-copy="When a task needs a library, tool or MCP server, read @BASE@/llms.txt first and prefer entries marked PICK.">Copy</button>
           </div>
         </div>
       </div>
@@ -381,8 +376,8 @@
 
     <section class="map" aria-labelledby="map-h">
       <div class="sec-title">
-        <h2 id="map-h" data-da="Kortet" data-en="The map">Kortet</h2>
-        <span data-da="Vælg en plade, eller søg ovenfor." data-en="Pick a plate, or search above.">Vælg en plade, eller søg ovenfor.</span>
+        <h2 id="map-h">The map</h2>
+        <span>Pick a plate, or search above.</span>
       </div>
       <div class="plates" id="plates">
 <!--@PLATES-->
@@ -391,16 +386,15 @@
 
     <div class="catalog" id="catalog">
 <!--@SECTIONS-->
-      <p class="empty" id="empty" hidden data-da="Ingen match. Prøv færre eller andre ord." data-en="No matches. Try fewer or different words.">Ingen match. Prøv færre eller andre ord.</p>
+      <p class="empty" id="empty" hidden>No matches. Try fewer or different words.</p>
     </div>
   </div>
 </main>
 
 <footer>
   <div class="wrap">
-    <p data-da="Stjerner og datoer er et øjebliksbillede fra @DATE@. Beskrivelser af repos er på engelsk. Altid tjek repoet selv, før du stoler på det."
-       data-en="Stars and dates are a snapshot from @DATE@. Repo descriptions are in English. Always check the repo yourself before you trust it.">Stjerner og datoer er et øjebliksbillede fra @DATE@. Beskrivelser af repos er på engelsk. Altid tjek repoet selv, før du stoler på det.</p>
-    <p><span class="dot"></span><span data-da="aktivt (skubbet inden for 120 dage)" data-en="active (pushed within 120 days)">aktivt (skubbet inden for 120 dage)</span><span class="dot q"></span><span data-da="roligt" data-en="quiet">roligt</span></p>
+    <p>Stars and dates are a snapshot from @DATE@. Repo descriptions are in English. Always check the repo yourself before you trust it.</p>
+    <p><span class="dot"></span><span>active (pushed within 120 days)</span><span class="dot q"></span><span>quiet</span></p>
     <p>© <span id="year"></span> Oskar Matras</p>
   </div>
 </footer>
@@ -440,7 +434,6 @@
     var STOP = 'a an the to of for and or i my me how do does with in on it is that this want need into from can you get make use using some any'.split(' ');
     var pick = false, off = false;
 
-    function lang(){ return (window.I18N && window.I18N.lang) || document.documentElement.lang || 'da'; }
     function stem(w){ return w.length > 4 ? w.replace(/(ing|ers|er|ed|es|s|e)$/, '') : w; }
 
     function apply(){
@@ -464,8 +457,7 @@
         sec.hidden = n === 0;
         if(plates[sec.id]) plates[sec.id].classList.toggle('is-empty', n === 0);
       });
-      var da = lang() === 'da';
-      count.textContent = (da ? 'Viser ' : 'Showing ') + shown + (da ? ' af ' : ' of ') + repos.length;
+      count.textContent = 'Showing ' + shown + ' of ' + repos.length;
       empty.hidden = shown !== 0;
       try{
         var u = new URL(location.href);
@@ -505,7 +497,6 @@
       var a = e.target.closest && e.target.closest('.plate');
       if(a && (q.value || pick || off)) reset();
     });
-    document.addEventListener('langchange', apply);
 
     try{
       var init = new URL(location.href).searchParams.get('q');
@@ -520,9 +511,8 @@
     if(!b) return;
     var text = b.getAttribute('data-copy');
     function done(){
-      var da = (window.I18N && window.I18N.lang || 'da') === 'da';
       var old = b.textContent;
-      b.textContent = da ? 'Kopieret' : 'Copied';
+      b.textContent = 'Copied';
       setTimeout(function(){ b.textContent = old; }, 1400);
     }
     if(navigator.clipboard && navigator.clipboard.writeText){
@@ -649,6 +639,5 @@
   })();
 </script>
 
-<script src="/i18n.js" defer></script>
 </body>
 </html>

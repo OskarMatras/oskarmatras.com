@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="da">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title data-da="Repo Atlas · Oskar Matras" data-en="Repo Atlas · Oskar Matras">Repo Atlas · Oskar Matras</title>
-<meta name="description" content="Et håndplukket bibliotek af open source-repos ordnet efter opgave, skrevet til mennesker og AI-modeller." data-da-content="Et håndplukket bibliotek af open source-repos ordnet efter opgave, skrevet til mennesker og AI-modeller." data-en-content="A hand-picked library of open-source repositories indexed by task, written for people and AI models.">
+<title>Repo Atlas · Oskar Matras</title>
+<meta name="description" content="A hand-picked library of open-source repositories indexed by task, written for people and AI models.">
 <link rel="canonical" href="https://OskarMatras.com/Projects/RepoAtlas/">
 <link rel="alternate" type="text/plain" href="llms.txt" title="llms.txt">
 <link rel="alternate" type="text/markdown" href="atlas.md" title="atlas.md">
@@ -287,18 +287,17 @@
 <header class="site" id="site-header">
   <div class="wrap">
     <a class="brand" href="/">Oskar Matras</a>
-    <span class="nav-lang" data-lang-switch></span>
-    <button class="nav-toggle" id="nav-toggle" aria-label="Åbn menu" data-da-aria-label="Åbn menu" data-en-aria-label="Open menu" aria-expanded="false" aria-controls="main-nav">
+    <button class="nav-toggle" id="nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="main-nav">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
     </button>
     <nav class="main" id="main-nav">
-      <a href="/#om" data-da="Om" data-en="About">Om</a>
-      <a href="/#erfaring" data-da="Erfaring" data-en="Experience">Erfaring</a>
-      <a href="/#praktik" data-da="Praktik" data-en="Placements">Praktik</a>
-      <a href="/#uddannelse" data-da="Uddannelse" data-en="Education">Uddannelse</a>
-      <a href="/#kompetencer" data-da="Kompetencer" data-en="Skills">Kompetencer</a>
-      <a href="/Projects" class="current" data-da="Projekter" data-en="Projects">Projekter</a>
-      <a href="/#kontakt" data-da="Kontakt" data-en="Contact">Kontakt</a>
+      <a href="/#om">About</a>
+      <a href="/#erfaring">Experience</a>
+      <a href="/#praktik">Placements</a>
+      <a href="/#uddannelse">Education</a>
+      <a href="/#kompetencer">Skills</a>
+      <a href="/Projects" class="current">Projects</a>
+      <a href="/#kontakt">Contact</a>
     </nav>
   </div>
 </header>
@@ -306,16 +305,15 @@
 <main>
   <section class="hero">
     <div class="wrap">
-      <a class="crumb" href="/Projects"><span aria-hidden="true">←</span> <span data-da="Alle projekter" data-en="All projects">Alle projekter</span></a>
-      <span class="eyebrow" data-da="Et bibliotek over værktøjer" data-en="A library of tools">Et bibliotek over værktøjer</span>
+      <a class="crumb" href="/Projects"><span aria-hidden="true">←</span> <span>All projects</span></a>
+      <span class="eyebrow">A library of tools</span>
       <h1>Repo <em>Atlas</em></h1>
-      <p class="lead" data-da="Et lille, håndplukket kort over open source-repos på GitHub, ordnet efter hvad de hjælper dig med at få gjort. Kun værktøjer der lader dig gøre noget, du ikke kunne før."
-         data-en="A small, hand-picked map of open-source repositories on GitHub, organised by the job they help you finish. Only tools that let you do something you could not do before.">Et lille, håndplukket kort over open source-repos på GitHub, ordnet efter hvad de hjælper dig med at få gjort. Kun værktøjer der lader dig gøre noget, du ikke kunne før.</p>
+      <p class="lead">A small, hand-picked map of open-source repositories on GitHub, organised by the job they help you finish. Only tools that let you do something you could not do before.</p>
       <div class="stats">
-        <div><b>30</b><span data-da="Repos" data-en="Repos">Repos</span></div>
-        <div><b>7</b><span data-da="Plader" data-en="Plates">Plader</span></div>
-        <div><b>19</b><span data-da="Standardvalg" data-en="Default picks">Standardvalg</span></div>
-        <div><b>2026-10-15</b><span data-da="Senest tjekket" data-en="Last verified">Senest tjekket</span></div>
+        <div><b>30</b><span>Repos</span></div>
+        <div><b>7</b><span>Plates</span></div>
+        <div><b>19</b><span>Default picks</span></div>
+        <div><b>2026-10-15</b><span>Last verified</span></div>
       </div>
     </div>
   </section>
@@ -325,14 +323,12 @@
       <label class="search">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.5" y2="16.5"></line></svg>
         <input id="q" type="search" autocomplete="off" spellcheck="false"
-               aria-label="Search the atlas" data-da-aria-label="Søg i atlasset" data-en-aria-label="Search the atlas"
-               placeholder="Beskriv opgaven: fx scrape en hjemmeside, læs en PDF…"
-               data-da-placeholder="Beskriv opgaven: fx scrape en hjemmeside, læs en PDF…"
-               data-en-placeholder="Describe the task: e.g. scrape a website, read a PDF…">
+               aria-label="Search the atlas"
+               placeholder="Describe the task: e.g. scrape a website, read a PDF…">
         <kbd aria-hidden="true">/</kbd>
       </label>
-      <button class="toggle" id="f-pick" type="button" aria-pressed="false">★ <span data-da="Kun standardvalg" data-en="Picks only">Kun standardvalg</span></button>
-      <button class="toggle" id="f-official" type="button" aria-pressed="false"><span data-da="Kun officielle" data-en="Official only">Kun officielle</span></button>
+      <button class="toggle" id="f-pick" type="button" aria-pressed="false">★ <span>Picks only</span></button>
+      <button class="toggle" id="f-official" type="button" aria-pressed="false"><span>Official only</span></button>
       <span class="count" id="count" aria-live="polite"></span>
     </div>
   </div>
@@ -342,38 +338,37 @@
       <div class="ai-in">
         <div>
           <span class="tag">robots welcome</span>
-          <h2 id="ai-h" data-da="Bygget til AI-modeller også" data-en="Built for AI models too">Bygget til AI-modeller også</h2>
-          <p data-da="Hver post siger hvad repoet er, hvornår du skal række ud efter det, og hvornår ikke. Siden er almindelig HTML, så den kan læses uden JavaScript, og de samme data findes som tekst, markdown og JSON."
-             data-en="Every entry says what the repo is, when to reach for it and when not to. The page is plain HTML, readable without JavaScript, and the same data exists as text, markdown and JSON.">Hver post siger hvad repoet er, hvornår du skal række ud efter det, og hvornår ikke. Siden er almindelig HTML, så den kan læses uden JavaScript, og de samme data findes som tekst, markdown og JSON.</p>
+          <h2 id="ai-h">Built for AI models too</h2>
+          <p>Every entry says what the repo is, when to reach for it and when not to. The page is plain HTML, readable without JavaScript, and the same data exists as text, markdown and JSON.</p>
           <ol class="steps">
-            <li data-da="Find kategorien der passer til opgaven." data-en="Match the task to a category.">Find kategorien der passer til opgaven.</li>
-            <li data-da="Tag et PICK-repo, og læs “Ikke til” først." data-en="Take a PICK entry and read “Not for” first.">Tag et PICK-repo, og læs “Ikke til” først.</li>
-            <li data-da="Tjek aktivitet, licens og kildekode, før du kører noget." data-en="Check activity, licence and source before you run anything.">Tjek aktivitet, licens og kildekode, før du kører noget.</li>
+            <li>Match the task to a category.</li>
+            <li>Take a PICK entry and read “Not for” first.</li>
+            <li>Check activity, licence and source before you run anything.</li>
           </ol>
         </div>
         <div class="eps">
           <div class="ep">
             <code>llms.txt</code>
-            <a class="mini" href="llms.txt" data-da="Åbn" data-en="Open">Åbn</a>
-            <button class="mini" type="button" data-copy="https://OskarMatras.com/Projects/RepoAtlas/llms.txt" data-da="Kopiér" data-en="Copy">Kopiér</button>
-            <span class="d" data-da="Start her. Reglerne og hele indekset i én fil." data-en="Start here. The rules plus the whole index in one file.">Start her. Reglerne og hele indekset i én fil.</span>
+            <a class="mini" href="llms.txt">Open</a>
+            <button class="mini" type="button" data-copy="https://OskarMatras.com/Projects/RepoAtlas/llms.txt">Copy</button>
+            <span class="d">Start here. The rules plus the whole index in one file.</span>
           </div>
           <div class="ep">
             <code>atlas.md</code>
-            <a class="mini" href="atlas.md" data-da="Åbn" data-en="Open">Åbn</a>
-            <button class="mini" type="button" data-copy="https://OskarMatras.com/Projects/RepoAtlas/atlas.md" data-da="Kopiér" data-en="Copy">Kopiér</button>
-            <span class="d" data-da="Det hele med stjerner, sprog og licens." data-en="Everything, with stars, language and licence.">Det hele med stjerner, sprog og licens.</span>
+            <a class="mini" href="atlas.md">Open</a>
+            <button class="mini" type="button" data-copy="https://OskarMatras.com/Projects/RepoAtlas/atlas.md">Copy</button>
+            <span class="d">Everything, with stars, language and licence.</span>
           </div>
           <div class="ep">
             <code>atlas.json</code>
-            <a class="mini" href="atlas.json" data-da="Åbn" data-en="Open">Åbn</a>
-            <button class="mini" type="button" data-copy="https://OskarMatras.com/Projects/RepoAtlas/atlas.json" data-da="Kopiér" data-en="Copy">Kopiér</button>
-            <span class="d" data-da="Struktureret, til filtrering efter tag og kategori." data-en="Structured, for filtering by tag and category.">Struktureret, til filtrering efter tag og kategori.</span>
+            <a class="mini" href="atlas.json">Open</a>
+            <button class="mini" type="button" data-copy="https://OskarMatras.com/Projects/RepoAtlas/atlas.json">Copy</button>
+            <span class="d">Structured, for filtering by tag and category.</span>
           </div>
           <div class="snippet">
-            <small data-da="Indsæt i CLAUDE.md eller en system-prompt" data-en="Paste into CLAUDE.md or a system prompt">Indsæt i CLAUDE.md eller en system-prompt</small>
+            <small>Paste into CLAUDE.md or a system prompt</small>
             <code>When a task needs a library, tool or MCP server, read https://OskarMatras.com/Projects/RepoAtlas/llms.txt first and prefer entries marked PICK.</code>
-            <button class="mini" type="button" data-copy="When a task needs a library, tool or MCP server, read https://OskarMatras.com/Projects/RepoAtlas/llms.txt first and prefer entries marked PICK." data-da="Kopiér" data-en="Copy">Kopiér</button>
+            <button class="mini" type="button" data-copy="When a task needs a library, tool or MCP server, read https://OskarMatras.com/Projects/RepoAtlas/llms.txt first and prefer entries marked PICK.">Copy</button>
           </div>
         </div>
       </div>
@@ -381,16 +376,16 @@
 
     <section class="map" aria-labelledby="map-h">
       <div class="sec-title">
-        <h2 id="map-h" data-da="Kortet" data-en="The map">Kortet</h2>
-        <span data-da="Vælg en plade, eller søg ovenfor." data-en="Pick a plate, or search above.">Vælg en plade, eller søg ovenfor.</span>
+        <h2 id="map-h">The map</h2>
+        <span>Pick a plate, or search above.</span>
       </div>
       <div class="plates" id="plates">
 <a class="plate" href="#extend" data-jump="extend">
       <svg class="terrain" viewBox="0 0 240 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"><path class="ink" d="M37.3 8L40 5.8M40 5.8L47 0M140 0L136.7 8M230.8 8L232 5.8M232 5.8L235.3 0M27.1 16L32 12.2M32 12.2L37.3 8M134.3 16L136 10.3M136 10.3L136.7 8M223.9 16L224 15.8M224 15.8L230.8 8M17 24L24 18.5M24 18.5L27.1 16M134.3 16L132.6 24M215.1 24L216 23.2M216 23.2L223.9 16M7.6 32L8 31.7M8 31.7L16 24.9M16 24.9L17 24M132.6 24L131.1 32M205.1 32L208 29.7M208 29.7L215.1 24M0 39.7L7.6 32M131.1 32L129.4 40M194.8 40L200 36M200 36L205.1 32M127 48L128 44.5M128 44.5L129.4 40M184.8 48L192 42.2M192 42.2L194.8 40M127 48L123.6 56M176 56L176 56M176 56L184 48.7M184 48.7L184.8 48M118.2 64L120 61.2M120 61.2L123.6 56M176 56L169 64M110.8 72L112 70.6M112 70.6L118.2 64M164.1 72L168 65.6M168 65.6L169 64M101.8 80L104 78M104 78L110.8 72M164.1 72L161.4 80M91.9 88L96 84.7M96 84.7L101.8 80M160 88L160 87.9M160 87.9L161.4 80M81.7 96L88 91M88 91L91.9 88M160 88L159.4 96M71.9 104L72 103.9M72 103.9L80 97.4M80 97.4L81.7 96M159.4 96L159.3 104M63 112L64 111.1M64 111.1L71.9 104M159.3 104L159.2 112M55.4 120L56 119.4M56 119.4L63 112M159.2 112L158.8 120M52.1 8L56 4.8M56 4.8L61.9 0M125.7 0L123.2 8M42 16L48 11.2M48 11.2L52.1 8M123.2 8L121.3 16M32.3 24L40 17.6M40 17.6L42 16M119.7 24L120 22.6M120 22.6L121.3 16M23.5 32L24 31.5M24 31.5L32 24.3M32 24.3L32.3 24M119.7 24L118 32M229.3 32L232 30.4M232 30.4L240 27M15.9 40L16 39.9M16 39.9L23.5 32M118 32L115.8 40M215.5 40L216 39.6M216 39.6L224 34.7M224 34.7L229.3 32M15.9 40L9.9 48M115.8 40L112.7 48M204.4 48L208 45.3M208 45.3L215.5 40M5.5 56L8 51.5M8 51.5L9.9 48M108.5 56L112 49.4M112 49.4L112.7 48M195.1 56L200 51.6M200 51.6L204.4 48M5.5 56L2.4 64M102.7 64L104 62.3M104 62.3L108.5 56M187.7 64L192 59.2M192 59.2L195.1 56M2.4 64L0.3 72M95.5 72L96 71.4M96 71.4L102.7 64M182.3 72L184 69.4M184 69.4L187.7 64M0 73.7L0.3 72M86.8 80L88 78.9M88 78.9L95.5 72M182.3 72L178.9 80M77.1 88L80 85.7M80 85.7L86.8 80M178.9 80L177.1 88M66.9 96L72 92.1M72 92.1L77.1 88M177.1 88L176.7 96M56.8 104L64 98.4M64 98.4L66.9 96M176.7 96L177.8 104M47.5 112L48 111.6M48 111.6L56 104.8M56 104.8L56.8 104M177.8 104L180.5 112M231.5 112L232 111.8M232 111.8L240 107.6M39.6 120L40 119.6M40 119.6L47.5 112M180.5 112L184 118.2M184 118.2L186.3 120M212.6 120L216 118.9M216 118.9L224 115.6M224 115.6L231.5 112"/><path class="gold" d="M29.3 8L32 6M32 6L39.5 0M143.5 8L144 6.9M144 6.9L147.1 0M220.8 8L224 2.6M224 2.6L225.5 0M18.3 16L24 12M24 12L29.3 8M143.5 8L141.2 16M214 16L216 13.7M216 13.7L220.8 8M6.8 24L8 23.3M8 23.3L16 17.8M16 17.8L18.3 16M141.2 16L139.7 24M205.3 24L208 21.5M208 21.5L214 16M0 28.8L6.8 24M139.7 24L138.7 32M195.2 32L200 28.3M200 28.3L205.3 24M138.7 32L137.9 40M184.5 40L192 34.5M192 34.5L195.2 32M137.9 40L136.6 48M173.4 48L176 46.3M176 46.3L184 40.4M184 40.4L184.5 40M134.5 56L136 50.1M136 50.1L136.6 48M163.4 56L168 52.5M168 52.5L173.4 48M134.5 56L129.9 64M156 64L160 59.9M160 59.9L163.4 56M121.7 72L128 65.6M128 65.6L129.9 64M156 64L152.5 72M111.3 80L112 79.4M112 79.4L120 73.2M120 73.2L121.7 72M150.9 80L152 74.8M152 74.8L152.5 72M100.5 88L104 85.3M104 85.3L111.3 80M150.9 80L150.6 88M89.6 96L96 91.2M96 91.2L100.5 88M150.6 88L150.7 96M79.4 104L80 103.5M80 103.5L88 97.2M88 97.2L89.6 96M150.7 96L150.7 104M70.4 112L72 110.6M72 110.6L79.4 104M150.7 104L150.5 112M62.8 120L64 118.7M64 118.7L70.4 112M150.5 112L149.6 120M44.7 8L48 5.3M48 5.3L54.3 0M133.1 0L130 8M34.8 16L40 11.8M40 11.8L44.7 8M127.8 16L128 15.4M128 15.4L130 8M236.5 16L240 12M25 24L32 18.3M32 18.3L34.8 16M127.8 16L126.1 24M226.4 24L232 19.4M232 19.4L236.5 16M16.1 32L24 24.9M24 24.9L25 24M126.1 24L124.4 32M215.4 32L216 31.5M216 31.5L224 25.6M224 25.6L226.4 24M8.5 40L16 32.1M16 32.1L16.1 32M124.4 32L122.3 40M204.6 40L208 37.4M208 37.4L215.4 32M2.5 48L8 40.7M8 40.7L8.5 40M119.4 48L120 46.4M120 46.4L122.3 40M194.4 48L200 43.5M200 43.5L204.6 40M0 52.9L2.5 48M119.4 48L115.5 56M185.6 56L192 50.2M192 50.2L194.4 48M109.9 64L112 61M112 61L115.5 56M178.6 64L184 57.8M184 57.8L185.6 56M102.7 72L104 70.5M104 70.5L109.9 64M173.5 72L176 68M176 68L178.6 64M94 80L96 78.1M96 78.1L102.7 72M173.5 72L170.2 80M84.4 88L88 85M88 85L94 80M170.2 80L168.5 88M74.3 96L80 91.5M80 91.5L84.4 88M167.8 96L168 93.6M168 93.6L168.5 88M64.5 104L72 97.9M72 97.9L74.3 96M167.8 96L167.9 104M55.6 112L56 111.6M56 111.6L64 104.5M64 104.5L64.5 104M167.9 104L168 105.3M168 105.3L168.6 112M47.9 120L48 119.9M48 119.9L55.6 112M168.6 112L169.5 120M238.1 120L240 119.1M60 8L64 4.8M64 4.8L70.4 0M117.3 0L115.6 8M49.5 16L56 11M56 11L60 8M115.6 8L114.4 16M39.4 24L40 23.5M40 23.5L48 17.1M48 17.1L49.5 16M114.4 16L113.2 24M30.5 32L32 30.6M32 30.6L39.4 24M111.7 32L112 30.3M112 30.3L113.2 24M22.8 40L24 38.8M24 38.8L30.5 32M111.7 32L109.4 40M22.8 40L16.8 48M109.4 40L106.3 48M216.9 48L224 44.3M224 44.3L232 41.3M232 41.3L240 40.6M12.2 56L16 49.4M16 49.4L16.8 48M101.9 56L104 52.2M104 52.2L106.3 48M205.7 56L208 54.1M208 54.1L216 48.5M216 48.5L216.9 48M12.2 56L9 64M96 64L96 64M96 64L101.9 56M197.5 64L200 61.4M200 61.4L205.7 56M6.9 72L8 67.8M8 67.8L9 64M96 64L88.6 72M191.6 72L192 71.5M192 71.5L197.5 64M6.9 72L5.5 80M79.7 80L80 79.8M80 79.8L88 72.5M88 72.5L88.6 72M191.6 72L188.3 80M5.5 80L4.6 88M69.7 88L72 86.2M72 86.2L79.7 80M188.3 80L186.9 88M4.6 88L3.9 96M58.9 96L64 92.3M64 92.3L69.7 88M186.9 88L187.7 96M239.8 96L240 95.9M3.9 96L2.9 104M48 104L56 98.2M56 98.2L58.9 96M187.7 96L191.5 104M225.7 104L232 100.8M232 100.8L239.8 96M2.9 104L1 112M37.2 112L40 110.1M40 110.1L48 104M48 104L48 104M191.5 104L192 104.6M192 104.6L200 108.9M200 108.9L208 109.3M208 109.3L216 107.7M216 107.7L224 104.8M224 104.8L225.7 104M0 114.2L1 112M28.2 120L32 116.9M32 116.9L37.2 112"/></svg>
       <span class="plate-num">01</span>
       <span class="plate-body">
-        <span class="plate-count">7 <span data-da="repos" data-en="repos">repos</span></span>
-        <strong class="plate-title" data-da="Udvid din agent" data-en="Extend your agent">Udvid din agent</strong>
+        <span class="plate-count">7 <span>repos</span></span>
+        <strong class="plate-title">Extend your agent</strong>
         <span class="plate-when">When the model has to touch a service (GitHub, a browser, a database), needs current library docs, or needs a packaged capability such as producing a .docx or .pptx.</span>
       </span>
     </a>
@@ -398,8 +393,8 @@
       <svg class="terrain" viewBox="0 0 240 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"><path class="ink" d="M34.2 8L40 3.2M40 3.2L43.9 0M167.3 0L162.5 8M24 16L24 16M24 16L32 9.7M32 9.7L34.2 8M157.7 16L160 12M160 12L162.5 8M13.2 24L16 21.9M16 21.9L24 16M157.7 16L152.7 24M2.1 32L8 27.8M8 27.8L13.2 24M147.9 32L152 25.2M152 25.2L152.7 24M232.9 32L240 28.3M0 33.5L2.1 32M142.5 40L144 37.8M144 37.8L147.9 32M218.5 40L224 36.8M224 36.8L232 32.5M232 32.5L232.9 32M142.5 40L136.9 48M205.4 48L208 46.3M208 46.3L216 41.4M216 41.4L218.5 40M130.9 56L136 49.2M136 49.2L136.9 48M193.5 56L200 51.5M200 51.5L205.4 48M124.1 64L128 59.4M128 59.4L130.9 56M182.7 64L184 63M184 63L192 57.1M192 57.1L193.5 56M116.5 72L120 68.3M120 68.3L124.1 64M173 72L176 69.4M176 69.4L182.7 64M108.2 80L112 76.4M112 76.4L116.5 72M164.4 80L168 76.6M168 76.6L173 72M99 88L104 83.7M104 83.7L108.2 80M156.9 88L160 84.7M160 84.7L164.4 80M89.2 96L96 90.5M96 90.5L99 88M150.4 96L152 94M152 94L156.9 88M79 104L80 103.2M80 103.2L88 96.9M88 96.9L89.2 96M150.4 96L144.5 104M68.6 112L72 109.4M72 109.4L79 104M139.2 112L144 104.8M144 104.8L144.5 104M58 120L64 115.6M64 115.6L68.6 112M134.3 120L136 117.2M136 117.2L139.2 112M54.8 8L56 7.1M56 7.1L64 1.2M64 1.2L65.7 0M134.6 8L136 4.9M136 4.9L138.3 0M43.8 16L48 12.9M48 12.9L54.8 8M134.6 8L130.7 16M32.5 24L40 18.7M40 18.7L43.8 16M126.4 24L128 21M128 21L130.7 16M21.3 32L24 30.1M24 30.1L32 24.4M32 24.4L32.5 24M126.4 24L121.7 32M10.1 40L16 35.8M16 35.8L21.3 32M116.5 40L120 34.5M120 34.5L121.7 32M0 47.3L8 41.6M8 41.6L10.1 40M110.7 48L112 46.1M112 46.1L116.5 40M110.7 48L104.3 56M97.4 64L104 56.4M104 56.4L104.3 56M229.2 64L232 62.4M232 62.4L240 58M89.7 72L96 65.4M96 65.4L97.4 64M217.4 72L224 67.5M224 67.5L229.2 64M81.5 80L88 73.7M88 73.7L89.7 72M207.6 80L208 79.7M208 79.7L216 73.2M216 73.2L217.4 72M72.5 88L80 81.3M80 81.3L81.5 80M199.7 88L200 87.7M200 87.7L207.6 80M63 96L64 95.2M64 95.2L72 88.5M72 88.5L72.5 88M199.7 88L193.7 96M53 104L56 101.6M56 101.6L63 96M189.9 104L192 99.8M192 99.8L193.7 96M42.4 112L48 107.8M48 107.8L53 104M189.9 104L190.4 112M229.6 112L232 111.5M232 111.5L240 110M31.4 120L32 119.6M32 119.6L40 113.8M40 113.8L42.4 112M190.4 112L192 113.4M192 113.4L200 115.5M200 115.5L208 115.3M208 115.3L216 114.3M216 114.3L224 113M224 113L229.6 112"/><path class="gold" d="M24.3 8L32 1.4M32 1.4L33.7 0M181.6 8L184 3.8M184 3.8L186.5 0M14 16L16 14.4M16 14.4L24 8.2M24 8.2L24.3 8M181.6 8L177.1 16M229.5 16L232 14.5M232 14.5L240 9.8M3.2 24L8 20.4M8 20.4L14 16M173.4 24L176 18.2M176 18.2L177.1 16M215.3 24L216 23.6M216 23.6L224 18.9M224 18.9L229.5 16M0 26.3L3.2 24M173.4 24L170.6 32M200.6 32L208 27.8M208 27.8L215.3 24M170.6 32L169.8 40M184.1 40L192 36M192 36L200 32.3M200 32.3L200.6 32M169.8 40L176 42.2M176 42.2L184 40M184 40L184.1 40M92.5 112L96 110.1M96 110.1L104 107M104 107L112 112M78.7 120L80 119.2M80 119.2L88 114.5M88 114.5L92.5 112M112 112L109.2 120M44.2 8L48 4.9M48 4.9L54.2 0M148.2 8L152 1.1M152 1.1L152.6 0M33.6 16L40 11.1M40 11.1L44.2 8M143.6 16L144 15.2M144 15.2L148.2 8M22.8 24L24 23.1M24 23.1L32 17.2M32 17.2L33.6 16M143.6 16L138.9 24M11.7 32L16 28.9M16 28.9L22.8 24M133.8 32L136 28.5M136 28.5L138.9 24M0.6 40L8 34.7M8 34.7L11.7 32M133.8 32L128.4 40M0 40.4L0.6 40M122.6 48L128 40.5M128 40.5L128.4 40M229.9 48L232 46.8M232 46.8L240 42.7M116.2 56L120 51.2M120 51.2L122.6 48M216.4 56L224 51.4M224 51.4L229.9 48M109.2 64L112 60.8M112 60.8L116.2 56M204.6 64L208 61.6M208 61.6L216 56.2M216 56.2L216.4 56M101.6 72L104 69.5M104 69.5L109.2 64M194.3 72L200 67.5M200 67.5L204.6 64M93.3 80L96 77.4M96 77.4L101.6 72M185.3 80L192 74M192 74L194.3 72M84.4 88L88 84.8M88 84.8L93.3 80M177.4 88L184 81.3M184 81.3L185.3 80M74.9 96L80 91.8M80 91.8L84.4 88M170.5 96L176 89.6M176 89.6L177.4 88M65 104L72 98.4M72 98.4L74.9 96M164.7 104L168 99.5M168 99.5L170.5 96M54.7 112L56 111M56 111L64 104.8M64 104.8L65 104M159.7 112L160 111.5M160 111.5L164.7 104M44.1 120L48 117.1M48 117.1L54.7 112M159.7 112L155.9 120M68.3 8L72 5.5M72 5.5L80 0.7M80 0.7L81.3 0M119.4 8L120 4.5M120 4.5L120.8 0M55.5 16L56 15.7M56 15.7L64 10.6M64 10.6L68.3 8M119.4 8L116.8 16M43.5 24L48 21M48 21L55.5 16M116.8 16L113.6 24M31.6 32L32 31.7M32 31.7L40 26.3M40 26.3L43.5 24M109.5 32L112 27.1M112 27.1L113.6 24M20.2 40L24 37.3M24 37.3L31.6 32M109.5 32L104.8 40M9 48L16 43M16 43L20.2 40M99.3 48L104 41.2M104 41.2L104.8 40M0 54.7L8 48.7M8 48.7L9 48M93.2 56L96 52.3M96 52.3L99.3 48M86.3 64L88 62M88 62L93.2 56M78.7 72L80 70.7M80 70.7L86.3 64M70.4 80L72 78.5M72 78.5L78.7 72M61.4 88L64 85.7M64 85.7L70.4 80M51.6 96L56 92.5M56 92.5L61.4 88M41.2 104L48 98.9M48 98.9L51.6 96M30 112L32 110.6M32 110.6L40 104.9M40 104.9L41.2 104M17.9 120L24 116.1M24 116.1L30 112"/></svg>
       <span class="plate-num">02</span>
       <span class="plate-body">
-        <span class="plate-count">4 <span data-da="repos" data-en="repos">repos</span></span>
-        <strong class="plate-title" data-da="Lad agenter kode" data-en="Let agents code">Lad agenter kode</strong>
+        <span class="plate-count">4 <span>repos</span></span>
+        <strong class="plate-title">Let agents code</strong>
         <span class="plate-when">When a task spans many files, needs to run commands and tests, or has to be handed off and left to finish.</span>
       </span>
     </a>
@@ -407,8 +402,8 @@
       <svg class="terrain" viewBox="0 0 240 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"><path class="ink" d="M22.8 24L24 23.3M24 23.3L32 20M32 20L40 17.9M40 17.9L48 16.7M48 16.7L56 16.4M56 16.4L64 18M64 18L70.1 24M170.9 24L176 21.6M176 21.6L184 19.3M184 19.3L192 18.4M192 18.4L200 18.9M200 18.9L208 22.1M208 22.1L210.1 24M12.2 32L16 28.4M16 28.4L22.8 24M70.1 24L71.2 32M159.2 32L160 31.3M160 31.3L168 25.4M168 25.4L170.9 24M210.1 24L213.9 32M5.4 40L8 36.4M8 36.4L12.2 32M71.2 32L70.5 40M151.6 40L152 39.5M152 39.5L159.2 32M213.9 32L214.8 40M0 47.9L5.4 40M70.5 40L69.3 48M151.6 40L145.4 48M214.8 40L214.5 48M69.3 48L68 56M139.8 56L144 50M144 50L145.4 48M214.5 48L213.7 56M68 56L66.7 64M134.2 64L136 61.4M136 61.4L139.8 56M213.7 56L212.8 64M66.7 64L65.7 72M134.2 64L128.2 72M212.8 64L212 72M65.7 72L65.3 80M121.1 80L128 72.3M128 72.3L128.2 72M212 72L211.7 80M65.3 80L66.6 88M111.6 88L112 87.8M112 87.8L120 81.2M120 81.2L121.1 80M211.7 80L212.7 88M66.6 88L72 94.9M72 94.9L74.8 96M92.7 96L96 95.3M96 95.3L104 92.3M104 92.3L111.6 88M212.7 88L216 93.8M216 93.8L218.9 96M74.8 96L80 97.2M80 97.2L88 97M88 97L92.7 96M218.9 96L224 98M224 98L232 99M232 99L240 98.8M162.7 0L168 1.2M168 1.2L176 1.4M176 1.4L184 1.1M184 1.1L192 0.6M192 0.6L199.5 0M239.5 8L240 1.2M239.5 8L237.6 16M106.1 24L112 20.5M112 20.5L120 17.6M120 17.6L128 16.2M128 16.2L136 23.7M136 23.7L136 24M237.6 16L235.7 24M97.7 32L104 25.4M104 25.4L106.1 24M133.4 32L136 24.1M136 24.1L136 24M235.7 24L233.8 32M92.8 40L96 34.2M96 34.2L97.7 32M133.4 32L129.9 40M233.8 32L232.1 40M92.8 40L89.6 48M125.4 48L128 43.6M128 43.6L129.9 40M230.9 48L232 40.5M232 40.5L232.1 40M87.7 56L88 54.5M88 54.5L89.6 48M125.4 48L120.2 56M230.9 48L230.3 56M87.7 56L87.9 64M112.8 64L120 56.3M120 56.3L120.2 56M230.3 56L230.7 64M87.9 64L88 64.3M88 64.3L96 71.7M96 71.7L104 69.8M104 69.8L112 64.8M112 64.8L112.8 64M230.7 64L232 68.8M232 68.8L233.7 72M233.7 72L240 76.7"/><path class="gold" d="M28.7 32L32 30.5M32 30.5L40 28.6M40 28.6L48 28.7M48 28.7L55.3 32M174.3 32L176 31.1M176 31.1L184 28.8M184 28.8L192 28.7M192 28.7L200 31.7M200 31.7L200.3 32M16.5 40L24 34.3M24 34.3L28.7 32M55.3 32L56 32.7M56 32.7L59.1 40M162.5 40L168 35.6M168 35.6L174.3 32M200.3 32L204.7 40M9.2 48L16 40.4M16 40.4L16.5 40M59.1 40L59.7 48M154.8 48L160 42.2M160 42.2L162.5 40M204.7 40L205.8 48M3.6 56L8 49.5M8 49.5L9.2 48M59.7 48L59.1 56M148.5 56L152 51.3M152 51.3L154.8 48M205.8 48L205.5 56M0 61.7L3.6 56M59.1 56L57.9 64M142.8 64L144 62.3M144 62.3L148.5 56M205.5 56L204.5 64M57.9 64L56.5 72M142.8 64L137.4 72M204.5 64L203.1 72M54.9 80L56 74.7M56 74.7L56.5 72M131.7 80L136 74.1M136 74.1L137.4 72M203.1 72L201.4 80M54.9 80L53.5 88M124.9 88L128 84.7M128 84.7L131.7 80M199.6 88L200 86.5M200 86.5L201.4 80M53.5 88L52.7 96M115.5 96L120 92.8M120 92.8L124.9 88M199.6 88L197.8 96M52.7 96L54.2 104M97.9 104L104 102M104 102L112 98.3M112 98.3L115.5 96M197.8 96L196.7 104M54.2 104L56 105.7M56 105.7L64 108.2M64 108.2L72 108.3M72 108.3L80 107.6M80 107.6L88 106.4M88 106.4L96 104.6M96 104.6L97.9 104M196.7 104L200 109.5M200 109.5L208 110.5M208 110.5L216 110.1M216 110.1L224 109.6M224 109.6L232 109.1M232 109.1L240 108.6M165.9 120L168 119.4M168 119.4L176 118.4M176 118.4L184 119.3M184 119.3L184.9 120M0 2L2.1 0M38 8L40 7.6M40 7.6L48 6.2M48 6.2L56 4.7M56 4.7L64 2.9M64 2.9L72 0.1M72 0.1L72.2 0M103.1 8L104 7.6M104 7.6L112 4.4M112 4.4L120 1.7M120 1.7L124.4 0M12.1 16L16 13.5M16 13.5L24 10.8M24 10.8L32 9.1M32 9.1L38 8M92.3 16L96 12.1M96 12.1L103.1 8M165.7 16L168 14.8M168 14.8L176 12.1M176 12.1L184 10.4M184 10.4L192 9.4M192 9.4L200 8.9M200 8.9L208 9.3M208 9.3L216 11.6M216 11.6L221.4 16M4.3 24L8 19.1M8 19.1L12.1 16M87.1 24L88 22M88 22L92.3 16M154.3 24L160 19.1M160 19.1L165.7 16M221.4 16L224 23.9M224 23.9L224 24M0 30.8L4.3 24M87.1 24L83.6 32M147.3 32L152 26.2M152 26.2L154.3 24M224 24L224.1 32M83.6 32L80.9 40M141.6 40L144 36.3M144 36.3L147.3 32M223.4 40L224 33.1M224 33.1L224.1 32M78.6 48L80 42.8M80 42.8L80.9 40M141.6 40L136.4 48M223.4 40L222.5 48M78.6 48L77 56M130.9 56L136 48.5M136 48.5L136.4 48M222.5 48L221.6 56M77 56L75.9 64M124.9 64L128 60.1M128 60.1L130.9 56M221.6 56L221.1 64M75.9 64L76 72M117.8 72L120 69.9M120 69.9L124.9 64M221.1 64L221.3 72M76 72L78.3 80M107.8 80L112 77.2M112 77.2L117.8 72M221.3 72L223.3 80M78.3 80L80 82.1M80 82.1L88 85.7M88 85.7L96 85.1M96 85.1L104 82.3M104 82.3L107.8 80M223.3 80L224 81.2M224 81.2L232 87.6M232 87.6L233.9 88M233.9 88L240 88.8"/></svg>
       <span class="plate-num">03</span>
       <span class="plate-body">
-        <span class="plate-count">4 <span data-da="repos" data-en="repos">repos</span></span>
-        <strong class="plate-title" data-da="Nå ud på nettet" data-en="Reach the web">Nå ud på nettet</strong>
+        <span class="plate-count">4 <span>repos</span></span>
+        <strong class="plate-title">Reach the web</strong>
         <span class="plate-when">When the answer lives on a web page, behind a login, or inside a video.</span>
       </span>
     </a>
@@ -416,8 +411,8 @@
       <svg class="terrain" viewBox="0 0 240 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"><path class="ink" d="M167.3 0L168 1M168 1L170.9 8M0 9.4L8 9.6M8 9.6L16 13.6M16 13.6L17.9 16M170.9 8L170.9 16M17.9 16L20.7 24M170.9 16L170.1 24M20.7 24L21.3 32M170.1 24L169.4 32M21.3 32L20.9 40M169.4 32L175.6 40M176.3 40L184 38.9M184 38.9L192 37.9M192 37.9L200 37.4M200 37.4L208 37.4M208 37.4L216 37.9M216 37.9L224 38.9M224 38.9L230.3 40M20.9 40L20 48M175.6 40L176 40.1M176 40.1L176.3 40M230.3 40L232 40.3M232 40.3L240 42.1M20 48L18.9 56M148.3 56L152 54.3M152 54.3L156.7 56M18.9 56L17.7 64M130.8 64L136 61M136 61L144 57.2M144 57.2L148.3 56M156.7 56L157.7 64M17.7 64L16.4 72M116.4 72L120 69.7M120 69.7L128 65.3M128 65.3L130.8 64M157.7 64L156.4 72M15.4 80L16 75.4M16 75.4L16.4 72M102.6 80L104 79.1M104 79.1L112 74.4M112 74.4L116.4 72M156.4 72L154.8 80M15.4 80L14.7 88M89 88L96 83.9M96 83.9L102.6 80M154.8 80L153.1 88M14.7 88L14.6 96M75 96L80 93.3M80 93.3L88 88.6M88 88.6L89 88M151.4 96L152 93.1M152 93.1L153.1 88M14.6 96L16 103.7M16 103.7L16.1 104M59.5 104L64 102M64 102L72 97.8M72 97.8L75 96M151.4 96L149.5 104M16.1 104L24 111.8M24 111.8L25.4 112M36.5 112L40 111.5M40 111.5L48 109.1M48 109.1L56 105.8M56 105.8L59.5 104M149.5 104L147.8 112M25.4 112L32 112.8M32 112.8L36.5 112M147.8 112L146.2 120M234.2 0L235.3 8M235.3 8L240 13.4M95.4 112L96 111.7M96 111.7L104 109.2M104 109.2L112 110M112 110L113.9 112M83.8 120L88 117M88 117L95.4 112M113.9 112L114.7 120"/><path class="gold" d="M42.7 8L48 0.2M48 0.2L48.3 0M110.7 0L112 0.4M112 0.4L120 3.2M120 3.2L128 6.8M128 6.8L130.3 8M39.2 16L40 13.6M40 13.6L42.7 8M130.3 8L136 13.9M136 13.9L137.7 16M39.2 16L36.5 24M137.7 16L139.2 24M36.5 24L34.3 32M139.2 24L137.5 32M34.3 32L32.3 40M133.3 40L136 34.6M136 34.6L137.5 32M30.6 48L32 41.1M32 41.1L32.3 40M127 48L128 46.6M128 46.6L133.3 40M30.6 48L29.2 56M118.8 56L120 54.8M120 54.8L127 48M194.1 56L200 53.5M200 53.5L208 51.4M208 51.4L216 50.6M216 50.6L224 50.7M224 50.7L232 51.8M232 51.8L240 54M29.2 56L28.2 64M109 64L112 61.5M112 61.5L118.8 56M182.2 64L184 62.4M184 62.4L192 57M192 57L194.1 56M28.2 64L27.8 72M97.7 72L104 67.5M104 67.5L109 64M175.1 72L176 70.8M176 70.8L182.2 64M27.8 72L28.4 80M84.8 80L88 78.1M88 78.1L96 73.1M96 73.1L97.7 72M175.1 72L170.1 80M28.4 80L31 88M69.5 88L72 86.9M72 86.9L80 82.8M80 82.8L84.8 80M166.3 88L168 84.2M168 84.2L170.1 80M31 88L32 89.5M32 89.5L40 94.4M40 94.4L48 94.8M48 94.8L56 93.2M56 93.2L64 90.5M64 90.5L69.5 88M166.3 88L163.3 96M163.3 96L161 104M159.2 112L160 108.4M160 108.4L161 104M159.2 112L158.1 120M237.1 120L240 117.1M212.1 0L210.3 8M210.3 8L212.6 16M212.6 16L216 19M216 19L223.1 24M0 27.1L5.2 32M223.1 24L224 24.3M224 24.3L232 27.3M232 27.3L240 30M5.2 32L8 38.7M8 38.7L8.3 40M8.3 40L8.9 48M8.9 48L8.5 56M7.4 64L8 60M8 60L8.5 56M7.4 64L5.9 72M5.9 72L4 80M4 80L1.7 88M111.4 88L112 87.7M112 87.7L120 85.4M120 85.4L128 85M128 85L133 88M0 93.4L1.7 88M94.9 96L96 95.4M96 95.4L104 91.4M104 91.4L111.4 88M133 88L136 94.3M136 94.3L136.3 96M81.3 104L88 100.1M88 100.1L94.9 96M136.3 96L136.3 104M68.7 112L72 110M72 110L80 104.8M80 104.8L81.3 104M135.2 112L136 106.6M136 106.6L136.3 104M57 120L64 115.5M64 115.5L68.7 112M135.2 112L133.4 120"/></svg>
       <span class="plate-num">04</span>
       <span class="plate-body">
-        <span class="plate-count">3 <span data-da="repos" data-en="repos">repos</span></span>
-        <strong class="plate-title" data-da="Læs ethvert dokument" data-en="Read any document">Læs ethvert dokument</strong>
+        <span class="plate-count">3 <span>repos</span></span>
+        <strong class="plate-title">Read any document</strong>
         <span class="plate-when">When the input is a file rather than text, or the output has to be a specific file format.</span>
       </span>
     </a>
@@ -425,8 +420,8 @@
       <svg class="terrain" viewBox="0 0 240 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"><path class="ink" d="M29.3 0L26 8M87.8 8L88 7.3M88 7.3L89.8 0M203.6 0L200.6 8M21.9 16L24 12.1M24 12.1L26 8M87.8 8L84.3 16M198.7 16L200 10.3M200 10.3L200.6 8M15.7 24L16 23.7M16 23.7L21.9 16M79.2 24L80 23M80 23L84.3 16M198.7 16L197.4 24M5.2 32L8 30.2M8 30.2L15.7 24M71.4 32L72 31.5M72 31.5L79.2 24M197.4 24L196.4 32M233.1 32L240 25M0 34.9L5.2 32M61.4 40L64 38M64 38L71.4 32M196.4 32L195.8 40M219 40L224 37.8M224 37.8L232 33M232 33L233.1 32M52.9 48L56 44.8M56 44.8L61.4 40M191.4 48L192 47.4M195.8 40L200 46.9M192 47.4L194.5 48M200 46.9L208 44.2M208 44.2L216 41.4M216 41.4L219 40M47.4 56L48 54.9M48 54.9L52.9 48M164.4 56L168 54.7M168 54.7L176 52.4M176 52.4L184 50.2M184 50.2L191.4 48M194.5 48L194.7 56M47.4 56L44 64M146.4 64L152 60.9M152 60.9L160 57.5M160 57.5L164.4 56M194.7 56L194.4 64M44 64L41.8 72M136.6 72L144 65.5M144 65.5L146.4 64M194.4 64L194.2 72M41.8 72L40.2 80M130.9 80L136 72.7M136 72.7L136.6 72M194.2 72L193.9 80M38.9 88L40 81.1M40 81.1L40.2 80M127 88L128 85.7M128 85.7L130.9 80M193.9 80L193.7 88M38.9 88L37.7 96M127 88L124.1 96M193.7 88L193.3 96M37.7 96L36.3 104M124.1 96L121.4 104M193.3 96L192.8 104M36.3 104L34.3 112M118.4 112L120 108M120 108L121.4 104M192.8 104L192.1 112M31 120L32 118M32 118L34.3 112M118.4 112L114 120M190.6 120L192 112.4M192 112.4L192.1 112M14.3 0L9.7 8M103 0L101.4 8M188.5 0L185.6 8M2.8 16L8 10.3M8 10.3L9.7 8M101.4 8L99.6 16M182.4 16L184 12.2M184 12.2L185.6 8M0 18.4L2.8 16M99.6 16L97 24M182.4 16L178.4 24M92.9 32L96 26.2M96 26.2L97 24M172.2 32L176 27.5M176 27.5L178.4 24M86.3 40L88 38.2M88 38.2L92.9 32M161.5 40L168 35.6M168 35.6L172.2 32M76.9 48L80 45.5M80 45.5L86.3 40M145.2 48L152 44.9M152 44.9L160 40.9M160 40.9L161.5 40M67.7 56L72 52M72 52L76.9 48M130.6 56L136 52.7M136 52.7L144 48.6M144 48.6L145.2 48M230 56L232 54.6M232 54.6L240 49M61.1 64L64 60M64 60L67.7 56M122.2 64L128 58.1M128 58.1L130.6 56M220.6 64L224 60.8M224 60.8L230 56M61.1 64L56.8 72M117.1 72L120 67.2M120 67.2L122.2 64M214.8 72L216 70M216 70L220.6 64M54.4 80L56 74.4M56 74.4L56.8 72M117.1 72L113.6 80M214.8 72L211.7 80M54.4 80L53.2 88M110.5 88L112 84.2M112 84.2L113.6 80M211.7 80L210.1 88M53.2 88L53 96M110.5 88L106.9 96M210.1 88L209.7 96M53 96L54 104M102.1 104L104 101.3M104 101.3L106.9 96M209.7 96L210.2 104M54 104L56 109.8M56 109.8L57.4 112M93.9 112L96 110.5M96 110.5L102.1 104M210.2 104L212 112M57.4 112L64 117.2M64 117.2L72 118.6M72 118.6L80 117.9M80 117.9L88 115.3M88 115.3L93.9 112M212 112L215.9 120"/><path class="gold" d="M37.7 0L35.1 8M79.5 8L80 6.8M80 6.8L81.9 0M214.6 0L211.7 8M238.2 0L236.9 8M35.1 8L32.3 16M79.5 8L74.9 16M211.7 8L211.1 16M236.9 8L233.3 16M29.1 24L32 16.7M32 16.7L32.3 16M67.4 24L72 19.7M72 19.7L74.9 16M211.1 16L215.4 24M221.6 24L224 23.8M224 23.8L232 17.7M232 17.7L233.3 16M22.2 32L24 30.3M24 30.3L29.1 24M56.5 32L64 26.8M64 26.8L67.4 24M215.4 24L216 24.4M216 24.4L221.6 24M6.9 40L8 39.5M8 39.5L16 35.8M16 35.8L22.2 32M45.4 40L48 37.9M48 37.9L56 32.4M56 32.4L56.5 32M0 42.9L6.9 40M45.4 40L40.1 48M37.3 56L40 48.2M40 48.2L40.1 48M37.3 56L35.7 64M35.7 64L34.5 72M149.6 72L152 70.4M152 70.4L160 67.2M160 67.2L168 65.8M168 65.8L176 67.3M176 67.3L180.7 72M34.5 72L33.4 80M140.9 80L144 76.5M144 76.5L149.6 72M180.7 72L183.8 80M33.4 80L32.1 88M135.9 88L136 87.8M136 87.8L140.9 80M183.8 80L184 81.1M184 81.1L184.6 88M30.4 96L32 88.6M32 88.6L32.1 88M135.9 88L133.1 96M184.6 88L184.5 96M30.4 96L28.1 104M133.1 96L131.3 104M183.5 104L184 100.4M184 100.4L184.5 96M28.1 104L24.4 112M131.3 104L130.1 112M183.5 104L181 112M17.8 120L24 112.6M24 112.6L24.4 112M130.1 112L129.6 120M181 112L176.6 120M21.8 0L17.9 8M94.8 8L96 2.9M96 2.9L96.6 0M195.6 0L192.7 8M12.5 16L16 11.1M16 11.1L17.9 8M94.8 8L92.2 16M190.1 16L192 10.1M192 10.1L192.7 8M4.2 24L8 20.8M8 20.8L12.5 16M92.2 16L88.4 24M190.1 16L187.3 24M0 26.9L4.2 24M82.5 32L88 24.7M88 24.7L88.4 24M183.1 32L184 30.6M184 30.6L187.3 24M74 40L80 34.6M80 34.6L82.5 32M175.9 40L176 39.9M176 39.9L183.1 32M237.4 40L240 37.8M64.5 48L72 41.6M72 41.6L74 40M162.2 48L168 45.1M168 45.1L175.9 40M225.8 48L232 44.1M232 44.1L237.4 40M57 56L64 48.4M64 48.4L64.5 48M145.2 56L152 52.7M152 52.7L160 49M160 49L162.2 48M214.6 56L216 54.9M216 54.9L224 49.3M224 49.3L225.8 48M52.2 64L56 57.4M56 57.4L57 56M133.6 64L136 62M136 62L144 56.7M144 56.7L145.2 56M214.6 56L208 64M52.2 64L49 72M126.7 72L128 70.2M128 70.2L133.6 64M204.6 72L208 64M208 64L208 64M47 80L48 75.8M48 75.8L49 72M126.7 72L122.2 80M204.6 72L202.8 80M47 80L45.8 88M118.8 88L120 85.1M120 85.1L122.2 80M202.8 80L201.9 88M45.8 88L45 96M118.8 88L115.7 96M201.9 88L201.4 96M45 96L44.6 104M115.7 96L112.2 104M201.4 96L201.4 104M44.6 104L44.6 112M107.3 112L112 104.4M112 104.4L112.2 104M201.4 104L201.8 112M44.6 112L45.3 120M98.7 120L104 115.8M104 115.8L107.3 112M201.8 112L202.8 120M6.3 0L0.6 8M109.4 0L108.2 8M181.6 0L178.6 8M0 8.6L0.6 8M108.2 8L107 16M174.8 16L176 13.8M176 13.8L178.6 8M107 16L105.8 24M174.8 16L169.5 24M105.8 24L104 32M160.8 32L168 25.7M168 25.7L169.5 24M101.3 40L104 32.1M104 32.1L104 32M145.5 40L152 37.1M152 37.1L160 32.5M160 32.5L160.8 32M94.4 48L96 46.5M96 46.5L101.3 40M124.9 48L128 46.8M128 46.8L136 43.7M136 43.7L144 40.7M144 40.7L145.5 40M82.4 56L88 52.3M88 52.3L94.4 48M113.4 56L120 50.7M120 50.7L124.9 48M72.2 64L80 57.5M80 57.5L82.4 56M108.9 64L112 58.2M112 58.2L113.4 56M235.3 64L240 60.8M66.6 72L72 64.2M72 64.2L72.2 64M108.9 64L106.3 72M226.5 72L232 66.5M232 66.5L235.3 64M63.2 80L64 77.7M64 77.7L66.6 72M106.3 72L104 80M221.6 80L224 75.6M224 75.6L226.5 72M63.2 80L62.2 88M100.6 88L104 80.1M104 80.1L104 80M221.6 80L219.4 88M62.2 88L63.1 96M100.6 88L96.4 96M219.4 88L219 96M63.1 96L64 98.3M64 98.3L68.8 104M87.6 104L88 103.8M88 103.8L96 96.5M96 96.5L96.4 96M219 96L220.5 104M68.8 104L72 106M72 106L80 106.5M80 106.5L87.6 104M220.5 104L224 111.2M224 111.2L224.7 112M224.7 112L232 117.5M232 117.5L240 119.9"/></svg>
       <span class="plate-num">05</span>
       <span class="plate-body">
-        <span class="plate-count">4 <span data-da="repos" data-en="repos">repos</span></span>
-        <strong class="plate-title" data-da="Byg agenter og AI-apps" data-en="Build agents and AI apps">Byg agenter og AI-apps</strong>
+        <span class="plate-count">4 <span>repos</span></span>
+        <strong class="plate-title">Build agents and AI apps</strong>
         <span class="plate-when">When you are writing code that calls a model, uses tools, or has to keep state across steps.</span>
       </span>
     </a>
@@ -434,8 +429,8 @@
       <svg class="terrain" viewBox="0 0 240 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"><path class="ink" d="M0 35.5L8 35.1M8 35.1L16 34.9M16 34.9L24 34.9M24 34.9L32 35.5M32 35.5L40 37M40 37L48 40M48 40L48.1 40M48.1 40L56 45M56 45L59 48M59 48L64 54.1M64 54.1L65.2 56M65.2 56L68.9 64M68.9 64L70.3 72M70.3 72L69.2 80M69.2 80L64.9 88M238.6 88L240 87.6M56.4 96L64 88.9M64 88.9L64.9 88M218.1 96L224 93.4M224 93.4L232 90.2M232 90.2L238.6 88M43.2 104L48 101.2M48 101.2L56 96.3M56 96.3L56.4 96M205.3 104L208 102.1M208 102.1L216 97.1M216 97.1L218.1 96M25.3 112L32 109.1M32 109.1L40 105.5M40 105.5L43.2 104M198 112L200 109.6M200 109.6L205.3 104M3.1 120L8 118.3M8 118.3L16 115.4M16 115.4L24 112.5M24 112.5L25.3 112M198 112L195.3 120M158.2 16L160 15.6M160 15.6L168 14M168 14L176 12.7M176 12.7L184 11.9M184 11.9L192 11.6M192 11.6L200 12M200 12L208 13M208 13L216 15M216 15L218.7 16M136.3 24L144 20.8M144 20.8L152 17.9M152 17.9L158.2 16M218.7 16L224 18.7M224 18.7L231.8 24M125.3 32L128 29.8M128 29.8L136 24.2M136 24.2L136.3 24M231.8 24L232 24.2M232 24.2L237.6 32M125.3 32L120.3 40M237.6 32L239.1 40M119 48L120 41.5M120 41.5L120.3 40M239.1 40L236 48M119 48L120 54.3M120 54.3L120.3 56M227.7 56L232 52M232 52L236 48M120.3 56L123.5 64M213.7 64L216 62.8M216 62.8L224 58.2M224 58.2L227.7 56M123.5 64L128 71.7M128 71.7L128.2 72M194.3 72L200 69.8M200 69.8L208 66.5M208 66.5L213.7 64M128.2 72L136 79.4M136 79.4L137.4 80M168.3 80L176 78M176 78L184 75.5M184 75.5L192 72.8M192 72.8L194.3 72M137.4 80L144 82.6M144 82.6L152 82.9M152 82.9L160 81.8M160 81.8L168 80.1M168 80.1L168.3 80M99.5 112L104 110.9M104 110.9L112 109.8M112 109.8L120 109.7M120 109.7L127.7 112M69.3 120L72 119.1M72 119.1L80 116.7M80 116.7L88 114.5M88 114.5L96 112.6M96 112.6L99.5 112M127.7 112L128 112.1M128 112.1L136 117.1M136 117.1L138.5 120"/><path class="gold" d="M0 52.8L8 53.3M8 53.3L16 54.4M16 54.4L22.8 56M22.8 56L24 56.4M24 56.4L32 60.4M32 60.4L36.9 64M36.9 64L40 68.8M40 68.8L41.6 72M41.6 72L41.2 80M36 88L40 82M40 82L41.2 80M25.6 96L32 91.2M32 91.2L36 88M8.2 104L16 100.6M16 100.6L24 96.8M24 96.8L25.6 96M0 106.5L8 104.1M8 104.1L8.2 104M235 120L240 113.5M15.6 0L11.8 8M132.9 8L136 7.2M136 7.2L144 5.3M144 5.3L152 3.5M152 3.5L160 1.8M160 1.8L168 0.4M168 0.4L170.2 0M228.7 0L232 1M232 1L240 4.6M0 13.5L8 10.1M8 10.1L11.8 8M108.5 16L112 14.7M112 14.7L120 12M120 12L128 9.4M128 9.4L132.9 8M95.1 24L96 23.4M96 23.4L104 18.4M104 18.4L108.5 16M95.1 24L90 32M90 32L89.4 40M89.4 40L90.7 48M90.7 48L92.7 56M92.7 56L94.7 64M94.7 64L96 71.5M96 71.5L96.1 72M236 72L240 70.2M95.9 80L96 76.8M96 76.8L96.1 72M215.9 80L216 80M216 80L224 76.7M224 76.7L232 73.5M232 73.5L236 72M95.9 80L93.2 88M197.4 88L200 86.8M200 86.8L208 83.3M208 83.3L215.9 80M86 96L88 93.8M88 93.8L93.2 88M182.8 96L184 95.3M184 95.3L192 90.8M192 90.8L197.4 88M73.4 104L80 99.9M80 99.9L86 96M173.5 104L176 101.7M176 101.7L182.8 96M56.1 112L64 108.4M64 108.4L72 104.7M72 104.7L73.4 104M173.5 104L169.4 112M35.9 120L40 118.4M40 118.4L48 115.2M48 115.2L56 112M56 112L56.1 112M169.4 112L169 120M164 40L168 37.7M168 37.7L176 35M176 35L184 34.5M184 34.5L192 37.3M192 37.3L195.1 40M164 40L162.5 48M189.9 48L192 45.4M192 45.4L195.1 40M162.5 48L168 50.9M168 50.9L176 51.7M176 51.7L184 50.2M184 50.2L189.9 48"/></svg>
       <span class="plate-num">06</span>
       <span class="plate-body">
-        <span class="plate-count">4 <span data-da="repos" data-en="repos">repos</span></span>
-        <strong class="plate-title" data-da="Automatisér og kør lokalt" data-en="Automate and run locally">Automatisér og kør lokalt</strong>
+        <span class="plate-count">4 <span>repos</span></span>
+        <strong class="plate-title">Automate and run locally</strong>
         <span class="plate-when">When the job should run on a schedule or trigger, offline, or on private data.</span>
       </span>
     </a>
@@ -443,8 +438,8 @@
       <svg class="terrain" viewBox="0 0 240 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"><path class="ink" d="M60.7 0L64 6M64 6L65.3 8M176.4 0L181 8M235.6 0L238.4 8M65.3 8L70.3 16M181 8L184 12.9M184 12.9L186.4 16M238.4 8L240 13M0 22.6L7.7 24M70.3 16L72 18.7M72 18.7L76.9 24M186.4 16L192 23.1M192 23.1L192.9 24M7.7 24L8 24.1M8 24.1L16 25.6M16 25.6L24 27.1M24 27.1L32 28.7M32 28.7L40 30.5M40 30.5L45.4 32M76.9 24L80 27.1M80 27.1L88 31.6M88 31.6L88.9 32M192.9 24L200 30.6M200 30.6L201.9 32M45.4 32L48 32.7M48 32.7L56 35.4M56 35.4L64 39.5M64 39.5L64.7 40M88.9 32L96 35.3M96 35.3L104 38.1M104 38.1L110.1 40M201.9 32L208 36.2M208 36.2L215.4 40M64.7 40L72 46.2M72 46.2L73.3 48M110.1 40L112 40.6M112 40.6L120 43.5M120 43.5L128 46.2M128 46.2L132.8 48M215.4 40L216 40.3M216 40.3L224 43.4M224 43.4L232 45.5M232 45.5L240 45.6M73.3 48L78.8 56M132.8 48L136 49.3M136 49.3L144 53M144 53L149.6 56M78.8 56L80 57.8M80 57.8L83.4 64M149.6 56L152 57.5M152 57.5L160 63.5M160 63.5L160.6 64M83.4 64L87.4 72M160.6 64L167.7 72M87.4 72L88 73.2M88 73.2L91.3 80M167.7 72L168 72.4M168 72.4L172.4 80M91.3 80L94.9 88M172.4 80L175.3 88M94.9 88L96 90.5M96 90.5L98.6 96M175.3 88L176 92.3M176 92.3L176.6 96M98.6 96L102.1 104M175.9 104L176 103.4M176 103.4L176.6 96M102.1 104L104 109.1M104 109.1L105.5 112M175.9 104L172.3 112M105.5 112L108.8 120M163.6 120L168 116.7M168 116.7L172.3 112M86.9 0L88 1M88 1L96 6.9M96 6.9L97.9 8M153.5 0L153.7 8M97.9 8L104 11.6M104 11.6L112 15.3M112 15.3L113.9 16M151.2 16L152 14.5M152 14.5L153.7 8M113.9 16L120 18.2M120 18.2L128 20.2M128 20.2L136 21.1M136 21.1L144 20.4M144 20.4L151.2 16M2.9 80L8 78.1M8 78.1L16 75.5M16 75.5L24 74.2M24 74.2L32 75M32 75L40 78.7M40 78.7L41.6 80M0 80.9L2.9 80M41.6 80L48 86.9M48 86.9L48.7 88M48.7 88L52 96M52 96L53.8 104M53.8 104L54.3 112M54.3 112L54.5 120"/><path class="gold" d="M0 2.5L8 5.8M8 5.8L15.9 8M36.6 8L40 6M40 6L43 0M190.5 0L192 2M192 2L198.3 8M223.2 0L223.5 8M15.9 8L16 8M16 8L24 9.2M24 9.2L32 9.2M32 9.2L36.6 8M198.3 8L200 9.7M200 9.7L208 14.6M208 14.6L213.8 16M223.5 8L217.4 16M213.8 16L216 16.6M216 16.6L217.4 16M115.8 72L120 67.4M120 67.4L128 67.6M128 67.6L136 70.6M136 70.6L138.2 72M115.8 72L116.7 80M138.2 72L144 77.2M144 77.2L146.4 80M116.7 80L120 87.3M120 87.3L120.4 88M146.4 80L149.6 88M120.4 88L127.8 96M149.6 88L147.4 96M127.8 96L128 96.1M128 96.1L136 99.4M136 99.4L144 98.6M144 98.6L147.4 96M74 0L80 6.5M80 6.5L81.7 8M165 0L167.9 8M81.7 8L88 13.5M88 13.5L91.7 16M167.9 8L168 8.5M168 8.5L170.4 16M91.7 16L96 19M96 19L104 23.2M104 23.2L105.7 24M170.4 16L172.7 24M105.7 24L112 26.9M112 26.9L120 29.9M120 29.9L126.3 32M172.7 24L174.2 32M126.3 32L128 32.6M128 32.6L136 35M136 35L144 37.2M144 37.2L152 39.1M152 39.1L156.8 40M174.2 32L171.7 40M4.7 48L8 47M8 47L16 45.9M16 45.9L24 46.3M24 46.3L32 47.7M32 47.7L32.9 48M156.8 40L160 40.7M160 40.7L168 41.2M168 41.2L171.7 40M0 49.9L4.7 48M32.9 48L40 50.5M40 50.5L48 54.5M48 54.5L50.3 56M50.3 56L56 60.4M56 60.4L59.7 64M196.3 64L200 61.6M200 61.6L208 62.2M208 62.2L214.7 64M59.7 64L64 68.9M64 68.9L66.3 72M196.3 64L195.1 72M214.7 64L216 64.4M216 64.4L224 67.7M224 67.7L232 71.9M232 71.9L232.2 72M66.3 72L71.3 80M195.1 72L196 80M232.2 72L240 77.8M71.3 80L72 81.5M72 81.5L74.9 88M196 80L197 88M74.9 88L77.6 96M197 88L197.7 96M77.6 96L79.1 104M197.7 96L197.8 104M79.1 104L79.2 112M197.8 104L196.7 112M79.2 112L77.9 120M196.7 112L193.4 120M102.8 0L104 0.7M104 0.7L112 4.1M112 4.1L120 6.2M120 6.2L128 6.5M128 6.5L136 3.3M136 3.3L138.5 0M0 104.2L8 104.9M8 104.9L16 107.1M16 107.1L24 112M24 112L24 112M24 112L31.1 120"/></svg>
       <span class="plate-num">07</span>
       <span class="plate-body">
-        <span class="plate-count">4 <span data-da="repos" data-en="repos">repos</span></span>
-        <strong class="plate-title" data-da="Terminal-superkræfter" data-en="Terminal superpowers">Terminal-superkræfter</strong>
+        <span class="plate-count">4 <span>repos</span></span>
+        <strong class="plate-title">Terminal superpowers</strong>
         <span class="plate-when">When you are searching, reshaping or converting things at the command line.</span>
       </span>
     </a>
@@ -456,14 +451,14 @@
       <div class="cat-head">
         <svg class="terrain mini" viewBox="0 0 240 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"><path class="ink" d="M37.3 8L40 5.8M40 5.8L47 0M140 0L136.7 8M230.8 8L232 5.8M232 5.8L235.3 0M27.1 16L32 12.2M32 12.2L37.3 8M134.3 16L136 10.3M136 10.3L136.7 8M223.9 16L224 15.8M224 15.8L230.8 8M17 24L24 18.5M24 18.5L27.1 16M134.3 16L132.6 24M215.1 24L216 23.2M216 23.2L223.9 16M7.6 32L8 31.7M8 31.7L16 24.9M16 24.9L17 24M132.6 24L131.1 32M205.1 32L208 29.7M208 29.7L215.1 24M0 39.7L7.6 32M131.1 32L129.4 40M194.8 40L200 36M200 36L205.1 32M127 48L128 44.5M128 44.5L129.4 40M184.8 48L192 42.2M192 42.2L194.8 40M127 48L123.6 56M176 56L176 56M176 56L184 48.7M184 48.7L184.8 48M118.2 64L120 61.2M120 61.2L123.6 56M176 56L169 64M110.8 72L112 70.6M112 70.6L118.2 64M164.1 72L168 65.6M168 65.6L169 64M101.8 80L104 78M104 78L110.8 72M164.1 72L161.4 80M91.9 88L96 84.7M96 84.7L101.8 80M160 88L160 87.9M160 87.9L161.4 80M81.7 96L88 91M88 91L91.9 88M160 88L159.4 96M71.9 104L72 103.9M72 103.9L80 97.4M80 97.4L81.7 96M159.4 96L159.3 104M63 112L64 111.1M64 111.1L71.9 104M159.3 104L159.2 112M55.4 120L56 119.4M56 119.4L63 112M159.2 112L158.8 120M52.1 8L56 4.8M56 4.8L61.9 0M125.7 0L123.2 8M42 16L48 11.2M48 11.2L52.1 8M123.2 8L121.3 16M32.3 24L40 17.6M40 17.6L42 16M119.7 24L120 22.6M120 22.6L121.3 16M23.5 32L24 31.5M24 31.5L32 24.3M32 24.3L32.3 24M119.7 24L118 32M229.3 32L232 30.4M232 30.4L240 27M15.9 40L16 39.9M16 39.9L23.5 32M118 32L115.8 40M215.5 40L216 39.6M216 39.6L224 34.7M224 34.7L229.3 32M15.9 40L9.9 48M115.8 40L112.7 48M204.4 48L208 45.3M208 45.3L215.5 40M5.5 56L8 51.5M8 51.5L9.9 48M108.5 56L112 49.4M112 49.4L112.7 48M195.1 56L200 51.6M200 51.6L204.4 48M5.5 56L2.4 64M102.7 64L104 62.3M104 62.3L108.5 56M187.7 64L192 59.2M192 59.2L195.1 56M2.4 64L0.3 72M95.5 72L96 71.4M96 71.4L102.7 64M182.3 72L184 69.4M184 69.4L187.7 64M0 73.7L0.3 72M86.8 80L88 78.9M88 78.9L95.5 72M182.3 72L178.9 80M77.1 88L80 85.7M80 85.7L86.8 80M178.9 80L177.1 88M66.9 96L72 92.1M72 92.1L77.1 88M177.1 88L176.7 96M56.8 104L64 98.4M64 98.4L66.9 96M176.7 96L177.8 104M47.5 112L48 111.6M48 111.6L56 104.8M56 104.8L56.8 104M177.8 104L180.5 112M231.5 112L232 111.8M232 111.8L240 107.6M39.6 120L40 119.6M40 119.6L47.5 112M180.5 112L184 118.2M184 118.2L186.3 120M212.6 120L216 118.9M216 118.9L224 115.6M224 115.6L231.5 112"/><path class="gold" d="M29.3 8L32 6M32 6L39.5 0M143.5 8L144 6.9M144 6.9L147.1 0M220.8 8L224 2.6M224 2.6L225.5 0M18.3 16L24 12M24 12L29.3 8M143.5 8L141.2 16M214 16L216 13.7M216 13.7L220.8 8M6.8 24L8 23.3M8 23.3L16 17.8M16 17.8L18.3 16M141.2 16L139.7 24M205.3 24L208 21.5M208 21.5L214 16M0 28.8L6.8 24M139.7 24L138.7 32M195.2 32L200 28.3M200 28.3L205.3 24M138.7 32L137.9 40M184.5 40L192 34.5M192 34.5L195.2 32M137.9 40L136.6 48M173.4 48L176 46.3M176 46.3L184 40.4M184 40.4L184.5 40M134.5 56L136 50.1M136 50.1L136.6 48M163.4 56L168 52.5M168 52.5L173.4 48M134.5 56L129.9 64M156 64L160 59.9M160 59.9L163.4 56M121.7 72L128 65.6M128 65.6L129.9 64M156 64L152.5 72M111.3 80L112 79.4M112 79.4L120 73.2M120 73.2L121.7 72M150.9 80L152 74.8M152 74.8L152.5 72M100.5 88L104 85.3M104 85.3L111.3 80M150.9 80L150.6 88M89.6 96L96 91.2M96 91.2L100.5 88M150.6 88L150.7 96M79.4 104L80 103.5M80 103.5L88 97.2M88 97.2L89.6 96M150.7 96L150.7 104M70.4 112L72 110.6M72 110.6L79.4 104M150.7 104L150.5 112M62.8 120L64 118.7M64 118.7L70.4 112M150.5 112L149.6 120M44.7 8L48 5.3M48 5.3L54.3 0M133.1 0L130 8M34.8 16L40 11.8M40 11.8L44.7 8M127.8 16L128 15.4M128 15.4L130 8M236.5 16L240 12M25 24L32 18.3M32 18.3L34.8 16M127.8 16L126.1 24M226.4 24L232 19.4M232 19.4L236.5 16M16.1 32L24 24.9M24 24.9L25 24M126.1 24L124.4 32M215.4 32L216 31.5M216 31.5L224 25.6M224 25.6L226.4 24M8.5 40L16 32.1M16 32.1L16.1 32M124.4 32L122.3 40M204.6 40L208 37.4M208 37.4L215.4 32M2.5 48L8 40.7M8 40.7L8.5 40M119.4 48L120 46.4M120 46.4L122.3 40M194.4 48L200 43.5M200 43.5L204.6 40M0 52.9L2.5 48M119.4 48L115.5 56M185.6 56L192 50.2M192 50.2L194.4 48M109.9 64L112 61M112 61L115.5 56M178.6 64L184 57.8M184 57.8L185.6 56M102.7 72L104 70.5M104 70.5L109.9 64M173.5 72L176 68M176 68L178.6 64M94 80L96 78.1M96 78.1L102.7 72M173.5 72L170.2 80M84.4 88L88 85M88 85L94 80M170.2 80L168.5 88M74.3 96L80 91.5M80 91.5L84.4 88M167.8 96L168 93.6M168 93.6L168.5 88M64.5 104L72 97.9M72 97.9L74.3 96M167.8 96L167.9 104M55.6 112L56 111.6M56 111.6L64 104.5M64 104.5L64.5 104M167.9 104L168 105.3M168 105.3L168.6 112M47.9 120L48 119.9M48 119.9L55.6 112M168.6 112L169.5 120M238.1 120L240 119.1M60 8L64 4.8M64 4.8L70.4 0M117.3 0L115.6 8M49.5 16L56 11M56 11L60 8M115.6 8L114.4 16M39.4 24L40 23.5M40 23.5L48 17.1M48 17.1L49.5 16M114.4 16L113.2 24M30.5 32L32 30.6M32 30.6L39.4 24M111.7 32L112 30.3M112 30.3L113.2 24M22.8 40L24 38.8M24 38.8L30.5 32M111.7 32L109.4 40M22.8 40L16.8 48M109.4 40L106.3 48M216.9 48L224 44.3M224 44.3L232 41.3M232 41.3L240 40.6M12.2 56L16 49.4M16 49.4L16.8 48M101.9 56L104 52.2M104 52.2L106.3 48M205.7 56L208 54.1M208 54.1L216 48.5M216 48.5L216.9 48M12.2 56L9 64M96 64L96 64M96 64L101.9 56M197.5 64L200 61.4M200 61.4L205.7 56M6.9 72L8 67.8M8 67.8L9 64M96 64L88.6 72M191.6 72L192 71.5M192 71.5L197.5 64M6.9 72L5.5 80M79.7 80L80 79.8M80 79.8L88 72.5M88 72.5L88.6 72M191.6 72L188.3 80M5.5 80L4.6 88M69.7 88L72 86.2M72 86.2L79.7 80M188.3 80L186.9 88M4.6 88L3.9 96M58.9 96L64 92.3M64 92.3L69.7 88M186.9 88L187.7 96M239.8 96L240 95.9M3.9 96L2.9 104M48 104L56 98.2M56 98.2L58.9 96M187.7 96L191.5 104M225.7 104L232 100.8M232 100.8L239.8 96M2.9 104L1 112M37.2 112L40 110.1M40 110.1L48 104M48 104L48 104M191.5 104L192 104.6M192 104.6L200 108.9M200 108.9L208 109.3M208 109.3L216 107.7M216 107.7L224 104.8M224 104.8L225.7 104M0 114.2L1 112M28.2 120L32 116.9M32 116.9L37.2 112"/></svg>
         <div class="cat-titles">
-          <span class="cat-num">01 · <span data-da="Kort-plade" data-en="Plate">Plate</span></span>
-          <h2 data-da="Udvid din agent" data-en="Extend your agent">Udvid din agent</h2>
-          <p class="cat-blurb" data-da="MCP-servere, skills og dokumentation der giver en AI-model hænder, øjne og viden den aldrig er trænet på." data-en="MCP servers, skills and docs that give an AI model hands, eyes and knowledge it was never trained on.">MCP-servere, skills og dokumentation der giver en AI-model hænder, øjne og viden den aldrig er trænet på.</p>
+          <span class="cat-num">01 · <span>Plate</span></span>
+          <h2>Extend your agent</h2>
+          <p class="cat-blurb">MCP servers, skills and docs that give an AI model hands, eyes and knowledge it was never trained on.</p>
         </div>
       </div>
       <div class="router">
-        <p><b data-da="Brug den når" data-en="Reach for it when">Reach for it when</b> the model has to touch a service (GitHub, a browser, a database), needs current library docs, or needs a packaged capability such as producing a .docx or .pptx.</p>
-        <p><b data-da="Beslutningsregel" data-en="Decision rule">Decision rule</b> Need current API docs: context7. Need GitHub: github-mcp-server. Need a browser: playwright-mcp. Need a repeatable procedure or document format: anthropics/skills. Building your own tool server: fastmcp. Need a server for service X: awesome-mcp-servers.</p>
+        <p><b>Reach for it when</b> the model has to touch a service (GitHub, a browser, a database), needs current library docs, or needs a packaged capability such as producing a .docx or .pptx.</p>
+        <p><b>Decision rule</b> Need current API docs: context7. Need GitHub: github-mcp-server. Need a browser: playwright-mcp. Need a repeatable procedure or document format: anthropics/skills. Building your own tool server: fastmcp. Need a server for service X: awesome-mcp-servers.</p>
       </div>
       <div class="repos">
 <article class="repo" id="modelcontextprotocol-servers" data-cat="extend" data-pick="1" data-official="1" data-text="modelcontextprotocol/servers reference mcp servers maintained by the mcp project: filesystem, git, fetch, memory, sequential thinking and more. you want a known-good tool server, or a template for writing your own.  mcp reference filesystem git extend your agent the model has to touch a service (github, a browser, a database), needs current library docs, or needs a packaged capability such as producing a .docx or .pptx">
@@ -472,7 +467,7 @@
           <span class="badges"><span class="badge pick" title="Default choice for its niche">PICK</span><span class="badge official" title="Made by the vendor or project behind the technology">OFFICIAL</span></span>
         </div>
         <p class="what">Reference MCP servers maintained by the MCP project: filesystem, git, fetch, memory, sequential thinking and more.</p>
-        <p class="use"><b data-da="Brug når" data-en="Use when">Use when</b> You want a known-good tool server, or a template for writing your own.</p>
+        <p class="use"><b>Use when</b> You want a known-good tool server, or a template for writing your own.</p>
         
         <div class="repo-foot">
           <span class="stats"><span class="stat stars" title="GitHub stars">★ 91k</span><span class="stat">JavaScript</span><span class="stat">MIT → Apache-2.0</span><span class="stat active" title="Last push"><i></i>2026-10-13</span></span>
@@ -485,7 +480,7 @@
           <span class="badges"><span class="badge pick" title="Default choice for its niche">PICK</span><span class="badge official" title="Made by the vendor or project behind the technology">OFFICIAL</span></span>
         </div>
         <p class="what">Anthropic's public Agent Skills: folders of instructions and scripts that teach Claude a task, including creating .docx, .pdf, .pptx and .xlsx files.</p>
-        <p class="use"><b data-da="Brug når" data-en="Use when">Use when</b> A task has a repeatable procedure (office documents, design, testing) that the agent should follow reliably.</p>
+        <p class="use"><b>Use when</b> A task has a repeatable procedure (office documents, design, testing) that the agent should follow reliably.</p>
         
         <div class="repo-foot">
           <span class="stats"><span class="stat stars" title="GitHub stars">★ 181k</span><span class="stat">Python</span><span class="stat">Per skill</span><span class="stat active" title="Last push"><i></i>2026-10-09</span></span>
@@ -498,7 +493,7 @@
           <span class="badges"><span class="badge pick" title="Default choice for its niche">PICK</span></span>
         </div>
         <p class="what">MCP server that pulls version-specific, up-to-date library documentation straight into the prompt.</p>
-        <p class="use"><b data-da="Brug når" data-en="Use when">Use when</b> The model keeps using outdated or invented APIs for a fast-moving library.</p>
+        <p class="use"><b>Use when</b> The model keeps using outdated or invented APIs for a fast-moving library.</p>
         
         <div class="repo-foot">
           <span class="stats"><span class="stat stars" title="GitHub stars">★ 63k</span><span class="stat">TypeScript</span><span class="stat">MIT</span><span class="stat active" title="Last push"><i></i>2026-10-15</span></span>
@@ -511,7 +506,7 @@
           <span class="badges"><span class="badge official" title="Made by the vendor or project behind the technology">OFFICIAL</span></span>
         </div>
         <p class="what">GitHub's official MCP server: read repositories, search code, manage issues, pull requests and Actions.</p>
-        <p class="use"><b data-da="Brug når" data-en="Use when">Use when</b> The agent has to work with GitHub beyond what plain git does.</p>
+        <p class="use"><b>Use when</b> The agent has to work with GitHub beyond what plain git does.</p>
         
         <div class="repo-foot">
           <span class="stats"><span class="stat stars" title="GitHub stars">★ 34k</span><span class="stat">Go</span><span class="stat">MIT</span><span class="stat active" title="Last push"><i></i>2026-10-15</span></span>
@@ -524,7 +519,7 @@
           <span class="badges"><span class="badge official" title="Made by the vendor or project behind the technology">OFFICIAL</span></span>
         </div>
         <p class="what">Playwright as an MCP server: the agent drives a real browser through structured page snapshots instead of screenshots.</p>
-        <p class="use"><b data-da="Brug når" data-en="Use when">Use when</b> The agent must click, fill in and verify things in a web app.</p>
+        <p class="use"><b>Use when</b> The agent must click, fill in and verify things in a web app.</p>
         
         <div class="repo-foot">
           <span class="stats"><span class="stat stars" title="GitHub stars">★ 38k</span><span class="stat">TypeScript</span><span class="stat">Apache-2.0</span><span class="stat active" title="Last push"><i></i>2026-10-08</span></span>
@@ -537,7 +532,7 @@
           <span class="badges"><span class="badge pick" title="Default choice for its niche">PICK</span></span>
         </div>
         <p class="what">The fast, Pythonic way to build MCP servers and clients: decorate a function and it becomes a tool.</p>
-        <p class="use"><b data-da="Brug når" data-en="Use when">Use when</b> You want to expose your own script, API or database to an agent in under an hour.</p>
+        <p class="use"><b>Use when</b> You want to expose your own script, API or database to an agent in under an hour.</p>
         
         <div class="repo-foot">
           <span class="stats"><span class="stat stars" title="GitHub stars">★ 28k</span><span class="stat">Python</span><span class="stat">Apache-2.0</span><span class="stat active" title="Last push"><i></i>2026-10-15</span></span>
@@ -550,8 +545,8 @@
           <span class="badges"></span>
         </div>
         <p class="what">The largest curated directory of MCP servers, grouped by what they connect to.</p>
-        <p class="use"><b data-da="Brug når" data-en="Use when">Use when</b> You need an MCP server for a specific service and want to see what already exists.</p>
-        <p class="not"><b data-da="Ikke til" data-en="Not for">Not for</b> Quality varies a lot. Read a server's source before handing it credentials.</p>
+        <p class="use"><b>Use when</b> You need an MCP server for a specific service and want to see what already exists.</p>
+        <p class="not"><b>Not for</b> Quality varies a lot. Read a server's source before handing it credentials.</p>
         <div class="repo-foot">
           <span class="stats"><span class="stat stars" title="GitHub stars">★ 96k</span><span class="stat">MIT</span><span class="stat active" title="Last push"><i></i>2026-10-15</span></span>
           <span class="tags"><span class="tag-chip">directory</span><span class="tag-chip">mcp</span><span class="tag-chip">discovery</span></span>
@@ -563,14 +558,14 @@
       <div class="cat-head">
         <svg class="terrain mini" viewBox="0 0 240 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"><path class="ink" d="M34.2 8L40 3.2M40 3.2L43.9 0M167.3 0L162.5 8M24 16L24 16M24 16L32 9.7M32 9.7L34.2 8M157.7 16L160 12M160 12L162.5 8M13.2 24L16 21.9M16 21.9L24 16M157.7 16L152.7 24M2.1 32L8 27.8M8 27.8L13.2 24M147.9 32L152 25.2M152 25.2L152.7 24M232.9 32L240 28.3M0 33.5L2.1 32M142.5 40L144 37.8M144 37.8L147.9 32M218.5 40L224 36.8M224 36.8L232 32.5M232 32.5L232.9 32M142.5 40L136.9 48M205.4 48L208 46.3M208 46.3L216 41.4M216 41.4L218.5 40M130.9 56L136 49.2M136 49.2L136.9 48M193.5 56L200 51.5M200 51.5L205.4 48M124.1 64L128 59.4M128 59.4L130.9 56M182.7 64L184 63M184 63L192 57.1M192 57.1L193.5 56M116.5 72L120 68.3M120 68.3L124.1 64M173 72L176 69.4M176 69.4L182.7 64M108.2 80L112 76.4M112 76.4L116.5 72M164.4 80L168 76.6M168 76.6L173 72M99 88L104 83.7M104 83.7L108.2 80M156.9 88L160 84.7M160 84.7L164.4 80M89.2 96L96 90.5M96 90.5L99 88M150.4 96L152 94M152 94L156.9 88M79 104L80 103.2M80 103.2L88 96.9M88 96.9L89.2 96M150.4 96L144.5 104M68.6 112L72 109.4M72 109.4L79 104M139.2 112L144 104.8M144 104.8L144.5 104M58 120L64 115.6M64 115.6L68.6 112M134.3 120L136 117.2M136 117.2L139.2 112M54.8 8L56 7.1M56 7.1L64 1.2M64 1.2L65.7 0M134.6 8L136 4.9M136 4.9L138.3 0M43.8 16L48 12.9M48 12.9L54.8 8M134.6 8L130.7 16M32.5 24L40 18.7M40 18.7L43.8 16M126.4 24L128 21M128 21L130.7 16M21.3 32L24 30.1M24 30.1L32 24.4M32 24.4L32.5 24M126.4 24L121.7 32M10.1 40L16 35.8M16 35.8L21.3 32M116.5 40L120 34.5M120 34.5L121.7 32M0 47.3L8 41.6M8 41.6L10.1 40M110.7 48L112 46.1M112 46.1L116.5 40M110.7 48L104.3 56M97.4 64L104 56.4M104 56.4L104.3 56M229.2 64L232 62.4M232 62.4L240 58M89.7 72L96 65.4M96 65.4L97.4 64M217.4 72L224 67.5M224 67.5L229.2 64M81.5 80L88 73.7M88 73.7L89.7 72M207.6 80L208 79.7M208 79.7L216 73.2M216 73.2L217.4 72M72.5 88L80 81.3M80 81.3L81.5 80M199.7 88L200 87.7M200 87.7L207.6 80M63 96L64 95.2M64 95.2L72 88.5M72 88.5L72.5 88M199.7 88L193.7 96M53 104L56 101.6M56 101.6L63 96M189.9 104L192 99.8M192 99.8L193.7 96M42.4 112L48 107.8M48 107.8L53 104M189.9 104L190.4 112M229.6 112L232 111.5M232 111.5L240 110M31.4 120L32 119.6M32 119.6L40 113.8M40 113.8L42.4 112M190.4 112L192 113.4M192 113.4L200 115.5M200 115.5L208 115.3M208 115.3L216 114.3M216 114.3L224 113M224 113L229.6 112"/><path class="gold" d="M24.3 8L32 1.4M32 1.4L33.7 0M181.6 8L184 3.8M184 3.8L186.5 0M14 16L16 14.4M16 14.4L24 8.2M24 8.2L24.3 8M181.6 8L177.1 16M229.5 16L232 14.5M232 14.5L240 9.8M3.2 24L8 20.4M8 20.4L14 16M173.4 24L176 18.2M176 18.2L177.1 16M215.3 24L216 23.6M216 23.6L224 18.9M224 18.9L229.5 16M0 26.3L3.2 24M173.4 24L170.6 32M200.6 32L208 27.8M208 27.8L215.3 24M170.6 32L169.8 40M184.1 40L192 36M192 36L200 32.3M200 32.3L200.6 32M169.8 40L176 42.2M176 42.2L184 40M184 40L184.1 40M92.5 112L96 110.1M96 110.1L104 107M104 107L112 112M78.7 120L80 119.2M80 119.2L88 114.5M88 114.5L92.5 112M112 112L109.2 120M44.2 8L48 4.9M48 4.9L54.2 0M148.2 8L152 1.1M152 1.1L152.6 0M33.6 16L40 11.1M40 11.1L44.2 8M143.6 16L144 15.2M144 15.2L148.2 8M22.8 24L24 23.1M24 23.1L32 17.2M32 17.2L33.6 16M143.6 16L138.9 24M11.7 32L16 28.9M16 28.9L22.8 24M133.8 32L136 28.5M136 28.5L138.9 24M0.6 40L8 34.7M8 34.7L11.7 32M133.8 32L128.4 40M0 40.4L0.6 40M122.6 48L128 40.5M128 40.5L128.4 40M229.9 48L232 46.8M232 46.8L240 42.7M116.2 56L120 51.2M120 51.2L122.6 48M216.4 56L224 51.4M224 51.4L229.9 48M109.2 64L112 60.8M112 60.8L116.2 56M204.6 64L208 61.6M208 61.6L216 56.2M216 56.2L216.4 56M101.6 72L104 69.5M104 69.5L109.2 64M194.3 72L200 67.5M200 67.5L204.6 64M93.3 80L96 77.4M96 77.4L101.6 72M185.3 80L192 74M192 74L194.3 72M84.4 88L88 84.8M88 84.8L93.3 80M177.4 88L184 81.3M184 81.3L185.3 80M74.9 96L80 91.8M80 91.8L84.4 88M170.5 96L176 89.6M176 89.6L177.4 88M65 104L72 98.4M72 98.4L74.9 96M164.7 104L168 99.5M168 99.5L170.5 96M54.7 112L56 111M56 111L64 104.8M64 104.8L65 104M159.7 112L160 111.5M160 111.5L164.7 104M44.1 120L48 117.1M48 117.1L54.7 112M159.7 112L155.9 120M68.3 8L72 5.5M72 5.5L80 0.7M80 0.7L81.3 0M119.4 8L120 4.5M120 4.5L120.8 0M55.5 16L56 15.7M56 15.7L64 10.6M64 10.6L68.3 8M119.4 8L116.8 16M43.5 24L48 21M48 21L55.5 16M116.8 16L113.6 24M31.6 32L32 31.7M32 31.7L40 26.3M40 26.3L43.5 24M109.5 32L112 27.1M112 27.1L113.6 24M20.2 40L24 37.3M24 37.3L31.6 32M109.5 32L104.8 40M9 48L16 43M16 43L20.2 40M99.3 48L104 41.2M104 41.2L104.8 40M0 54.7L8 48.7M8 48.7L9 48M93.2 56L96 52.3M96 52.3L99.3 48M86.3 64L88 62M88 62L93.2 56M78.7 72L80 70.7M80 70.7L86.3 64M70.4 80L72 78.5M72 78.5L78.7 72M61.4 88L64 85.7M64 85.7L70.4 80M51.6 96L56 92.5M56 92.5L61.4 88M41.2 104L48 98.9M48 98.9L51.6 96M30 112L32 110.6M32 110.6L40 104.9M40 104.9L41.2 104M17.9 120L24 116.1M24 116.1L30 112"/></svg>
         <div class="cat-titles">
-          <span class="cat-num">02 · <span data-da="Kort-plade" data-en="Plate">Plate</span></span>
-          <h2 data-da="Lad agenter kode" data-en="Let agents code">Lad agenter kode</h2>
-          <p class="cat-blurb" data-da="Agenter der læser en hel kodebase, ændrer den og kører den, plus værktøjet der gør store ændringer sikre." data-en="Agents that read a whole codebase, change it and run it, plus the tool that makes sweeping changes safe.">Agenter der læser en hel kodebase, ændrer den og kører den, plus værktøjet der gør store ændringer sikre.</p>
+          <span class="cat-num">02 · <span>Plate</span></span>
+          <h2>Let agents code</h2>
+          <p class="cat-blurb">Agents that read a whole codebase, change it and run it, plus the tool that makes sweeping changes safe.</p>
         </div>
       </div>
       <div class="router">
-        <p><b data-da="Brug den når" data-en="Reach for it when">Reach for it when</b> a task spans many files, needs to run commands and tests, or has to be handed off and left to finish.</p>
-        <p><b data-da="Beslutningsregel" data-en="Decision rule">Decision rule</b> Interactive work in the terminal: claude-code, or codex as a second opinion. Hand off a self-contained task to run unattended: OpenHands. Mechanical change across many call sites: ast-grep.</p>
+        <p><b>Reach for it when</b> a task spans many files, needs to run commands and tests, or has to be handed off and left to finish.</p>
+        <p><b>Decision rule</b> Interactive work in the terminal: claude-code, or codex as a second opinion. Hand off a self-contained task to run unattended: OpenHands. Mechanical change across many call sites: ast-grep.</p>
       </div>
       <div class="repos">
 <article class="repo" id="anthropics-claude-code" data-cat="code" data-pick="1" data-official="1" data-text="anthropics/claude-code anthropic's agentic coding tool for the terminal: reads a codebase, edits files, runs commands, and extends through skills, hooks, subagents and mcp. you want an agent that works across a whole repository from the command line. proprietary licence: the repository holds docs, issues and plugin examples, not the product source. agent terminal claude let agents code a task spans many files, needs to run commands and tests, or has to be handed off and left to finish">
@@ -579,8 +574,8 @@
           <span class="badges"><span class="badge pick" title="Default choice for its niche">PICK</span><span class="badge official" title="Made by the vendor or project behind the technology">OFFICIAL</span></span>
         </div>
         <p class="what">Anthropic's agentic coding tool for the terminal: reads a codebase, edits files, runs commands, and extends through skills, hooks, subagents and MCP.</p>
-        <p class="use"><b data-da="Brug når" data-en="Use when">Use when</b> You want an agent that works across a whole repository from the command line.</p>
-        <p class="not"><b data-da="Ikke til" data-en="Not for">Not for</b> Proprietary licence: the repository holds docs, issues and plugin examples, not the product source.</p>
+        <p class="use"><b>Use when</b> You want an agent that works across a whole repository from the command line.</p>
+        <p class="not"><b>Not for</b> Proprietary licence: the repository holds docs, issues and plugin examples, not the product source.</p>
         <div class="repo-foot">
           <span class="stats"><span class="stat stars" title="GitHub stars">★ 151k</span><span class="stat">TypeScript</span><span class="stat">Proprietary</span><span class="stat active" title="Last push"><i></i>2026-10-15</span></span>
           <span class="tags"><span class="tag-chip">agent</span><span class="tag-chip">terminal</span><span class="tag-chip">claude</span></span>
@@ -592,7 +587,7 @@
           <span class="badges"><span class="badge official" title="Made by the vendor or project behind the technology">OFFICIAL</span></span>
         </div>
         <p class="what">OpenAI's open-source coding agent for the terminal: reads the repo, edits files and runs commands in a sandbox.</p>
-        <p class="use"><b data-da="Brug når" data-en="Use when">Use when</b> You want a second, independent terminal agent, or you are already on OpenAI models.</p>
+        <p class="use"><b>Use when</b> You want a second, independent terminal agent, or you are already on OpenAI models.</p>
         
         <div class="repo-foot">
           <span class="stats"><span class="stat stars" title="GitHub stars">★ 129k</span><span class="stat">Rust</span><span class="stat">Apache-2.0</span><span class="stat active" title="Last push"><i></i>2026-10-15</span></span>
@@ -605,8 +600,8 @@
           <span class="badges"></span>
         </div>
         <p class="what">Autonomous software-engineering agent that works inside a sandbox: writes code, runs commands and browses the web.</p>
-        <p class="use"><b data-da="Brug når" data-en="Use when">Use when</b> You want to hand off a self-contained task and let it run in isolation.</p>
-        <p class="not"><b data-da="Ikke til" data-en="Not for">Not for</b> Overkill for quick edits where a terminal agent is enough.</p>
+        <p class="use"><b>Use when</b> You want to hand off a self-contained task and let it run in isolation.</p>
+        <p class="not"><b>Not for</b> Overkill for quick edits where a terminal agent is enough.</p>
         <div class="repo-foot">
           <span class="stats"><span class="stat stars" title="GitHub stars">★ 91k</span><span class="stat">TypeScript</span><span class="stat">MIT</span><span class="stat active" title="Last push"><i></i>2026-10-15</span></span>
           <span class="tags"><span class="tag-chip">agent</span><span class="tag-chip">sandbox</span><span class="tag-chip">autonomous</span></span>
@@ -618,7 +613,7 @@
           <span class="badges"><span class="badge pick" title="Default choice for its niche">PICK</span></span>
         </div>
         <p class="what">Structural code search, lint and rewrite built on syntax trees instead of text, for many languages.</p>
-        <p class="use"><b data-da="Brug når" data-en="Use when">Use when</b> A refactor touches hundreds of call sites and regex would be fragile.</p>
+        <p class="use"><b>Use when</b> A refactor touches hundreds of call sites and regex would be fragile.</p>
         
         <div class="repo-foot">
           <span class="stats"><span class="stat stars" title="GitHub stars">★ 16k</span><span class="stat">Rust</span><span class="stat">MIT</span><span class="stat active" title="Last push"><i></i>2026-10-15</span></span>
@@ -631,14 +626,14 @@
       <div class="cat-head">
         <svg class="terrain mini" viewBox="0 0 240 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"><path class="ink" d="M22.8 24L24 23.3M24 23.3L32 20M32 20L40 17.9M40 17.9L48 16.7M48 16.7L56 16.4M56 16.4L64 18M64 18L70.1 24M170.9 24L176 21.6M176 21.6L184 19.3M184 19.3L192 18.4M192 18.4L200 18.9M200 18.9L208 22.1M208 22.1L210.1 24M12.2 32L16 28.4M16 28.4L22.8 24M70.1 24L71.2 32M159.2 32L160 31.3M160 31.3L168 25.4M168 25.4L170.9 24M210.1 24L213.9 32M5.4 40L8 36.4M8 36.4L12.2 32M71.2 32L70.5 40M151.6 40L152 39.5M152 39.5L159.2 32M213.9 32L214.8 40M0 47.9L5.4 40M70.5 40L69.3 48M151.6 40L145.4 48M214.8 40L214.5 48M69.3 48L68 56M139.8 56L144 50M144 50L145.4 48M214.5 48L213.7 56M68 56L66.7 64M134.2 64L136 61.4M136 61.4L139.8 56M213.7 56L212.8 64M66.7 64L65.7 72M134.2 64L128.2 72M212.8 64L212 72M65.7 72L65.3 80M121.1 80L128 72.3M128 72.3L128.2 72M212 72L211.7 80M65.3 80L66.6 88M111.6 88L112 87.8M112 87.8L120 81.2M120 81.2L121.1 80M211.7 80L212.7 88M66.6 88L72 94.9M72 94.9L74.8 96M92.7 96L96 95.3M96 95.3L104 92.3M104 92.3L111.6 88M212.7 88L216 93.8M216 93.8L218.9 96M74.8 96L80 97.2M80 97.2L88 97M88 97L92.7 96M218.9 96L224 98M224 98L232 99M232 99L240 98.8M162.7 0L168 1.2M168 1.2L176 1.4M176 1.4L184 1.1M184 1.1L192 0.6M192 0.6L199.5 0M239.5 8L240 1.2M239.5 8L237.6 16M106.1 24L112 20.5M112 20.5L120 17.6M120 17.6L128 16.2M128 16.2L136 23.7M136 23.7L136 24M237.6 16L235.7 24M97.7 32L104 25.4M104 25.4L106.1 24M133.4 32L136 24.1M136 24.1L136 24M235.7 24L233.8 32M92.8 40L96 34.2M96 34.2L97.7 32M133.4 32L129.9 40M233.8 32L232.1 40M92.8 40L89.6 48M125.4 48L128 43.6M128 43.6L129.9 40M230.9 48L232 40.5M232 40.5L232.1 40M87.7 56L88 54.5M88 54.5L89.6 48M125.4 48L120.2 56M230.9 48L230.3 56M87.7 56L87.9 64M112.8 64L120 56.3M120 56.3L120.2 56M230.3 56L230.7 64M87.9 64L88 64.3M88 64.3L96 71.7M96 71.7L104 69.8M104 69.8L112 64.8M112 64.8L112.8 64M230.7 64L232 68.8M232 68.8L233.7 72M233.7 72L240 76.7"/><path class="gold" d="M28.7 32L32 30.5M32 30.5L40 28.6M40 28.6L48 28.7M48 28.7L55.3 32M174.3 32L176 31.1M176 31.1L184 28.8M184 28.8L192 28.7M192 28.7L200 31.7M200 31.7L200.3 32M16.5 40L24 34.3M24 34.3L28.7 32M55.3 32L56 32.7M56 32.7L59.1 40M162.5 40L168 35.6M168 35.6L174.3 32M200.3 32L204.7 40M9.2 48L16 40.4M16 40.4L16.5 40M59.1 40L59.7 48M154.8 48L160 42.2M160 42.2L162.5 40M204.7 40L205.8 48M3.6 56L8 49.5M8 49.5L9.2 48M59.7 48L59.1 56M148.5 56L152 51.3M152 51.3L154.8 48M205.8 48L205.5 56M0 61.7L3.6 56M59.1 56L57.9 64M142.8 64L144 62.3M144 62.3L148.5 56M205.5 56L204.5 64M57.9 64L56.5 72M142.8 64L137.4 72M204.5 64L203.1 72M54.9 80L56 74.7M56 74.7L56.5 72M131.7 80L136 74.1M136 74.1L137.4 72M203.1 72L201.4 80M54.9 80L53.5 88M124.9 88L128 84.7M128 84.7L131.7 80M199.6 88L200 86.5M200 86.5L201.4 80M53.5 88L52.7 96M115.5 96L120 92.8M120 92.8L124.9 88M199.6 88L197.8 96M52.7 96L54.2 104M97.9 104L104 102M104 102L112 98.3M112 98.3L115.5 96M197.8 96L196.7 104M54.2 104L56 105.7M56 105.7L64 108.2M64 108.2L72 108.3M72 108.3L80 107.6M80 107.6L88 106.4M88 106.4L96 104.6M96 104.6L97.9 104M196.7 104L200 109.5M200 109.5L208 110.5M208 110.5L216 110.1M216 110.1L224 109.6M224 109.6L232 109.1M232 109.1L240 108.6M165.9 120L168 119.4M168 119.4L176 118.4M176 118.4L184 119.3M184 119.3L184.9 120M0 2L2.1 0M38 8L40 7.6M40 7.6L48 6.2M48 6.2L56 4.7M56 4.7L64 2.9M64 2.9L72 0.1M72 0.1L72.2 0M103.1 8L104 7.6M104 7.6L112 4.4M112 4.4L120 1.7M120 1.7L124.4 0M12.1 16L16 13.5M16 13.5L24 10.8M24 10.8L32 9.1M32 9.1L38 8M92.3 16L96 12.1M96 12.1L103.1 8M165.7 16L168 14.8M168 14.8L176 12.1M176 12.1L184 10.4M184 10.4L192 9.4M192 9.4L200 8.9M200 8.9L208 9.3M208 9.3L216 11.6M216 11.6L221.4 16M4.3 24L8 19.1M8 19.1L12.1 16M87.1 24L88 22M88 22L92.3 16M154.3 24L160 19.1M160 19.1L165.7 16M221.4 16L224 23.9M224 23.9L224 24M0 30.8L4.3 24M87.1 24L83.6 32M147.3 32L152 26.2M152 26.2L154.3 24M224 24L224.1 32M83.6 32L80.9 40M141.6 40L144 36.3M144 36.3L147.3 32M223.4 40L224 33.1M224 33.1L224.1 32M78.6 48L80 42.8M80 42.8L80.9 40M141.6 40L136.4 48M223.4 40L222.5 48M78.6 48L77 56M130.9 56L136 48.5M136 48.5L136.4 48M222.5 48L221.6 56M77 56L75.9 64M124.9 64L128 60.1M128 60.1L130.9 56M221.6 56L221.1 64M75.9 64L76 72M117.8 72L120 69.9M120 69.9L124.9 64M221.1 64L221.3 72M76 72L78.3 80M107.8 80L112 77.2M112 77.2L117.8 72M221.3 72L223.3 80M78.3 80L80 82.1M80 82.1L88 85.7M88 85.7L96 85.1M96 85.1L104 82.3M104 82.3L107.8 80M223.3 80L224 81.2M224 81.2L232 87.6M232 87.6L233.9 88M233.9 88L240 88.8"/></svg>
         <div class="cat-titles">
-          <span class="cat-num">03 · <span data-da="Kort-plade" data-en="Plate">Plate</span></span>
-          <h2 data-da="Nå ud på nettet" data-en="Reach the web">Nå ud på nettet</h2>
-          <p class="cat-blurb" data-da="Hent, styr og download fra det levende web, også de sider der ikke har et API." data-en="Fetch, drive and download from the live web, including the pages that have no API.">Hent, styr og download fra det levende web, også de sider der ikke har et API.</p>
+          <span class="cat-num">03 · <span>Plate</span></span>
+          <h2>Reach the web</h2>
+          <p class="cat-blurb">Fetch, drive and download from the live web, including the pages that have no API.</p>
         </div>
       </div>
       <div class="router">
-        <p><b data-da="Brug den når" data-en="Reach for it when">Reach for it when</b> the answer lives on a web page, behind a login, or inside a video.</p>
-        <p><b data-da="Beslutningsregel" data-en="Decision rule">Decision rule</b> Page content as clean text: firecrawl. Unknown steps on a site with no API: browser-use. Known steps or tests: playwright. Transcript, audio or metadata from a video: yt-dlp.</p>
+        <p><b>Reach for it when</b> the answer lives on a web page, behind a login, or inside a video.</p>
+        <p><b>Decision rule</b> Page content as clean text: firecrawl. Unknown steps on a site with no API: browser-use. Known steps or tests: playwright. Transcript, audio or metadata from a video: yt-dlp.</p>
       </div>
       <div class="repos">
 <article class="repo" id="firecrawl-firecrawl" data-cat="web" data-pick="1" data-official="0" data-text="firecrawl/firecrawl turns websites into clean, llm-ready markdown or structured data through crawl, scrape, search and extract apis. an agent needs the contents of web pages, or a whole site, in readable form.  scraping crawling markdown reach the web the answer lives on a web page, behind a login, or inside a video">
@@ -647,7 +642,7 @@
           <span class="badges"><span class="badge pick" title="Default choice for its niche">PICK</span></span>
         </div>
         <p class="what">Turns websites into clean, LLM-ready markdown or structured data through crawl, scrape, search and extract APIs.</p>
-        <p class="use"><b data-da="Brug når" data-en="Use when">Use when</b> An agent needs the contents of web pages, or a whole site, in readable form.</p>
+        <p class="use"><b>Use when</b> An agent needs the contents of web pages, or a whole site, in readable form.</p>
         
         <div class="repo-foot">
           <span class="stats"><span class="stat stars" title="GitHub stars">★ 192k</span><span class="stat">TypeScript</span><span class="stat">AGPL-3.0</span><span class="stat active" title="Last push"><i></i>2026-10-15</span></span>
@@ -660,7 +655,7 @@
           <span class="badges"></span>
         </div>
         <p class="what">Python library that lets an LLM operate a real browser to finish multi-step tasks on sites that have no API.</p>
-        <p class="use"><b data-da="Brug når" data-en="Use when">Use when</b> The job needs logging in, clicking through and filling in forms on a site you cannot call directly.</p>
+        <p class="use"><b>Use when</b> The job needs logging in, clicking through and filling in forms on a site you cannot call directly.</p>
         
         <div class="repo-foot">
           <span class="stats"><span class="stat stars" title="GitHub stars">★ 118k</span><span class="stat">Python</span><span class="stat">MIT</span><span class="stat active" title="Last push"><i></i>2026-10-15</span></span>
@@ -673,8 +668,8 @@
           <span class="badges"><span class="badge pick" title="Default choice for its niche">PICK</span></span>
         </div>
         <p class="what">Reliable cross-browser automation and testing in code, for Chromium, Firefox and WebKit.</p>
-        <p class="use"><b data-da="Brug når" data-en="Use when">Use when</b> You need deterministic scripted browsing, scraping of JavaScript-heavy pages, or end-to-end tests.</p>
-        <p class="not"><b data-da="Ikke til" data-en="Not for">Not for</b> The steps are not known in advance. Use browser-use instead.</p>
+        <p class="use"><b>Use when</b> You need deterministic scripted browsing, scraping of JavaScript-heavy pages, or end-to-end tests.</p>
+        <p class="not"><b>Not for</b> The steps are not known in advance. Use browser-use instead.</p>
         <div class="repo-foot">
           <span class="stats"><span class="stat stars" title="GitHub stars">★ 98k</span><span class="stat">TypeScript</span><span class="stat">Apache-2.0</span><span class="stat active" title="Last push"><i></i>2026-10-15</span></span>
           <span class="tags"><span class="tag-chip">browser</span><span class="tag-chip">testing</span><span class="tag-chip">scraping</span></span>
@@ -686,8 +681,8 @@
           <span class="badges"><span class="badge pick" title="Default choice for its niche">PICK</span></span>
         </div>
         <p class="what">Command-line downloader for video and audio from thousands of sites that also fetches metadata and subtitles.</p>
-        <p class="use"><b data-da="Brug når" data-en="Use when">Use when</b> You need a transcript, subtitle track, audio or metadata from a video page.</p>
-        <p class="not"><b data-da="Ikke til" data-en="Not for">Not for</b> Only for content you have the right to download.</p>
+        <p class="use"><b>Use when</b> You need a transcript, subtitle track, audio or metadata from a video page.</p>
+        <p class="not"><b>Not for</b> Only for content you have the right to download.</p>
         <div class="repo-foot">
           <span class="stats"><span class="stat stars" title="GitHub stars">★ 198k</span><span class="stat">Python</span><span class="stat">Unlicense</span><span class="stat active" title="Last push"><i></i>2026-10-10</span></span>
           <span class="tags"><span class="tag-chip">video</span><span class="tag-chip">audio</span><span class="tag-chip">transcripts</span><span class="tag-chip">cli</span></span>
@@ -699,14 +694,14 @@
       <div class="cat-head">
         <svg class="terrain mini" viewBox="0 0 240 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"><path class="ink" d="M167.3 0L168 1M168 1L170.9 8M0 9.4L8 9.6M8 9.6L16 13.6M16 13.6L17.9 16M170.9 8L170.9 16M17.9 16L20.7 24M170.9 16L170.1 24M20.7 24L21.3 32M170.1 24L169.4 32M21.3 32L20.9 40M169.4 32L175.6 40M176.3 40L184 38.9M184 38.9L192 37.9M192 37.9L200 37.4M200 37.4L208 37.4M208 37.4L216 37.9M216 37.9L224 38.9M224 38.9L230.3 40M20.9 40L20 48M175.6 40L176 40.1M176 40.1L176.3 40M230.3 40L232 40.3M232 40.3L240 42.1M20 48L18.9 56M148.3 56L152 54.3M152 54.3L156.7 56M18.9 56L17.7 64M130.8 64L136 61M136 61L144 57.2M144 57.2L148.3 56M156.7 56L157.7 64M17.7 64L16.4 72M116.4 72L120 69.7M120 69.7L128 65.3M128 65.3L130.8 64M157.7 64L156.4 72M15.4 80L16 75.4M16 75.4L16.4 72M102.6 80L104 79.1M104 79.1L112 74.4M112 74.4L116.4 72M156.4 72L154.8 80M15.4 80L14.7 88M89 88L96 83.9M96 83.9L102.6 80M154.8 80L153.1 88M14.7 88L14.6 96M75 96L80 93.3M80 93.3L88 88.6M88 88.6L89 88M151.4 96L152 93.1M152 93.1L153.1 88M14.6 96L16 103.7M16 103.7L16.1 104M59.5 104L64 102M64 102L72 97.8M72 97.8L75 96M151.4 96L149.5 104M16.1 104L24 111.8M24 111.8L25.4 112M36.5 112L40 111.5M40 111.5L48 109.1M48 109.1L56 105.8M56 105.8L59.5 104M149.5 104L147.8 112M25.4 112L32 112.8M32 112.8L36.5 112M147.8 112L146.2 120M234.2 0L235.3 8M235.3 8L240 13.4M95.4 112L96 111.7M96 111.7L104 109.2M104 109.2L112 110M112 110L113.9 112M83.8 120L88 117M88 117L95.4 112M113.9 112L114.7 120"/><path class="gold" d="M42.7 8L48 0.2M48 0.2L48.3 0M110.7 0L112 0.4M112 0.4L120 3.2M120 3.2L128 6.8M128 6.8L130.3 8M39.2 16L40 13.6M40 13.6L42.7 8M130.3 8L136 13.9M136 13.9L137.7 16M39.2 16L36.5 24M137.7 16L139.2 24M36.5 24L34.3 32M139.2 24L137.5 32M34.3 32L32.3 40M133.3 40L136 34.6M136 34.6L137.5 32M30.6 48L32 41.1M32 41.1L32.3 40M127 48L128 46.6M128 46.6L133.3 40M30.6 48L29.2 56M118.8 56L120 54.8M120 54.8L127 48M194.1 56L200 53.5M200 53.5L208 51.4M208 51.4L216 50.6M216 50.6L224 50.7M224 50.7L232 51.8M232 51.8L240 54M29.2 56L28.2 64M109 64L112 61.5M112 61.5L118.8 56M182.2 64L184 62.4M184 62.4L192 57M192 57L194.1 56M28.2 64L27.8 72M97.7 72L104 67.5M104 67.5L109 64M175.1 72L176 70.8M176 70.8L182.2 64M27.8 72L28.4 80M84.8 80L88 78.1M88 78.1L96 73.1M96 73.1L97.7 72M175.1 72L170.1 80M28.4 80L31 88M69.5 88L72 86.9M72 86.9L80 82.8M80 82.8L84.8 80M166.3 88L168 84.2M168 84.2L170.1 80M31 88L32 89.5M32 89.5L40 94.4M40 94.4L48 94.8M48 94.8L56 93.2M56 93.2L64 90.5M64 90.5L69.5 88M166.3 88L163.3 96M163.3 96L161 104M159.2 112L160 108.4M160 108.4L161 104M159.2 112L158.1 120M237.1 120L240 117.1M212.1 0L210.3 8M210.3 8L212.6 16M212.6 16L216 19M216 19L223.1 24M0 27.1L5.2 32M223.1 24L224 24.3M224 24.3L232 27.3M232 27.3L240 30M5.2 32L8 38.7M8 38.7L8.3 40M8.3 40L8.9 48M8.9 48L8.5 56M7.4 64L8 60M8 60L8.5 56M7.4 64L5.9 72M5.9 72L4 80M4 80L1.7 88M111.4 88L112 87.7M112 87.7L120 85.4M120 85.4L128 85M128 85L133 88M0 93.4L1.7 88M94.9 96L96 95.4M96 95.4L104 91.4M104 91.4L111.4 88M133 88L136 94.3M136 94.3L136.3 96M81.3 104L88 100.1M88 100.1L94.9 96M136.3 96L136.3 104M68.7 112L72 110M72 110L80 104.8M80 104.8L81.3 104M135.2 112L136 106.6M136 106.6L136.3 104M57 120L64 115.5M64 115.5L68.7 112M135.2 112L133.4 120"/></svg>
         <div class="cat-titles">
-          <span class="cat-num">04 · <span data-da="Kort-plade" data-en="Plate">Plate</span></span>
-          <h2 data-da="Læs ethvert dokument" data-en="Read any document">Læs ethvert dokument</h2>
-          <p class="cat-blurb" data-da="Gør PDF'er, Office-filer og scanninger til tekst en model kan bruge, og gør tekst til leverancer igen." data-en="Turn PDFs, Office files and scans into text a model can use, and turn text back into deliverables.">Gør PDF'er, Office-filer og scanninger til tekst en model kan bruge, og gør tekst til leverancer igen.</p>
+          <span class="cat-num">04 · <span>Plate</span></span>
+          <h2>Read any document</h2>
+          <p class="cat-blurb">Turn PDFs, Office files and scans into text a model can use, and turn text back into deliverables.</p>
         </div>
       </div>
       <div class="router">
-        <p><b data-da="Brug den når" data-en="Reach for it when">Reach for it when</b> the input is a file rather than text, or the output has to be a specific file format.</p>
-        <p><b data-da="Beslutningsregel" data-en="Decision rule">Decision rule</b> Any file to quick text: markitdown. Tables and layout must survive: docling. Converting between document formats: pandoc.</p>
+        <p><b>Reach for it when</b> the input is a file rather than text, or the output has to be a specific file format.</p>
+        <p><b>Decision rule</b> Any file to quick text: markitdown. Tables and layout must survive: docling. Converting between document formats: pandoc.</p>
       </div>
       <div class="repos">
 <article class="repo" id="microsoft-markitdown" data-cat="docs" data-pick="1" data-official="0" data-text="microsoft/markitdown converts office files, pdfs, images, audio, html and more into markdown that language models read well. you want one call that turns almost any file into model-ready text.  markdown pdf office convert read any document the input is a file rather than text, or the output has to be a specific file format">
@@ -715,7 +710,7 @@
           <span class="badges"><span class="badge pick" title="Default choice for its niche">PICK</span></span>
         </div>
         <p class="what">Converts Office files, PDFs, images, audio, HTML and more into Markdown that language models read well.</p>
-        <p class="use"><b data-da="Brug når" data-en="Use when">Use when</b> You want one call that turns almost any file into model-ready text.</p>
+        <p class="use"><b>Use when</b> You want one call that turns almost any file into model-ready text.</p>
         
         <div class="repo-foot">
           <span class="stats"><span class="stat stars" title="GitHub stars">★ 190k</span><span class="stat">Python</span><span class="stat">MIT</span><span class="stat active" title="Last push"><i></i>2026-10-04</span></span>
@@ -728,7 +723,7 @@
           <span class="badges"></span>
         </div>
         <p class="what">Layout-aware document parsing that keeps tables, reading order and structure from PDFs and Office files.</p>
-        <p class="use"><b data-da="Brug når" data-en="Use when">Use when</b> Tables and layout matter, as in financial reports and scientific papers.</p>
+        <p class="use"><b>Use when</b> Tables and layout matter, as in financial reports and scientific papers.</p>
         
         <div class="repo-foot">
           <span class="stats"><span class="stat stars" title="GitHub stars">★ 69k</span><span class="stat">Python</span><span class="stat">MIT</span><span class="stat active" title="Last push"><i></i>2026-10-15</span></span>
@@ -741,7 +736,7 @@
           <span class="badges"><span class="badge pick" title="Default choice for its niche">PICK</span></span>
         </div>
         <p class="what">The universal document converter: Markdown, HTML, LaTeX, docx, EPUB and dozens of other formats in either direction.</p>
-        <p class="use"><b data-da="Brug når" data-en="Use when">Use when</b> You need to produce or convert a deliverable format from plain text.</p>
+        <p class="use"><b>Use when</b> You need to produce or convert a deliverable format from plain text.</p>
         
         <div class="repo-foot">
           <span class="stats"><span class="stat stars" title="GitHub stars">★ 47k</span><span class="stat">Haskell</span><span class="stat">GPL-2.0</span><span class="stat active" title="Last push"><i></i>2026-10-15</span></span>
@@ -754,14 +749,14 @@
       <div class="cat-head">
         <svg class="terrain mini" viewBox="0 0 240 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"><path class="ink" d="M29.3 0L26 8M87.8 8L88 7.3M88 7.3L89.8 0M203.6 0L200.6 8M21.9 16L24 12.1M24 12.1L26 8M87.8 8L84.3 16M198.7 16L200 10.3M200 10.3L200.6 8M15.7 24L16 23.7M16 23.7L21.9 16M79.2 24L80 23M80 23L84.3 16M198.7 16L197.4 24M5.2 32L8 30.2M8 30.2L15.7 24M71.4 32L72 31.5M72 31.5L79.2 24M197.4 24L196.4 32M233.1 32L240 25M0 34.9L5.2 32M61.4 40L64 38M64 38L71.4 32M196.4 32L195.8 40M219 40L224 37.8M224 37.8L232 33M232 33L233.1 32M52.9 48L56 44.8M56 44.8L61.4 40M191.4 48L192 47.4M195.8 40L200 46.9M192 47.4L194.5 48M200 46.9L208 44.2M208 44.2L216 41.4M216 41.4L219 40M47.4 56L48 54.9M48 54.9L52.9 48M164.4 56L168 54.7M168 54.7L176 52.4M176 52.4L184 50.2M184 50.2L191.4 48M194.5 48L194.7 56M47.4 56L44 64M146.4 64L152 60.9M152 60.9L160 57.5M160 57.5L164.4 56M194.7 56L194.4 64M44 64L41.8 72M136.6 72L144 65.5M144 65.5L146.4 64M194.4 64L194.2 72M41.8 72L40.2 80M130.9 80L136 72.7M136 72.7L136.6 72M194.2 72L193.9 80M38.9 88L40 81.1M40 81.1L40.2 80M127 88L128 85.7M128 85.7L130.9 80M193.9 80L193.7 88M38.9 88L37.7 96M127 88L124.1 96M193.7 88L193.3 96M37.7 96L36.3 104M124.1 96L121.4 104M193.3 96L192.8 104M36.3 104L34.3 112M118.4 112L120 108M120 108L121.4 104M192.8 104L192.1 112M31 120L32 118M32 118L34.3 112M118.4 112L114 120M190.6 120L192 112.4M192 112.4L192.1 112M14.3 0L9.7 8M103 0L101.4 8M188.5 0L185.6 8M2.8 16L8 10.3M8 10.3L9.7 8M101.4 8L99.6 16M182.4 16L184 12.2M184 12.2L185.6 8M0 18.4L2.8 16M99.6 16L97 24M182.4 16L178.4 24M92.9 32L96 26.2M96 26.2L97 24M172.2 32L176 27.5M176 27.5L178.4 24M86.3 40L88 38.2M88 38.2L92.9 32M161.5 40L168 35.6M168 35.6L172.2 32M76.9 48L80 45.5M80 45.5L86.3 40M145.2 48L152 44.9M152 44.9L160 40.9M160 40.9L161.5 40M67.7 56L72 52M72 52L76.9 48M130.6 56L136 52.7M136 52.7L144 48.6M144 48.6L145.2 48M230 56L232 54.6M232 54.6L240 49M61.1 64L64 60M64 60L67.7 56M122.2 64L128 58.1M128 58.1L130.6 56M220.6 64L224 60.8M224 60.8L230 56M61.1 64L56.8 72M117.1 72L120 67.2M120 67.2L122.2 64M214.8 72L216 70M216 70L220.6 64M54.4 80L56 74.4M56 74.4L56.8 72M117.1 72L113.6 80M214.8 72L211.7 80M54.4 80L53.2 88M110.5 88L112 84.2M112 84.2L113.6 80M211.7 80L210.1 88M53.2 88L53 96M110.5 88L106.9 96M210.1 88L209.7 96M53 96L54 104M102.1 104L104 101.3M104 101.3L106.9 96M209.7 96L210.2 104M54 104L56 109.8M56 109.8L57.4 112M93.9 112L96 110.5M96 110.5L102.1 104M210.2 104L212 112M57.4 112L64 117.2M64 117.2L72 118.6M72 118.6L80 117.9M80 117.9L88 115.3M88 115.3L93.9 112M212 112L215.9 120"/><path class="gold" d="M37.7 0L35.1 8M79.5 8L80 6.8M80 6.8L81.9 0M214.6 0L211.7 8M238.2 0L236.9 8M35.1 8L32.3 16M79.5 8L74.9 16M211.7 8L211.1 16M236.9 8L233.3 16M29.1 24L32 16.7M32 16.7L32.3 16M67.4 24L72 19.7M72 19.7L74.9 16M211.1 16L215.4 24M221.6 24L224 23.8M224 23.8L232 17.7M232 17.7L233.3 16M22.2 32L24 30.3M24 30.3L29.1 24M56.5 32L64 26.8M64 26.8L67.4 24M215.4 24L216 24.4M216 24.4L221.6 24M6.9 40L8 39.5M8 39.5L16 35.8M16 35.8L22.2 32M45.4 40L48 37.9M48 37.9L56 32.4M56 32.4L56.5 32M0 42.9L6.9 40M45.4 40L40.1 48M37.3 56L40 48.2M40 48.2L40.1 48M37.3 56L35.7 64M35.7 64L34.5 72M149.6 72L152 70.4M152 70.4L160 67.2M160 67.2L168 65.8M168 65.8L176 67.3M176 67.3L180.7 72M34.5 72L33.4 80M140.9 80L144 76.5M144 76.5L149.6 72M180.7 72L183.8 80M33.4 80L32.1 88M135.9 88L136 87.8M136 87.8L140.9 80M183.8 80L184 81.1M184 81.1L184.6 88M30.4 96L32 88.6M32 88.6L32.1 88M135.9 88L133.1 96M184.6 88L184.5 96M30.4 96L28.1 104M133.1 96L131.3 104M183.5 104L184 100.4M184 100.4L184.5 96M28.1 104L24.4 112M131.3 104L130.1 112M183.5 104L181 112M17.8 120L24 112.6M24 112.6L24.4 112M130.1 112L129.6 120M181 112L176.6 120M21.8 0L17.9 8M94.8 8L96 2.9M96 2.9L96.6 0M195.6 0L192.7 8M12.5 16L16 11.1M16 11.1L17.9 8M94.8 8L92.2 16M190.1 16L192 10.1M192 10.1L192.7 8M4.2 24L8 20.8M8 20.8L12.5 16M92.2 16L88.4 24M190.1 16L187.3 24M0 26.9L4.2 24M82.5 32L88 24.7M88 24.7L88.4 24M183.1 32L184 30.6M184 30.6L187.3 24M74 40L80 34.6M80 34.6L82.5 32M175.9 40L176 39.9M176 39.9L183.1 32M237.4 40L240 37.8M64.5 48L72 41.6M72 41.6L74 40M162.2 48L168 45.1M168 45.1L175.9 40M225.8 48L232 44.1M232 44.1L237.4 40M57 56L64 48.4M64 48.4L64.5 48M145.2 56L152 52.7M152 52.7L160 49M160 49L162.2 48M214.6 56L216 54.9M216 54.9L224 49.3M224 49.3L225.8 48M52.2 64L56 57.4M56 57.4L57 56M133.6 64L136 62M136 62L144 56.7M144 56.7L145.2 56M214.6 56L208 64M52.2 64L49 72M126.7 72L128 70.2M128 70.2L133.6 64M204.6 72L208 64M208 64L208 64M47 80L48 75.8M48 75.8L49 72M126.7 72L122.2 80M204.6 72L202.8 80M47 80L45.8 88M118.8 88L120 85.1M120 85.1L122.2 80M202.8 80L201.9 88M45.8 88L45 96M118.8 88L115.7 96M201.9 88L201.4 96M45 96L44.6 104M115.7 96L112.2 104M201.4 96L201.4 104M44.6 104L44.6 112M107.3 112L112 104.4M112 104.4L112.2 104M201.4 104L201.8 112M44.6 112L45.3 120M98.7 120L104 115.8M104 115.8L107.3 112M201.8 112L202.8 120M6.3 0L0.6 8M109.4 0L108.2 8M181.6 0L178.6 8M0 8.6L0.6 8M108.2 8L107 16M174.8 16L176 13.8M176 13.8L178.6 8M107 16L105.8 24M174.8 16L169.5 24M105.8 24L104 32M160.8 32L168 25.7M168 25.7L169.5 24M101.3 40L104 32.1M104 32.1L104 32M145.5 40L152 37.1M152 37.1L160 32.5M160 32.5L160.8 32M94.4 48L96 46.5M96 46.5L101.3 40M124.9 48L128 46.8M128 46.8L136 43.7M136 43.7L144 40.7M144 40.7L145.5 40M82.4 56L88 52.3M88 52.3L94.4 48M113.4 56L120 50.7M120 50.7L124.9 48M72.2 64L80 57.5M80 57.5L82.4 56M108.9 64L112 58.2M112 58.2L113.4 56M235.3 64L240 60.8M66.6 72L72 64.2M72 64.2L72.2 64M108.9 64L106.3 72M226.5 72L232 66.5M232 66.5L235.3 64M63.2 80L64 77.7M64 77.7L66.6 72M106.3 72L104 80M221.6 80L224 75.6M224 75.6L226.5 72M63.2 80L62.2 88M100.6 88L104 80.1M104 80.1L104 80M221.6 80L219.4 88M62.2 88L63.1 96M100.6 88L96.4 96M219.4 88L219 96M63.1 96L64 98.3M64 98.3L68.8 104M87.6 104L88 103.8M88 103.8L96 96.5M96 96.5L96.4 96M219 96L220.5 104M68.8 104L72 106M72 106L80 106.5M80 106.5L87.6 104M220.5 104L224 111.2M224 111.2L224.7 112M224.7 112L232 117.5M232 117.5L240 119.9"/></svg>
         <div class="cat-titles">
-          <span class="cat-num">05 · <span data-da="Kort-plade" data-en="Plate">Plate</span></span>
-          <h2 data-da="Byg agenter og AI-apps" data-en="Build agents and AI apps">Byg agenter og AI-apps</h2>
-          <p class="cat-blurb" data-da="Rammeværk og rør til at sætte en model ind i dit eget produkt." data-en="Frameworks and plumbing for putting a model inside your own product.">Rammeværk og rør til at sætte en model ind i dit eget produkt.</p>
+          <span class="cat-num">05 · <span>Plate</span></span>
+          <h2>Build agents and AI apps</h2>
+          <p class="cat-blurb">Frameworks and plumbing for putting a model inside your own product.</p>
         </div>
       </div>
       <div class="router">
-        <p><b data-da="Brug den når" data-en="Reach for it when">Reach for it when</b> you are writing code that calls a model, uses tools, or has to keep state across steps.</p>
-        <p><b data-da="Beslutningsregel" data-en="Decision rule">Decision rule</b> Stateful multi-step agent: langgraph. Typed, validated outputs in Python: pydantic-ai. AI feature in a TypeScript or React app: vercel/ai. Many providers behind one API: litellm.</p>
+        <p><b>Reach for it when</b> you are writing code that calls a model, uses tools, or has to keep state across steps.</p>
+        <p><b>Decision rule</b> Stateful multi-step agent: langgraph. Typed, validated outputs in Python: pydantic-ai. AI feature in a TypeScript or React app: vercel/ai. Many providers behind one API: litellm.</p>
       </div>
       <div class="repos">
 <article class="repo" id="langchain-ai-langgraph" data-cat="build" data-pick="1" data-official="0" data-text="langchain-ai/langgraph low-level framework for stateful, long-running agents modelled as graphs, with persistence and human-in-the-loop steps. you are building a multi-step agent that needs state, branching, retries and checkpoints.  agents python orchestration build agents and ai apps you are writing code that calls a model, uses tools, or has to keep state across steps">
@@ -770,7 +765,7 @@
           <span class="badges"><span class="badge pick" title="Default choice for its niche">PICK</span></span>
         </div>
         <p class="what">Low-level framework for stateful, long-running agents modelled as graphs, with persistence and human-in-the-loop steps.</p>
-        <p class="use"><b data-da="Brug når" data-en="Use when">Use when</b> You are building a multi-step agent that needs state, branching, retries and checkpoints.</p>
+        <p class="use"><b>Use when</b> You are building a multi-step agent that needs state, branching, retries and checkpoints.</p>
         
         <div class="repo-foot">
           <span class="stats"><span class="stat stars" title="GitHub stars">★ 43k</span><span class="stat">Python</span><span class="stat">MIT</span><span class="stat active" title="Last push"><i></i>2026-10-15</span></span>
@@ -783,7 +778,7 @@
           <span class="badges"></span>
         </div>
         <p class="what">Type-safe Python agent framework from the Pydantic team: validated structured outputs and tools across model providers.</p>
-        <p class="use"><b data-da="Brug når" data-en="Use when">Use when</b> You want agents with typed, validated outputs and a small API.</p>
+        <p class="use"><b>Use when</b> You want agents with typed, validated outputs and a small API.</p>
         
         <div class="repo-foot">
           <span class="stats"><span class="stat stars" title="GitHub stars">★ 21k</span><span class="stat">Python</span><span class="stat">MIT</span><span class="stat active" title="Last push"><i></i>2026-10-15</span></span>
@@ -796,7 +791,7 @@
           <span class="badges"><span class="badge pick" title="Default choice for its niche">PICK</span></span>
         </div>
         <p class="what">The AI SDK for TypeScript: one API for text, structured output, tools and streaming UI across providers.</p>
-        <p class="use"><b data-da="Brug når" data-en="Use when">Use when</b> You are adding an AI feature to a TypeScript or React web app.</p>
+        <p class="use"><b>Use when</b> You are adding an AI feature to a TypeScript or React web app.</p>
         
         <div class="repo-foot">
           <span class="stats"><span class="stat stars" title="GitHub stars">★ 27k</span><span class="stat">TypeScript</span><span class="stat">Apache-2.0</span><span class="stat active" title="Last push"><i></i>2026-10-15</span></span>
@@ -809,7 +804,7 @@
           <span class="badges"></span>
         </div>
         <p class="what">One OpenAI-style interface, as SDK or proxy, to 100+ model providers, with fallbacks and spend tracking.</p>
-        <p class="use"><b data-da="Brug når" data-en="Use when">Use when</b> You want to swap or mix models without rewriting code.</p>
+        <p class="use"><b>Use when</b> You want to swap or mix models without rewriting code.</p>
         
         <div class="repo-foot">
           <span class="stats"><span class="stat stars" title="GitHub stars">★ 61k</span><span class="stat">Python</span><span class="stat">MIT + enterprise</span><span class="stat active" title="Last push"><i></i>2026-10-15</span></span>
@@ -822,14 +817,14 @@
       <div class="cat-head">
         <svg class="terrain mini" viewBox="0 0 240 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"><path class="ink" d="M0 35.5L8 35.1M8 35.1L16 34.9M16 34.9L24 34.9M24 34.9L32 35.5M32 35.5L40 37M40 37L48 40M48 40L48.1 40M48.1 40L56 45M56 45L59 48M59 48L64 54.1M64 54.1L65.2 56M65.2 56L68.9 64M68.9 64L70.3 72M70.3 72L69.2 80M69.2 80L64.9 88M238.6 88L240 87.6M56.4 96L64 88.9M64 88.9L64.9 88M218.1 96L224 93.4M224 93.4L232 90.2M232 90.2L238.6 88M43.2 104L48 101.2M48 101.2L56 96.3M56 96.3L56.4 96M205.3 104L208 102.1M208 102.1L216 97.1M216 97.1L218.1 96M25.3 112L32 109.1M32 109.1L40 105.5M40 105.5L43.2 104M198 112L200 109.6M200 109.6L205.3 104M3.1 120L8 118.3M8 118.3L16 115.4M16 115.4L24 112.5M24 112.5L25.3 112M198 112L195.3 120M158.2 16L160 15.6M160 15.6L168 14M168 14L176 12.7M176 12.7L184 11.9M184 11.9L192 11.6M192 11.6L200 12M200 12L208 13M208 13L216 15M216 15L218.7 16M136.3 24L144 20.8M144 20.8L152 17.9M152 17.9L158.2 16M218.7 16L224 18.7M224 18.7L231.8 24M125.3 32L128 29.8M128 29.8L136 24.2M136 24.2L136.3 24M231.8 24L232 24.2M232 24.2L237.6 32M125.3 32L120.3 40M237.6 32L239.1 40M119 48L120 41.5M120 41.5L120.3 40M239.1 40L236 48M119 48L120 54.3M120 54.3L120.3 56M227.7 56L232 52M232 52L236 48M120.3 56L123.5 64M213.7 64L216 62.8M216 62.8L224 58.2M224 58.2L227.7 56M123.5 64L128 71.7M128 71.7L128.2 72M194.3 72L200 69.8M200 69.8L208 66.5M208 66.5L213.7 64M128.2 72L136 79.4M136 79.4L137.4 80M168.3 80L176 78M176 78L184 75.5M184 75.5L192 72.8M192 72.8L194.3 72M137.4 80L144 82.6M144 82.6L152 82.9M152 82.9L160 81.8M160 81.8L168 80.1M168 80.1L168.3 80M99.5 112L104 110.9M104 110.9L112 109.8M112 109.8L120 109.7M120 109.7L127.7 112M69.3 120L72 119.1M72 119.1L80 116.7M80 116.7L88 114.5M88 114.5L96 112.6M96 112.6L99.5 112M127.7 112L128 112.1M128 112.1L136 117.1M136 117.1L138.5 120"/><path class="gold" d="M0 52.8L8 53.3M8 53.3L16 54.4M16 54.4L22.8 56M22.8 56L24 56.4M24 56.4L32 60.4M32 60.4L36.9 64M36.9 64L40 68.8M40 68.8L41.6 72M41.6 72L41.2 80M36 88L40 82M40 82L41.2 80M25.6 96L32 91.2M32 91.2L36 88M8.2 104L16 100.6M16 100.6L24 96.8M24 96.8L25.6 96M0 106.5L8 104.1M8 104.1L8.2 104M235 120L240 113.5M15.6 0L11.8 8M132.9 8L136 7.2M136 7.2L144 5.3M144 5.3L152 3.5M152 3.5L160 1.8M160 1.8L168 0.4M168 0.4L170.2 0M228.7 0L232 1M232 1L240 4.6M0 13.5L8 10.1M8 10.1L11.8 8M108.5 16L112 14.7M112 14.7L120 12M120 12L128 9.4M128 9.4L132.9 8M95.1 24L96 23.4M96 23.4L104 18.4M104 18.4L108.5 16M95.1 24L90 32M90 32L89.4 40M89.4 40L90.7 48M90.7 48L92.7 56M92.7 56L94.7 64M94.7 64L96 71.5M96 71.5L96.1 72M236 72L240 70.2M95.9 80L96 76.8M96 76.8L96.1 72M215.9 80L216 80M216 80L224 76.7M224 76.7L232 73.5M232 73.5L236 72M95.9 80L93.2 88M197.4 88L200 86.8M200 86.8L208 83.3M208 83.3L215.9 80M86 96L88 93.8M88 93.8L93.2 88M182.8 96L184 95.3M184 95.3L192 90.8M192 90.8L197.4 88M73.4 104L80 99.9M80 99.9L86 96M173.5 104L176 101.7M176 101.7L182.8 96M56.1 112L64 108.4M64 108.4L72 104.7M72 104.7L73.4 104M173.5 104L169.4 112M35.9 120L40 118.4M40 118.4L48 115.2M48 115.2L56 112M56 112L56.1 112M169.4 112L169 120M164 40L168 37.7M168 37.7L176 35M176 35L184 34.5M184 34.5L192 37.3M192 37.3L195.1 40M164 40L162.5 48M189.9 48L192 45.4M192 45.4L195.1 40M162.5 48L168 50.9M168 50.9L176 51.7M176 51.7L184 50.2M184 50.2L189.9 48"/></svg>
         <div class="cat-titles">
-          <span class="cat-num">06 · <span data-da="Kort-plade" data-en="Plate">Plate</span></span>
-          <h2 data-da="Automatisér og kør lokalt" data-en="Automate and run locally">Automatisér og kør lokalt</h2>
-          <p class="cat-blurb" data-da="Kør modeller på din egen maskine og sæt arbejde sammen, så det sker uden dig." data-en="Run models on your own machine and wire work together so it happens without you.">Kør modeller på din egen maskine og sæt arbejde sammen, så det sker uden dig.</p>
+          <span class="cat-num">06 · <span>Plate</span></span>
+          <h2>Automate and run locally</h2>
+          <p class="cat-blurb">Run models on your own machine and wire work together so it happens without you.</p>
         </div>
       </div>
       <div class="router">
-        <p><b data-da="Brug den når" data-en="Reach for it when">Reach for it when</b> the job should run on a schedule or trigger, offline, or on private data.</p>
-        <p><b data-da="Beslutningsregel" data-en="Decision rule">Decision rule</b> Triggers and glue between apps: n8n. A private or offline model: ollama. Transcribe audio: faster-whisper. Generate images or video in a repeatable pipeline: ComfyUI.</p>
+        <p><b>Reach for it when</b> the job should run on a schedule or trigger, offline, or on private data.</p>
+        <p><b>Decision rule</b> Triggers and glue between apps: n8n. A private or offline model: ollama. Transcribe audio: faster-whisper. Generate images or video in a repeatable pipeline: ComfyUI.</p>
       </div>
       <div class="repos">
 <article class="repo" id="n8n-io-n8n" data-cat="automate" data-pick="1" data-official="0" data-text="n8n-io/n8n workflow automation with hundreds of integrations, ai nodes and a visual editor, self-hostable. you want triggers, schedules and glue between apps without writing a service. fair-code licence, not osi open source. automation workflow self-host automate and run locally the job should run on a schedule or trigger, offline, or on private data">
@@ -838,8 +833,8 @@
           <span class="badges"><span class="badge pick" title="Default choice for its niche">PICK</span></span>
         </div>
         <p class="what">Workflow automation with hundreds of integrations, AI nodes and a visual editor, self-hostable.</p>
-        <p class="use"><b data-da="Brug når" data-en="Use when">Use when</b> You want triggers, schedules and glue between apps without writing a service.</p>
-        <p class="not"><b data-da="Ikke til" data-en="Not for">Not for</b> Fair-code licence, not OSI open source.</p>
+        <p class="use"><b>Use when</b> You want triggers, schedules and glue between apps without writing a service.</p>
+        <p class="not"><b>Not for</b> Fair-code licence, not OSI open source.</p>
         <div class="repo-foot">
           <span class="stats"><span class="stat stars" title="GitHub stars">★ 208k</span><span class="stat">TypeScript</span><span class="stat">Sustainable Use</span><span class="stat active" title="Last push"><i></i>2026-10-15</span></span>
           <span class="tags"><span class="tag-chip">automation</span><span class="tag-chip">workflow</span><span class="tag-chip">self-host</span></span>
@@ -851,7 +846,7 @@
           <span class="badges"><span class="badge pick" title="Default choice for its niche">PICK</span></span>
         </div>
         <p class="what">Run open language models locally with one command and an OpenAI-compatible API.</p>
-        <p class="use"><b data-da="Brug når" data-en="Use when">Use when</b> You need a private, offline or free-to-call model.</p>
+        <p class="use"><b>Use when</b> You need a private, offline or free-to-call model.</p>
         
         <div class="repo-foot">
           <span class="stats"><span class="stat stars" title="GitHub stars">★ 183k</span><span class="stat">Go</span><span class="stat">MIT</span><span class="stat active" title="Last push"><i></i>2026-10-15</span></span>
@@ -864,7 +859,7 @@
           <span class="badges"><span class="badge pick" title="Default choice for its niche">PICK</span></span>
         </div>
         <p class="what">Fast reimplementation of Whisper speech-to-text on CTranslate2.</p>
-        <p class="use"><b data-da="Brug når" data-en="Use when">Use when</b> You need accurate transcripts of recordings, locally.</p>
+        <p class="use"><b>Use when</b> You need accurate transcripts of recordings, locally.</p>
         
         <div class="repo-foot">
           <span class="stats"><span class="stat stars" title="GitHub stars">★ 26k</span><span class="stat">Python</span><span class="stat">MIT</span><span class="stat active" title="Last push"><i></i>2026-10-15</span></span>
@@ -877,7 +872,7 @@
           <span class="badges"></span>
         </div>
         <p class="what">Node-based engine for image, video and audio generation with a huge ecosystem of models and custom nodes.</p>
-        <p class="use"><b data-da="Brug når" data-en="Use when">Use when</b> You need repeatable, scriptable image or video generation pipelines.</p>
+        <p class="use"><b>Use when</b> You need repeatable, scriptable image or video generation pipelines.</p>
         
         <div class="repo-foot">
           <span class="stats"><span class="stat stars" title="GitHub stars">★ 138k</span><span class="stat">Python</span><span class="stat">GPL-3.0</span><span class="stat active" title="Last push"><i></i>2026-10-15</span></span>
@@ -890,14 +885,14 @@
       <div class="cat-head">
         <svg class="terrain mini" viewBox="0 0 240 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"><path class="ink" d="M60.7 0L64 6M64 6L65.3 8M176.4 0L181 8M235.6 0L238.4 8M65.3 8L70.3 16M181 8L184 12.9M184 12.9L186.4 16M238.4 8L240 13M0 22.6L7.7 24M70.3 16L72 18.7M72 18.7L76.9 24M186.4 16L192 23.1M192 23.1L192.9 24M7.7 24L8 24.1M8 24.1L16 25.6M16 25.6L24 27.1M24 27.1L32 28.7M32 28.7L40 30.5M40 30.5L45.4 32M76.9 24L80 27.1M80 27.1L88 31.6M88 31.6L88.9 32M192.9 24L200 30.6M200 30.6L201.9 32M45.4 32L48 32.7M48 32.7L56 35.4M56 35.4L64 39.5M64 39.5L64.7 40M88.9 32L96 35.3M96 35.3L104 38.1M104 38.1L110.1 40M201.9 32L208 36.2M208 36.2L215.4 40M64.7 40L72 46.2M72 46.2L73.3 48M110.1 40L112 40.6M112 40.6L120 43.5M120 43.5L128 46.2M128 46.2L132.8 48M215.4 40L216 40.3M216 40.3L224 43.4M224 43.4L232 45.5M232 45.5L240 45.6M73.3 48L78.8 56M132.8 48L136 49.3M136 49.3L144 53M144 53L149.6 56M78.8 56L80 57.8M80 57.8L83.4 64M149.6 56L152 57.5M152 57.5L160 63.5M160 63.5L160.6 64M83.4 64L87.4 72M160.6 64L167.7 72M87.4 72L88 73.2M88 73.2L91.3 80M167.7 72L168 72.4M168 72.4L172.4 80M91.3 80L94.9 88M172.4 80L175.3 88M94.9 88L96 90.5M96 90.5L98.6 96M175.3 88L176 92.3M176 92.3L176.6 96M98.6 96L102.1 104M175.9 104L176 103.4M176 103.4L176.6 96M102.1 104L104 109.1M104 109.1L105.5 112M175.9 104L172.3 112M105.5 112L108.8 120M163.6 120L168 116.7M168 116.7L172.3 112M86.9 0L88 1M88 1L96 6.9M96 6.9L97.9 8M153.5 0L153.7 8M97.9 8L104 11.6M104 11.6L112 15.3M112 15.3L113.9 16M151.2 16L152 14.5M152 14.5L153.7 8M113.9 16L120 18.2M120 18.2L128 20.2M128 20.2L136 21.1M136 21.1L144 20.4M144 20.4L151.2 16M2.9 80L8 78.1M8 78.1L16 75.5M16 75.5L24 74.2M24 74.2L32 75M32 75L40 78.7M40 78.7L41.6 80M0 80.9L2.9 80M41.6 80L48 86.9M48 86.9L48.7 88M48.7 88L52 96M52 96L53.8 104M53.8 104L54.3 112M54.3 112L54.5 120"/><path class="gold" d="M0 2.5L8 5.8M8 5.8L15.9 8M36.6 8L40 6M40 6L43 0M190.5 0L192 2M192 2L198.3 8M223.2 0L223.5 8M15.9 8L16 8M16 8L24 9.2M24 9.2L32 9.2M32 9.2L36.6 8M198.3 8L200 9.7M200 9.7L208 14.6M208 14.6L213.8 16M223.5 8L217.4 16M213.8 16L216 16.6M216 16.6L217.4 16M115.8 72L120 67.4M120 67.4L128 67.6M128 67.6L136 70.6M136 70.6L138.2 72M115.8 72L116.7 80M138.2 72L144 77.2M144 77.2L146.4 80M116.7 80L120 87.3M120 87.3L120.4 88M146.4 80L149.6 88M120.4 88L127.8 96M149.6 88L147.4 96M127.8 96L128 96.1M128 96.1L136 99.4M136 99.4L144 98.6M144 98.6L147.4 96M74 0L80 6.5M80 6.5L81.7 8M165 0L167.9 8M81.7 8L88 13.5M88 13.5L91.7 16M167.9 8L168 8.5M168 8.5L170.4 16M91.7 16L96 19M96 19L104 23.2M104 23.2L105.7 24M170.4 16L172.7 24M105.7 24L112 26.9M112 26.9L120 29.9M120 29.9L126.3 32M172.7 24L174.2 32M126.3 32L128 32.6M128 32.6L136 35M136 35L144 37.2M144 37.2L152 39.1M152 39.1L156.8 40M174.2 32L171.7 40M4.7 48L8 47M8 47L16 45.9M16 45.9L24 46.3M24 46.3L32 47.7M32 47.7L32.9 48M156.8 40L160 40.7M160 40.7L168 41.2M168 41.2L171.7 40M0 49.9L4.7 48M32.9 48L40 50.5M40 50.5L48 54.5M48 54.5L50.3 56M50.3 56L56 60.4M56 60.4L59.7 64M196.3 64L200 61.6M200 61.6L208 62.2M208 62.2L214.7 64M59.7 64L64 68.9M64 68.9L66.3 72M196.3 64L195.1 72M214.7 64L216 64.4M216 64.4L224 67.7M224 67.7L232 71.9M232 71.9L232.2 72M66.3 72L71.3 80M195.1 72L196 80M232.2 72L240 77.8M71.3 80L72 81.5M72 81.5L74.9 88M196 80L197 88M74.9 88L77.6 96M197 88L197.7 96M77.6 96L79.1 104M197.7 96L197.8 104M79.1 104L79.2 112M197.8 104L196.7 112M79.2 112L77.9 120M196.7 112L193.4 120M102.8 0L104 0.7M104 0.7L112 4.1M112 4.1L120 6.2M120 6.2L128 6.5M128 6.5L136 3.3M136 3.3L138.5 0M0 104.2L8 104.9M8 104.9L16 107.1M16 107.1L24 112M24 112L24 112M24 112L31.1 120"/></svg>
         <div class="cat-titles">
-          <span class="cat-num">07 · <span data-da="Kort-plade" data-en="Plate">Plate</span></span>
-          <h2 data-da="Terminal-superkræfter" data-en="Terminal superpowers">Terminal-superkræfter</h2>
-          <p class="cat-blurb" data-da="Små, skarpe kommandolinjeværktøjer som både agenter og mennesker læner sig op ad hver dag." data-en="Small, sharp command-line tools that agents and humans both lean on every day.">Små, skarpe kommandolinjeværktøjer som både agenter og mennesker læner sig op ad hver dag.</p>
+          <span class="cat-num">07 · <span>Plate</span></span>
+          <h2>Terminal superpowers</h2>
+          <p class="cat-blurb">Small, sharp command-line tools that agents and humans both lean on every day.</p>
         </div>
       </div>
       <div class="router">
-        <p><b data-da="Brug den når" data-en="Reach for it when">Reach for it when</b> you are searching, reshaping or converting things at the command line.</p>
-        <p><b data-da="Beslutningsregel" data-en="Decision rule">Decision rule</b> Find text in files: ripgrep. Run a Python script with its dependencies: uv. Reshape JSON: jq. Convert or cut audio and video: ffmpeg.</p>
+        <p><b>Reach for it when</b> you are searching, reshaping or converting things at the command line.</p>
+        <p><b>Decision rule</b> Find text in files: ripgrep. Run a Python script with its dependencies: uv. Reshape JSON: jq. Convert or cut audio and video: ffmpeg.</p>
       </div>
       <div class="repos">
 <article class="repo" id="burntsushi-ripgrep" data-cat="terminal" data-pick="1" data-official="0" data-text="burntsushi/ripgrep very fast recursive text search that respects .gitignore. searching a large codebase or a folder of logs.  search cli rust terminal superpowers you are searching, reshaping or converting things at the command line">
@@ -906,7 +901,7 @@
           <span class="badges"><span class="badge pick" title="Default choice for its niche">PICK</span></span>
         </div>
         <p class="what">Very fast recursive text search that respects .gitignore.</p>
-        <p class="use"><b data-da="Brug når" data-en="Use when">Use when</b> Searching a large codebase or a folder of logs.</p>
+        <p class="use"><b>Use when</b> Searching a large codebase or a folder of logs.</p>
         
         <div class="repo-foot">
           <span class="stats"><span class="stat stars" title="GitHub stars">★ 69k</span><span class="stat">Rust</span><span class="stat">Unlicense</span><span class="stat active" title="Last push"><i></i>2026-08-04</span></span>
@@ -919,7 +914,7 @@
           <span class="badges"><span class="badge pick" title="Default choice for its niche">PICK</span></span>
         </div>
         <p class="what">Extremely fast Python package and project manager that also runs single-file scripts with inline dependencies.</p>
-        <p class="use"><b data-da="Brug når" data-en="Use when">Use when</b> Running or sharing Python scripts without setting up an environment first.</p>
+        <p class="use"><b>Use when</b> Running or sharing Python scripts without setting up an environment first.</p>
         
         <div class="repo-foot">
           <span class="stats"><span class="stat stars" title="GitHub stars">★ 91k</span><span class="stat">Rust</span><span class="stat">Apache-2.0</span><span class="stat active" title="Last push"><i></i>2026-10-15</span></span>
@@ -932,7 +927,7 @@
           <span class="badges"></span>
         </div>
         <p class="what">Command-line JSON processor for filtering, reshaping and extracting data.</p>
-        <p class="use"><b data-da="Brug når" data-en="Use when">Use when</b> Taming API responses and JSON logs.</p>
+        <p class="use"><b>Use when</b> Taming API responses and JSON logs.</p>
         
         <div class="repo-foot">
           <span class="stats"><span class="stat stars" title="GitHub stars">★ 36k</span><span class="stat">C</span><span class="stat">MIT</span><span class="stat active" title="Last push"><i></i>2026-10-13</span></span>
@@ -945,7 +940,7 @@
           <span class="badges"><span class="badge pick" title="Default choice for its niche">PICK</span></span>
         </div>
         <p class="what">The complete toolkit for converting, trimming, merging and processing audio and video.</p>
-        <p class="use"><b data-da="Brug når" data-en="Use when">Use when</b> Any media conversion, extraction or editing task.</p>
+        <p class="use"><b>Use when</b> Any media conversion, extraction or editing task.</p>
         
         <div class="repo-foot">
           <span class="stats"><span class="stat stars" title="GitHub stars">★ 65k</span><span class="stat">C</span><span class="stat">LGPL / GPL</span><span class="stat active" title="Last push"><i></i>2026-10-15</span></span>
@@ -954,16 +949,15 @@
       </article>
       </div>
     </section>
-      <p class="empty" id="empty" hidden data-da="Ingen match. Prøv færre eller andre ord." data-en="No matches. Try fewer or different words.">Ingen match. Prøv færre eller andre ord.</p>
+      <p class="empty" id="empty" hidden>No matches. Try fewer or different words.</p>
     </div>
   </div>
 </main>
 
 <footer>
   <div class="wrap">
-    <p data-da="Stjerner og datoer er et øjebliksbillede fra 2026-10-15. Beskrivelser af repos er på engelsk. Altid tjek repoet selv, før du stoler på det."
-       data-en="Stars and dates are a snapshot from 2026-10-15. Repo descriptions are in English. Always check the repo yourself before you trust it.">Stjerner og datoer er et øjebliksbillede fra 2026-10-15. Beskrivelser af repos er på engelsk. Altid tjek repoet selv, før du stoler på det.</p>
-    <p><span class="dot"></span><span data-da="aktivt (skubbet inden for 120 dage)" data-en="active (pushed within 120 days)">aktivt (skubbet inden for 120 dage)</span><span class="dot q"></span><span data-da="roligt" data-en="quiet">roligt</span></p>
+    <p>Stars and dates are a snapshot from 2026-10-15. Repo descriptions are in English. Always check the repo yourself before you trust it.</p>
+    <p><span class="dot"></span><span>active (pushed within 120 days)</span><span class="dot q"></span><span>quiet</span></p>
     <p>© <span id="year"></span> Oskar Matras</p>
   </div>
 </footer>
@@ -1003,7 +997,6 @@
     var STOP = 'a an the to of for and or i my me how do does with in on it is that this want need into from can you get make use using some any'.split(' ');
     var pick = false, off = false;
 
-    function lang(){ return (window.I18N && window.I18N.lang) || document.documentElement.lang || 'da'; }
     function stem(w){ return w.length > 4 ? w.replace(/(ing|ers|er|ed|es|s|e)$/, '') : w; }
 
     function apply(){
@@ -1027,8 +1020,7 @@
         sec.hidden = n === 0;
         if(plates[sec.id]) plates[sec.id].classList.toggle('is-empty', n === 0);
       });
-      var da = lang() === 'da';
-      count.textContent = (da ? 'Viser ' : 'Showing ') + shown + (da ? ' af ' : ' of ') + repos.length;
+      count.textContent = 'Showing ' + shown + ' of ' + repos.length;
       empty.hidden = shown !== 0;
       try{
         var u = new URL(location.href);
@@ -1068,7 +1060,6 @@
       var a = e.target.closest && e.target.closest('.plate');
       if(a && (q.value || pick || off)) reset();
     });
-    document.addEventListener('langchange', apply);
 
     try{
       var init = new URL(location.href).searchParams.get('q');
@@ -1083,9 +1074,8 @@
     if(!b) return;
     var text = b.getAttribute('data-copy');
     function done(){
-      var da = (window.I18N && window.I18N.lang || 'da') === 'da';
       var old = b.textContent;
-      b.textContent = da ? 'Kopieret' : 'Copied';
+      b.textContent = 'Copied';
       setTimeout(function(){ b.textContent = old; }, 1400);
     }
     if(navigator.clipboard && navigator.clipboard.writeText){
@@ -1212,6 +1202,5 @@
   })();
 </script>
 
-<script src="/i18n.js" defer></script>
 </body>
 </html>
