@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-da="Repo Atlas · Oskar Matras" data-en="Repo Atlas · Oskar Matras">Repo Atlas · Oskar Matras</title>
+<meta name="description" content="Et håndplukket bibliotek af open source-repos ordnet efter opgave, skrevet til mennesker og AI-modeller." data-da-content="Et håndplukket bibliotek af open source-repos ordnet efter opgave, skrevet til mennesker og AI-modeller." data-en-content="A hand-picked library of open-source repositories indexed by task, written for people and AI models.">
+<link rel="canonical" href="@BASE@/">
+<link rel="alternate" type="text/plain" href="llms.txt" title="llms.txt">
+<link rel="alternate" type="text/markdown" href="atlas.md" title="atlas.md">
+<link rel="alternate" type="application/json" href="atlas.json" title="atlas.json">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  /* ============================================================
+     Repo Atlas.
+
+     Same palette, type and header as the rest of the site. The idea
+     is a map of tools: every category is a "plate" with its own
+     frozen contour terrain, and the page behind it keeps drifting
+     like the Projects index.
+
+     This file is generated from tools/repo-atlas/template.html.
+     Edit the template or atlas.txt, not this output.
+     ============================================================ */
+  :root{
+    --navy:#0b2540; --navy-deep:#071a2e; --teal:#14547a;
+    --foam:#f4efe4; --cream:#faf6ee; --gold:#c99a4b;
+    --ink:#16232f; --ink-soft:rgba(22,35,47,0.68);
+    --line:rgba(11,37,64,0.12);
+    --live:#2f8f6b;
+    --serif:'Fraunces', Georgia, serif;
+    --sans:'Inter', system-ui, -apple-system, sans-serif;
+    --mono:'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+    --maxw:1120px;
+    --hh:64px;
+  }
+  *{box-sizing:border-box;}
+  [hidden]{display:none !important;}
+  html{scroll-behavior:smooth; overflow-x:hidden; width:100%; scroll-padding-top:140px;}
+  body{margin:0; background:var(--cream); color:var(--ink); font-family:var(--sans);
+       font-weight:400; line-height:1.6; -webkit-font-smoothing:antialiased;
+       overflow-x:clip; width:100%;}
+  h1,h2,h3{font-family:var(--serif); font-weight:600; letter-spacing:-0.01em; margin:0;}
+  a{color:inherit;}
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 28px;}
+
+  #contour-bg{position:fixed; inset:0; z-index:0; pointer-events:none; background:var(--cream);}
+  @media (prefers-reduced-motion: reduce){ #contour-bg{opacity:0.6;} }
+  main, header.site, footer{position:relative; z-index:2;}
+
+  /* ---------------- Header, identical to the Projects index ---------------- */
+  header.site{position:sticky; top:0; z-index:60; backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px); background:rgba(250,246,238,0.78);
+    border-bottom:1px solid var(--line);}
+  header.site .wrap{display:flex; align-items:center; justify-content:space-between;
+    padding:18px 28px; gap:16px; flex-wrap:wrap;}
+  .nav-lang{flex:none; margin-left:auto; order:1; font-size:0.92rem;}
+  @media (max-width:760px){ .nav-toggle{order:2; margin-left:10px;} }
+  @media (min-width:761px){
+    .nav-lang{order:3; margin-left:0; font-size:0.82rem;}
+    header.site nav.main{gap:18px;}
+  }
+  .brand{font-family:var(--serif); font-weight:600; font-size:1.05rem; text-decoration:none;
+    letter-spacing:-0.01em; flex-shrink:0;}
+  nav.main{display:flex; gap:26px; overflow-x:auto; -webkit-overflow-scrolling:touch;
+    scrollbar-width:none; min-width:0;}
+  nav.main::-webkit-scrollbar{display:none;}
+  nav.main a{position:relative; text-decoration:none; font-size:0.76rem; letter-spacing:0.07em;
+    text-transform:uppercase; color:var(--ink-soft); padding-bottom:5px;
+    transition:color .25s ease; white-space:nowrap; flex-shrink:0;}
+  nav.main a::after{content:''; position:absolute; left:0; right:0; bottom:0; height:1px;
+    background:var(--navy); transform:scaleX(0); transform-origin:right; transition:transform .3s ease;}
+  nav.main a:hover{color:var(--navy);}
+  nav.main a:hover::after{transform-origin:left; transform:scaleX(1);}
+  nav.main a.current{color:var(--navy);}
+  nav.main a.current::after{transform:scaleX(1);}
+  .nav-toggle{display:none; align-items:center; justify-content:center; width:38px; height:38px;
+    margin-left:auto; background:none; border:none; padding:0; color:var(--navy); cursor:pointer;}
+  .nav-toggle svg{width:22px; height:22px;}
+  @media (max-width:640px){
+    header.site .wrap{padding:14px 18px; gap:12px;}
+    .brand{font-size:0.95rem;}
+    .nav-toggle{display:inline-flex;}
+    nav.main{display:none; flex-basis:100%; flex-direction:column; gap:0; overflow:visible; padding-top:6px;}
+    nav.main.open{display:flex;}
+    nav.main a{padding:11px 2px; font-size:0.8rem; border-top:1px solid var(--line);}
+    nav.main a::after{display:none;}
+  }
+
+  /* ---------------- Hero ---------------- */
+  .hero{padding:76px 0 30px;}
+  .crumb{display:inline-flex; align-items:center; gap:8px; font-size:0.8rem; color:var(--ink-soft);
+    text-decoration:none; margin-bottom:26px;}
+  .crumb:hover{color:var(--navy);}
+  .eyebrow{display:block; font-size:0.8rem; letter-spacing:0.08em; text-transform:uppercase;
+    color:var(--gold); font-weight:600; margin-bottom:14px;}
+  .hero h1{font-size:clamp(2.8rem, 8vw, 5.4rem); line-height:0.98; letter-spacing:-0.025em;}
+  .hero h1 em{font-style:italic; color:var(--gold); font-weight:500;}
+  .hero p.lead{max-width:60ch; margin:22px 0 0; font-size:1.08rem; color:var(--ink-soft);}
+  .stats{display:flex; flex-wrap:wrap; gap:10px 36px; margin-top:34px; padding-top:22px;
+    border-top:1px solid var(--line);}
+  .stats div{display:flex; flex-direction:column; gap:2px;}
+  .stats b{font-family:var(--serif); font-size:2rem; font-weight:600; line-height:1; color:var(--navy);}
+  .stats span{font-family:var(--mono); font-size:0.68rem; letter-spacing:0.09em;
+    text-transform:uppercase; color:var(--ink-soft);}
+
+  /* ---------------- Search toolbar ---------------- */
+  .toolbar{position:sticky; top:var(--hh); z-index:40; padding:12px 0;
+    background:rgba(250,246,238,0.82); backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px); border-bottom:1px solid var(--line);}
+  .tb-in{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .search{position:relative; flex:1 1 320px; min-width:0;}
+  .search svg{position:absolute; left:15px; top:50%; width:18px; height:18px; transform:translateY(-50%);
+    color:var(--ink-soft); pointer-events:none;}
+  .search input{width:100%; font:inherit; font-size:0.96rem; color:var(--ink); padding:12px 44px 12px 44px;
+    background:#fff; border:1px solid var(--line); border-radius:999px; outline:none;
+    transition:border-color .2s ease, box-shadow .2s ease;}
+  .search input::placeholder{color:rgba(22,35,47,0.45);}
+  .search input:focus{border-color:var(--gold); box-shadow:0 0 0 4px rgba(201,154,75,0.2);}
+  .search kbd{position:absolute; right:14px; top:50%; transform:translateY(-50%); font-family:var(--mono);
+    font-size:0.7rem; color:var(--ink-soft); border:1px solid var(--line); border-radius:6px;
+    padding:1px 7px; background:var(--cream); pointer-events:none;}
+  .toggle{font:inherit; font-size:0.82rem; font-weight:500; color:var(--navy); cursor:pointer;
+    padding:10px 15px; border-radius:999px; border:1px solid var(--line); background:#fff;
+    transition:background .2s ease, color .2s ease, border-color .2s ease; white-space:nowrap;}
+  .toggle:hover{border-color:var(--gold);}
+  .toggle[aria-pressed="true"]{background:var(--navy); color:var(--foam); border-color:var(--navy);}
+  .count{font-family:var(--mono); font-size:0.72rem; color:var(--ink-soft); letter-spacing:0.04em;
+    margin-left:auto; white-space:nowrap;}
+
+  /* ---------------- For AI panel ---------------- */
+  .ai{margin:44px 0 0; position:relative; overflow:hidden; border-radius:22px; color:#e8eefa;
+    background:radial-gradient(120% 140% at 0% 0%, #12365a 0%, var(--navy-deep) 55%, #050f1b 100%);
+    border:1px solid rgba(232,238,250,0.12); box-shadow:0 30px 60px rgba(7,26,46,0.28);}
+  .ai::before{content:''; position:absolute; inset:0; pointer-events:none; opacity:.5;
+    background:radial-gradient(500px circle at 92% 8%, rgba(201,154,75,0.28), transparent 60%);}
+  .ai-in{position:relative; display:grid; grid-template-columns:1.05fr 1fr; gap:38px; padding:38px 40px;}
+  .ai .tag{font-family:var(--mono); font-size:0.7rem; color:var(--gold); letter-spacing:0.12em;
+    text-transform:uppercase;}
+  .ai h2{font-size:1.8rem; margin-top:10px; color:var(--foam);}
+  .ai p{color:rgba(232,238,250,0.74); font-size:0.97rem; margin:12px 0 0;}
+  .steps{list-style:none; margin:20px 0 0; padding:0; display:grid; gap:11px; counter-reset:s;}
+  .steps li{counter-increment:s; display:flex; gap:12px; font-size:0.93rem; color:rgba(232,238,250,0.9);}
+  .steps li::before{content:counter(s); flex:none; width:24px; height:24px; border-radius:50%;
+    display:grid; place-items:center; font-family:var(--mono); font-size:0.72rem; color:var(--navy-deep);
+    background:var(--gold); font-weight:600; margin-top:1px;}
+  .eps{display:grid; gap:10px; align-content:start;}
+  .ep{display:grid; grid-template-columns:1fr auto auto; gap:6px 10px; align-items:center;
+    padding:13px 14px 13px 16px; border-radius:14px; background:rgba(8,13,22,0.5);
+    border:1px solid rgba(232,238,250,0.12);}
+  .ep code{font-family:var(--mono); font-size:0.88rem; color:var(--foam);}
+  .ep .d{grid-column:1 / -1; font-size:0.8rem; color:rgba(232,238,250,0.6); margin-top:-2px;}
+  .mini{font:inherit; font-family:var(--mono); font-size:0.7rem; letter-spacing:0.05em; text-transform:uppercase;
+    color:var(--foam); text-decoration:none; background:rgba(232,238,250,0.08); cursor:pointer;
+    border:1px solid rgba(232,238,250,0.18); border-radius:8px; padding:5px 10px;
+    transition:background .2s ease, border-color .2s ease;}
+  .mini:hover{background:rgba(201,154,75,0.22); border-color:var(--gold);}
+  .snippet{margin-top:4px; padding:14px 16px; border-radius:14px; background:rgba(8,13,22,0.5);
+    border:1px dashed rgba(201,154,75,0.5);}
+  .snippet small{display:block; font-family:var(--mono); font-size:0.66rem; letter-spacing:0.08em;
+    text-transform:uppercase; color:var(--gold); margin-bottom:7px;}
+  .snippet code{display:block; font-family:var(--mono); font-size:0.78rem; line-height:1.55;
+    color:rgba(232,238,250,0.88); margin-bottom:10px; word-break:break-word;}
+
+  /* ---------------- Plates (the map) ---------------- */
+  .map{padding:56px 0 8px;}
+  .sec-title{display:flex; align-items:baseline; justify-content:space-between; gap:14px; flex-wrap:wrap;
+    margin-bottom:20px;}
+  .sec-title h2{font-size:1.7rem;}
+  .sec-title span{font-size:0.9rem; color:var(--ink-soft);}
+  .plates{display:grid; grid-template-columns:repeat(auto-fill, minmax(250px, 1fr)); gap:20px;}
+  .terrain{display:block; width:100%; height:auto; aspect-ratio:2 / 1; background:var(--navy-deep);}
+  .terrain path{fill:none; stroke-width:.9; vector-effect:non-scaling-stroke;}
+  .terrain .ink{stroke:rgba(150,185,230,0.3);}
+  .terrain .gold{stroke:rgba(201,154,75,0.85); stroke-width:1.2;}
+  .plate{position:relative; display:flex; flex-direction:column; text-decoration:none; color:inherit;
+    background:rgba(250,246,238,0.72); border:1px solid var(--line); border-radius:16px; overflow:hidden;
+    transition:transform .35s cubic-bezier(.2,.7,.3,1), box-shadow .35s ease, opacity .25s ease;}
+  .plate::before{content:''; position:absolute; inset:0; border-radius:inherit; padding:2.5px; z-index:3;
+    background:radial-gradient(260px circle at var(--mx,50%) var(--my,50%), var(--gold) 0%, rgba(201,154,75,.5) 40%, rgba(201,154,75,0) 74%);
+    -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude; opacity:0; transition:opacity .35s ease; pointer-events:none;}
+  .plate:hover{transform:translateY(-4px); box-shadow:0 22px 44px rgba(11,37,64,0.18), 0 0 40px rgba(201,154,75,0.24);}
+  .plate:hover::before{opacity:1;}
+  .plate:focus-visible{outline:2px solid var(--gold); outline-offset:3px;}
+  .plate .terrain{transition:transform .6s cubic-bezier(.2,.7,.3,1);}
+  .plate:hover .terrain{transform:scale(1.06);}
+  .plate-num{position:absolute; left:12px; top:10px; z-index:2; font-family:var(--mono); font-size:0.66rem;
+    letter-spacing:0.1em; color:rgba(240,243,249,0.82); background:rgba(8,13,22,0.6);
+    border:1px solid rgba(232,238,250,0.16); border-radius:999px; padding:3px 9px;}
+  .plate-body{display:flex; flex-direction:column; gap:5px; padding:16px 18px 20px;}
+  .plate-count{font-family:var(--mono); font-size:0.66rem; letter-spacing:0.09em; text-transform:uppercase; color:var(--gold); font-weight:500;}
+  .plate-title{font-family:var(--serif); font-size:1.18rem; font-weight:600; line-height:1.2;}
+  .plate-when{font-size:0.84rem; color:var(--ink-soft); line-height:1.5;
+    display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;}
+  .plate.is-empty{opacity:.38;}
+
+  /* ---------------- Categories ---------------- */
+  .catalog{padding:28px 0 90px;}
+  .cat{padding-top:54px;}
+  .cat-head{display:flex; gap:24px; align-items:center;}
+  .terrain.mini{width:170px; flex:none; border-radius:14px; border:1px solid rgba(11,37,64,0.3);}
+  .cat-num{font-family:var(--mono); font-size:0.7rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--gold); font-weight:500;}
+  .cat h2{font-size:clamp(1.7rem, 3.6vw, 2.3rem); line-height:1.1; margin-top:4px;}
+  .cat-blurb{margin:8px 0 0; color:var(--ink-soft); max-width:62ch;}
+  .router{margin-top:22px; padding:16px 20px; border-left:3px solid var(--gold); border-radius:0 12px 12px 0;
+    background:rgba(255,255,255,0.62); display:grid; gap:7px; font-size:0.92rem;}
+  .router p{margin:0;}
+  .router b{font-family:var(--mono); font-size:0.66rem; letter-spacing:0.09em; text-transform:uppercase;
+    color:var(--navy); margin-right:8px; font-weight:500;}
+  .repos{display:grid; grid-template-columns:repeat(auto-fill, minmax(330px, 1fr)); gap:20px; margin-top:22px;}
+
+  .repo{position:relative; display:flex; flex-direction:column; gap:10px; padding:22px 22px 18px;
+    background:rgba(250,246,238,0.78); backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px);
+    border:1px solid var(--line); border-radius:16px;
+    transition:transform .3s cubic-bezier(.2,.7,.3,1), box-shadow .3s ease, border-color .3s ease;}
+  .repo:hover{transform:translateY(-3px); border-color:rgba(201,154,75,0.7);
+    box-shadow:0 20px 40px rgba(11,37,64,0.14), 0 0 34px rgba(201,154,75,0.18);}
+  .repo-head{display:flex; align-items:flex-start; justify-content:space-between; gap:10px;}
+  .repo-name{font-family:var(--serif); font-size:1.18rem; font-weight:600; text-decoration:none;
+    word-break:break-word; line-height:1.25;}
+  .repo-name{display:flex; flex-direction:column; gap:1px;}
+  .repo-name .owner{display:block; font-family:var(--mono); font-size:0.68rem; letter-spacing:0.02em; color:var(--ink-soft); font-weight:400;}
+  .repo-name .nm::after{content:' ↗'; font-family:var(--sans); font-size:0.8em; color:var(--gold);
+    opacity:0; transition:opacity .2s ease;}
+  .repo:hover .repo-name .nm::after{opacity:1;}
+  .badges{display:flex; gap:5px; flex:none;}
+  .badge{font-family:var(--mono); font-size:0.58rem; letter-spacing:0.1em; padding:3px 7px; border-radius:999px;
+    font-weight:500; white-space:nowrap;}
+  .badge.pick{background:var(--gold); color:#2a1d05;}
+  .badge.official{border:1px solid var(--navy); color:var(--navy);}
+  .repo p{margin:0; font-size:0.92rem;}
+  .repo .what{color:var(--ink);}
+  .repo .use, .repo .not{color:var(--ink-soft); font-size:0.87rem;}
+  .repo p b{font-family:var(--mono); font-size:0.62rem; letter-spacing:0.08em; text-transform:uppercase;
+    color:var(--navy); margin-right:6px; font-weight:500;}
+  .repo .not b{color:#8a4a1f;}
+  .repo-foot{margin-top:auto; padding-top:12px; border-top:1px dashed var(--line); display:grid; gap:9px;}
+  .repo .stats{display:flex; flex-wrap:wrap; gap:4px 12px; margin:0; padding:0; border:0;}
+  .stat{font-family:var(--mono); font-size:0.7rem; color:var(--ink-soft); display:inline-flex; align-items:center; gap:5px;}
+  .stat.stars{color:var(--navy); font-weight:500;}
+  .stat i{width:7px; height:7px; border-radius:50%; background:var(--live); display:inline-block;}
+  .stat.quiet i{background:var(--gold);}
+  .stat.archived i{background:#9aa3ab;}
+  .tags{display:flex; flex-wrap:wrap; gap:5px;}
+  .tag-chip{font-size:0.7rem; color:var(--ink-soft); background:rgba(11,37,64,0.06); border-radius:6px; padding:2px 8px;}
+
+  .empty{margin:60px 0; text-align:center; color:var(--ink-soft); font-family:var(--serif); font-size:1.2rem;}
+
+  footer{padding:36px 0 60px; text-align:center; font-size:0.85rem; color:var(--ink-soft);
+    border-top:1px solid var(--line); background:rgba(250,246,238,0.55);}
+  footer p{margin:6px auto; max-width:68ch;}
+  footer .dot{display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--live); margin:0 4px 1px 10px;}
+  footer .dot.q{background:var(--gold);}
+
+  @media (max-width:860px){
+    .ai-in{grid-template-columns:1fr; padding:28px 24px; gap:26px;}
+  }
+  @media (max-width:640px){
+    .wrap{padding:0 18px;}
+    .hero{padding:48px 0 24px;}
+    .repos{grid-template-columns:1fr;}
+    .plates{grid-template-columns:1fr 1fr; gap:12px;}
+    .plate-body{padding:12px 13px 15px;}
+    .plate-when{display:none;}
+    .plate-title{font-size:1rem;}
+    .cat-head{flex-direction:column; align-items:flex-start; gap:14px;}
+    .terrain.mini{width:140px;}
+    .count{margin-left:0; width:100%;}
+    html{scroll-padding-top:90px;}
+    .toolbar{position:static;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .plate, .repo, .plate .terrain{transition:none;}
+    .plate:hover, .repo:hover{transform:none;}
+  }
+</style>
+</head>
+<body>
+
+<canvas id="contour-bg" aria-hidden="true"></canvas>
+
+<header class="site" id="site-header">
+  <div class="wrap">
+    <a class="brand" href="/">Oskar Matras</a>
+    <span class="nav-lang" data-lang-switch></span>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Åbn menu" data-da-aria-label="Åbn menu" data-en-aria-label="Open menu" aria-expanded="false" aria-controls="main-nav">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    </button>
+    <nav class="main" id="main-nav">
+      <a href="/#om" data-da="Om" data-en="About">Om</a>
+      <a href="/#erfaring" data-da="Erfaring" data-en="Experience">Erfaring</a>
+      <a href="/#praktik" data-da="Praktik" data-en="Placements">Praktik</a>
+      <a href="/#uddannelse" data-da="Uddannelse" data-en="Education">Uddannelse</a>
+      <a href="/#kompetencer" data-da="Kompetencer" data-en="Skills">Kompetencer</a>
+      <a href="/Projects" class="current" data-da="Projekter" data-en="Projects">Projekter</a>
+      <a href="/#kontakt" data-da="Kontakt" data-en="Contact">Kontakt</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <a class="crumb" href="/Projects"><span aria-hidden="true">←</span> <span data-da="Alle projekter" data-en="All projects">Alle projekter</span></a>
+      <span class="eyebrow" data-da="Et bibliotek over værktøjer" data-en="A library of tools">Et bibliotek over værktøjer</span>
+      <h1>Repo <em>Atlas</em></h1>
+      <p class="lead" data-da="Et lille, håndplukket kort over open source-repos på GitHub, ordnet efter hvad de hjælper dig med at få gjort. Kun værktøjer der lader dig gøre noget, du ikke kunne før."
+         data-en="A small, hand-picked map of open-source repositories on GitHub, organised by the job they help you finish. Only tools that let you do something you could not do before.">Et lille, håndplukket kort over open source-repos på GitHub, ordnet efter hvad de hjælper dig med at få gjort. Kun værktøjer der lader dig gøre noget, du ikke kunne før.</p>
+      <div class="stats">
+        <div><b>@TOTAL@</b><span data-da="Repos" data-en="Repos">Repos</span></div>
+        <div><b>@CATS@</b><span data-da="Plader" data-en="Plates">Plader</span></div>
+        <div><b>@PICKS@</b><span data-da="Standardvalg" data-en="Default picks">Standardvalg</span></div>
+        <div><b>@DATE@</b><span data-da="Senest tjekket" data-en="Last verified">Senest tjekket</span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="toolbar" id="toolbar">
+    <div class="wrap tb-in">
+      <label class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.5" y2="16.5"></line></svg>
+        <input id="q" type="search" autocomplete="off" spellcheck="false"
+               aria-label="Search the atlas" data-da-aria-label="Søg i atlasset" data-en-aria-label="Search the atlas"
+               placeholder="Beskriv opgaven: fx scrape en hjemmeside, læs en PDF…"
+               data-da-placeholder="Beskriv opgaven: fx scrape en hjemmeside, læs en PDF…"
+               data-en-placeholder="Describe the task: e.g. scrape a website, read a PDF…">
+        <kbd aria-hidden="true">/</kbd>
+      </label>
+      <button class="toggle" id="f-pick" type="button" aria-pressed="false">★ <span data-da="Kun standardvalg" data-en="Picks only">Kun standardvalg</span></button>
+      <button class="toggle" id="f-official" type="button" aria-pressed="false"><span data-da="Kun officielle" data-en="Official only">Kun officielle</span></button>
+      <span class="count" id="count" aria-live="polite"></span>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <section class="ai" aria-labelledby="ai-h">
+      <div class="ai-in">
+        <div>
+          <span class="tag">robots welcome</span>
+          <h2 id="ai-h" data-da="Bygget til AI-modeller også" data-en="Built for AI models too">Bygget til AI-modeller også</h2>
+          <p data-da="Hver post siger hvad repoet er, hvornår du skal række ud efter det, og hvornår ikke. Siden er almindelig HTML, så den kan læses uden JavaScript, og de samme data findes som tekst, markdown og JSON."
+             data-en="Every entry says what the repo is, when to reach for it and when not to. The page is plain HTML, readable without JavaScript, and the same data exists as text, markdown and JSON.">Hver post siger hvad repoet er, hvornår du skal række ud efter det, og hvornår ikke. Siden er almindelig HTML, så den kan læses uden JavaScript, og de samme data findes som tekst, markdown og JSON.</p>
+          <ol class="steps">
+            <li data-da="Find kategorien der passer til opgaven." data-en="Match the task to a category.">Find kategorien der passer til opgaven.</li>
+            <li data-da="Tag et PICK-repo, og læs “Ikke til” først." data-en="Take a PICK entry and read “Not for” first.">Tag et PICK-repo, og læs “Ikke til” først.</li>
+            <li data-da="Tjek aktivitet, licens og kildekode, før du kører noget." data-en="Check activity, licence and source before you run anything.">Tjek aktivitet, licens og kildekode, før du kører noget.</li>
+          </ol>
+        </div>
+        <div class="eps">
+          <div class="ep">
+            <code>llms.txt</code>
+            <a class="mini" href="llms.txt" data-da="Åbn" data-en="Open">Åbn</a>
+            <button class="mini" type="button" data-copy="@BASE@/llms.txt" data-da="Kopiér" data-en="Copy">Kopiér</button>
+            <span class="d" data-da="Start her. Reglerne og hele indekset i én fil." data-en="Start here. The rules plus the whole index in one file.">Start her. Reglerne og hele indekset i én fil.</span>
+          </div>
+          <div class="ep">
+            <code>atlas.md</code>
+            <a class="mini" href="atlas.md" data-da="Åbn" data-en="Open">Åbn</a>
+            <button class="mini" type="button" data-copy="@BASE@/atlas.md" data-da="Kopiér" data-en="Copy">Kopiér</button>
+            <span class="d" data-da="Det hele med stjerner, sprog og licens." data-en="Everything, with stars, language and licence.">Det hele med stjerner, sprog og licens.</span>
+          </div>
+          <div class="ep">
+            <code>atlas.json</code>
+            <a class="mini" href="atlas.json" data-da="Åbn" data-en="Open">Åbn</a>
+            <button class="mini" type="button" data-copy="@BASE@/atlas.json" data-da="Kopiér" data-en="Copy">Kopiér</button>
+            <span class="d" data-da="Struktureret, til filtrering efter tag og kategori." data-en="Structured, for filtering by tag and category.">Struktureret, til filtrering efter tag og kategori.</span>
+          </div>
+          <div class="snippet">
+            <small data-da="Indsæt i CLAUDE.md eller en system-prompt" data-en="Paste into CLAUDE.md or a system prompt">Indsæt i CLAUDE.md eller en system-prompt</small>
+            <code>When a task needs a library, tool or MCP server, read @BASE@/llms.txt first and prefer entries marked PICK.</code>
+            <button class="mini" type="button" data-copy="When a task needs a library, tool or MCP server, read @BASE@/llms.txt first and prefer entries marked PICK." data-da="Kopiér" data-en="Copy">Kopiér</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="map" aria-labelledby="map-h">
+      <div class="sec-title">
+        <h2 id="map-h" data-da="Kortet" data-en="The map">Kortet</h2>
+        <span data-da="Vælg en plade, eller søg ovenfor." data-en="Pick a plate, or search above.">Vælg en plade, eller søg ovenfor.</span>
+      </div>
+      <div class="plates" id="plates">
+<!--@PLATES-->
+      </div>
+    </section>
+
+    <div class="catalog" id="catalog">
+<!--@SECTIONS-->
+      <p class="empty" id="empty" hidden data-da="Ingen match. Prøv færre eller andre ord." data-en="No matches. Try fewer or different words.">Ingen match. Prøv færre eller andre ord.</p>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p data-da="Stjerner og datoer er et øjebliksbillede fra @DATE@. Beskrivelser af repos er på engelsk. Altid tjek repoet selv, før du stoler på det."
+       data-en="Stars and dates are a snapshot from @DATE@. Repo descriptions are in English. Always check the repo yourself before you trust it.">Stjerner og datoer er et øjebliksbillede fra @DATE@. Beskrivelser af repos er på engelsk. Altid tjek repoet selv, før du stoler på det.</p>
+    <p><span class="dot"></span><span data-da="aktivt (skubbet inden for 120 dage)" data-en="active (pushed within 120 days)">aktivt (skubbet inden for 120 dage)</span><span class="dot q"></span><span data-da="roligt" data-en="quiet">roligt</span></p>
+    <p>© <span id="year"></span> Oskar Matras</p>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  (function(){
+    var toggle = document.getElementById('nav-toggle');
+    var nav = document.getElementById('main-nav');
+    if(!toggle || !nav) return;
+    toggle.addEventListener('click', function(){
+      var open = nav.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    nav.addEventListener('click', function(e){
+      if(e.target.tagName === 'A'){ nav.classList.remove('open'); toggle.setAttribute('aria-expanded', 'false'); }
+    });
+  })();
+
+  // ---------------------------------------------------------------
+  // Search and filters. All content is already in the HTML; this only
+  // hides what does not match. Words are stemmed crudely (scraping,
+  // scrape and scrapers all become "scrap"), filler words are dropped,
+  // and entries are ranked by how many of the remaining words they hit.
+  // ---------------------------------------------------------------
+  (function(){
+    var q = document.getElementById('q');
+    var bPick = document.getElementById('f-pick');
+    var bOff = document.getElementById('f-official');
+    var count = document.getElementById('count');
+    var empty = document.getElementById('empty');
+    var repos = Array.prototype.slice.call(document.querySelectorAll('.repo'));
+    var secs = Array.prototype.slice.call(document.querySelectorAll('section.cat'));
+    var plates = {};
+    document.querySelectorAll('.plate').forEach(function(p){ plates[p.getAttribute('data-jump')] = p; });
+    var STOP = 'a an the to of for and or i my me how do does with in on it is that this want need into from can you get make use using some any'.split(' ');
+    var pick = false, off = false;
+
+    function lang(){ return (window.I18N && window.I18N.lang) || document.documentElement.lang || 'da'; }
+    function stem(w){ return w.length > 4 ? w.replace(/(ing|ers|er|ed|es|s|e)$/, '') : w; }
+
+    function apply(){
+      var raw = q.value.toLowerCase().replace(/[^a-z0-9æøå.+# -]/g, ' ');
+      var terms = raw.split(/\s+/).filter(function(t){ return t && STOP.indexOf(t) < 0; }).map(stem);
+      var shown = 0;
+      repos.forEach(function(el){
+        var ok = (!pick || el.getAttribute('data-pick') === '1') && (!off || el.getAttribute('data-official') === '1');
+        var score = 0;
+        if(ok && terms.length){
+          var text = el.getAttribute('data-text');
+          terms.forEach(function(t){ if(text.indexOf(t) > -1) score++; });
+          ok = score > 0;
+        }
+        el.hidden = !ok;
+        el.style.order = ok ? String(-score) : '0';
+        if(ok) shown++;
+      });
+      secs.forEach(function(sec){
+        var n = sec.querySelectorAll('.repo:not([hidden])').length;
+        sec.hidden = n === 0;
+        if(plates[sec.id]) plates[sec.id].classList.toggle('is-empty', n === 0);
+      });
+      var da = lang() === 'da';
+      count.textContent = (da ? 'Viser ' : 'Showing ') + shown + (da ? ' af ' : ' of ') + repos.length;
+      empty.hidden = shown !== 0;
+      try{
+        var u = new URL(location.href);
+        if(q.value) u.searchParams.set('q', q.value); else u.searchParams.delete('q');
+        history.replaceState(null, '', u.pathname + u.search + u.hash);
+      }catch(e){}
+    }
+
+    function reset(){
+      q.value = ''; pick = off = false;
+      bPick.setAttribute('aria-pressed', 'false'); bOff.setAttribute('aria-pressed', 'false');
+      apply();
+    }
+
+    var scrolled = false;
+    q.addEventListener('input', function(){
+      apply();
+      if(q.value && !scrolled){
+        scrolled = true;
+        var c = document.getElementById('catalog');
+        if(c.getBoundingClientRect().top > window.innerHeight * 0.6){
+          c.scrollIntoView({behavior:'smooth', block:'start'});
+        }
+      }
+    });
+    bPick.addEventListener('click', function(){ pick = !pick; bPick.setAttribute('aria-pressed', String(pick)); apply(); });
+    bOff.addEventListener('click', function(){ off = !off; bOff.setAttribute('aria-pressed', String(off)); apply(); });
+    document.addEventListener('keydown', function(e){
+      if(e.key === '/' && document.activeElement !== q && !/input|textarea/i.test(document.activeElement.tagName)){
+        e.preventDefault(); q.focus();
+      } else if(e.key === 'Escape' && document.activeElement === q){
+        q.blur();
+      }
+    });
+    // Jumping to a plate while a filter hides it would land on nothing.
+    document.getElementById('plates').addEventListener('click', function(e){
+      var a = e.target.closest && e.target.closest('.plate');
+      if(a && (q.value || pick || off)) reset();
+    });
+    document.addEventListener('langchange', apply);
+
+    try{
+      var init = new URL(location.href).searchParams.get('q');
+      if(init) q.value = init;
+    }catch(e){}
+    apply();
+  })();
+
+  // Copy buttons. The label flips to a confirmation for a moment.
+  document.addEventListener('click', function(e){
+    var b = e.target.closest && e.target.closest('[data-copy]');
+    if(!b) return;
+    var text = b.getAttribute('data-copy');
+    function done(){
+      var da = (window.I18N && window.I18N.lang || 'da') === 'da';
+      var old = b.textContent;
+      b.textContent = da ? 'Kopieret' : 'Copied';
+      setTimeout(function(){ b.textContent = old; }, 1400);
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done, function(){});
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      try{ document.execCommand('copy'); done(); }catch(err){}
+      document.body.removeChild(ta);
+    }
+  });
+
+  // Cursor position drives the gold border on plates.
+  document.querySelectorAll('.plate').forEach(function(el){
+    el.addEventListener('mousemove', function(e){
+      var r = el.getBoundingClientRect();
+      el.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+      el.style.setProperty('--my', (e.clientY - r.top) + 'px');
+    });
+  });
+
+  // The toolbar sticks directly under the header, whatever height that has.
+  (function(){
+    var h = document.getElementById('site-header');
+    function set(){ document.documentElement.style.setProperty('--hh', h.offsetHeight + 'px'); }
+    set(); window.addEventListener('resize', set);
+    if(document.fonts && document.fonts.ready) document.fonts.ready.then(set);
+  })();
+
+  // ---------------------------------------------------------------
+  // Ambient contour map, same as the Projects index: marching squares
+  // over three drifting sine waves, redrawn every frame.
+  // ---------------------------------------------------------------
+  (function(){
+    var canvas = document.getElementById('contour-bg');
+    if(!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var W, H, DPR, cols, rows, CELL = 26, field = [];
+
+    function resize(){
+      DPR = Math.min(window.devicePixelRatio || 1, 2);
+      W = Math.max(1, window.innerWidth); H = Math.max(1, window.innerHeight);
+      canvas.width = Math.round(W * DPR); canvas.height = Math.round(H * DPR);
+      canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+      cols = Math.ceil(W / CELL) + 1; rows = Math.ceil(H / CELL) + 1;
+      field = new Float32Array(cols * rows);
+    }
+    function ensureSize(){
+      var w = Math.max(1, window.innerWidth), h = Math.max(1, window.innerHeight);
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      if(w !== W || h !== H || dpr !== DPR) resize();
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    var LEVELS = [-1.5, -0.9, -0.3, 0.3, 0.9, 1.5];
+    function sample(t){
+      var i = 0;
+      for(var r = 0; r < rows; r++){
+        var y = r * CELL;
+        for(var c = 0; c < cols; c++){
+          var x = c * CELL;
+          field[i++] =
+            Math.sin(x * 0.0062 + t * 0.00019) +
+            Math.sin(y * 0.0078 - t * 0.00014) +
+            Math.sin((x + y) * 0.0037 + t * 0.00024) +
+            Math.sin((x - y * 1.6) * 0.0029 - t * 0.00011);
+        }
+      }
+    }
+    function lerp(v1, v2, p1, p2, L){
+      var d = v2 - v1;
+      var s = Math.abs(d) < 1e-6 ? 0.5 : (L - v1) / d;
+      return p1 + (p2 - p1) * s;
+    }
+    function drawLevel(L){
+      ctx.beginPath();
+      for(var r = 0; r < rows - 1; r++){
+        for(var c = 0; c < cols - 1; c++){
+          var i0 = r * cols + c;
+          var tl = field[i0], tr = field[i0 + 1], bl = field[i0 + cols], br = field[i0 + cols + 1];
+          var idx = (tl > L ? 8 : 0) | (tr > L ? 4 : 0) | (br > L ? 2 : 0) | (bl > L ? 1 : 0);
+          if(idx === 0 || idx === 15) continue;
+          var x0 = c * CELL, y0 = r * CELL, x1 = x0 + CELL, y1 = y0 + CELL;
+          var aX = lerp(tl, tr, x0, x1, L), aY = y0;
+          var bX = x1, bY = lerp(tr, br, y0, y1, L);
+          var cX = lerp(bl, br, x0, x1, L), cY = y1;
+          var dX = x0, dY = lerp(tl, bl, y0, y1, L);
+          switch(idx){
+            case 1:  case 14: ctx.moveTo(dX,dY); ctx.lineTo(cX,cY); break;
+            case 2:  case 13: ctx.moveTo(cX,cY); ctx.lineTo(bX,bY); break;
+            case 3:  case 12: ctx.moveTo(dX,dY); ctx.lineTo(bX,bY); break;
+            case 4:  case 11: ctx.moveTo(aX,aY); ctx.lineTo(bX,bY); break;
+            case 6:  case 9:  ctx.moveTo(aX,aY); ctx.lineTo(cX,cY); break;
+            case 7:  case 8:  ctx.moveTo(dX,dY); ctx.lineTo(aX,aY); break;
+            case 5:  ctx.moveTo(dX,dY); ctx.lineTo(aX,aY); ctx.moveTo(cX,cY); ctx.lineTo(bX,bY); break;
+            case 10: ctx.moveTo(aX,aY); ctx.lineTo(bX,bY); ctx.moveTo(dX,dY); ctx.lineTo(cX,cY); break;
+          }
+        }
+      }
+      ctx.stroke();
+    }
+    function draw(t){
+      ensureSize(); sample(t); ctx.clearRect(0, 0, W, H);
+      for(var k = 0; k < LEVELS.length; k++){
+        var index = (k % 3 === 0);
+        ctx.strokeStyle = index ? 'rgba(201,154,75,0.30)' : 'rgba(11,37,64,0.16)';
+        ctx.lineWidth = index ? 1.15 : 0.85;
+        drawLevel(LEVELS[k]);
+      }
+    }
+    var running = !document.hidden;
+    document.addEventListener('visibilitychange', function(){ running = !document.hidden; });
+    if(reduce){
+      draw(0);
+      window.addEventListener('resize', function(){ draw(0); });
+      document.addEventListener('visibilitychange', function(){ if(!document.hidden) draw(0); });
+      return;
+    }
+    function loop(now){ if(running) draw(now); requestAnimationFrame(loop); }
+    requestAnimationFrame(loop);
+  })();
+</script>
+
+<script src="/i18n.js" defer></script>
+</body>
+</html>
