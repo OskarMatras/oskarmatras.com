@@ -8,8 +8,8 @@
  * captures a half-finished turn.
  */
 import { S, SET, nid, saveRun, clearRun, saveBest, loadRun, saveSettings } from './state.js';
-import { geo, rc, squareOf, neighbours, isCenter } from './geometry.js';
-import { PIECES, SPECIALS, TILES, JOKERS, ITEMS, VOUCHERS, LINE_TYPES, hasJ } from './data.js';
+import { geo, rc, squareOf, neighbours, isCenter, mirrorOf } from './geometry.js';
+import { PIECES, SPECIALS, TILES, JOKERS, ITEMS, VOUCHERS, LINE_TYPES, EDITIONS, PACKS, hasJ } from './data.js';
 import {
   rand, shuffle, newPiece, freshRun, nextBoss, blindInfo, lineValues, handMax, isBoss,
   emptyCells, oWon, newXLines, viableLines, threats,
@@ -57,6 +57,7 @@ async function newGame() {
   if (isBoss('wall')) { const cs = [...Array(N * N).keys()].filter(isCenter); S.board[rand(cs)] = { t: 'S' }; }
   if (isBoss('crowd')) shuffle([...Array(N * N).keys()]).slice(0, 2).forEach(i => { S.board[i] = { t: 'S' }; });
   refill();
+  if (S.ante === 1 && S.blindIdx === 0 && S.round.gameNo === 1) ui.toast(t('toast.first'));
   const special = S.hand.findIndex((/** @type {any} */ p) => p.type !== 'plain');
   S.selIdx = special >= 0 ? special : 0;
   if (isBoss('echo')) {
@@ -96,7 +97,7 @@ async function onCell(/** @type {string} */ arg) {
 /** One full turn: your X, bombs, scoring, the rival's answer, end checks. @param {number} i */
 async function placeX(i) {
   S.busy = true;
-  const forkedBefore = threats().length >= 2;
+  const threatsBefore = threats().length;
   const p = S.hand.splice(S.selIdx, 1)[0];
   S.board[i] = { t: 'X', p, fresh: true };
   S.g.placements++;
@@ -107,7 +108,18 @@ async function placeX(i) {
     if (targets.length) {
       const k = rand(targets);
       await sleep(200); ui.pop(ui.cellEl(k), t('pop.boom'), 'xmult'); sfx.boom();
-      S.board[k] = null; ui.render();
+      S.board[k] = null;
+      const demo = jokerOf('demolition');
+      if (demo) { demo.data.m = (demo.data.m || 0) + 3; ui.jig(ui.jokerEl(demo.uid)); }
+      ui.render();
+    }
+  }
+  if (p.type === 'mirror') {
+    const m = mirrorOf(i);
+    if (m !== i && !S.board[m]) {
+      await sleep(180);
+      S.board[m] = { t: 'X', p: { uid: -2, type: 'plain', temp: true, mirrored: true }, fresh: true };
+      sfx.place(); ui.render(); ui.pop(ui.cellEl(m), t('pop.mirror'), 'info');
     }
   }
 
@@ -115,7 +127,7 @@ async function placeX(i) {
   if (fresh.length) {
     S.g.scored.push(...fresh); ui.render();
     await sleep(250);
-    for (const li of fresh) await scoreLine(li, fresh.length, forkedBefore);
+    for (const li of fresh) await scoreLine(li, fresh.length, threatsBefore);
     ui.render();
   }
   if (S.round.score >= S.round.target) { await sleep(500); return winBlind(); }
@@ -212,7 +224,7 @@ async function scoreX(ctx, i, isFirst) {
     if (r > 0) { ui.pop(target, t('pop.again'), 'info'); await sleep(220); }
     if (P.chips) await apply(ctx, { chips: P.chips }, target);
     if (P.mult) await apply(ctx, { mult: P.mult }, target);
-    if (P.xmult) await apply(ctx, { xmult: P.xmult }, target);
+    if (P.xmult) await apply(ctx, { xmult: p.type === 'glass' && hasJ('glassjaw') ? 3 : P.xmult }, target);
     if (p.type === 'gold' && !thief) await apply(ctx, { money: 2 }, target);
     if (p.type === 'lucky') {
       if (Math.random() < 1 / 3) await apply(ctx, { mult: 15 }, target);
@@ -247,6 +259,7 @@ async function runScore(ctx, label) {
   for (const j of S.jokers) {
     const d = JOKERS[j.id];
     if (d.line) { const e = d.line(ctx, j); if (e) await apply(ctx, e, ui.jokerEl(j.uid)); }
+    if (j.ed && EDITIONS[j.ed]) await apply(ctx, EDITIONS[j.ed].effect, ui.jokerEl(j.uid));
   }
 
   const total = Math.floor(ctx.chips * ctx.mult);
@@ -259,7 +272,7 @@ async function runScore(ctx, label) {
   if (total > S.stats.bestLine) { S.stats.bestLine = total; S.stats.bestType = ctx.type; }
   for (const i of ctx.cells) {
     const c = S.board[i];
-    if (c && c.p && c.p.type === 'glass' && !c.shattered && Math.random() < .25) {
+    if (c && c.p && c.p.type === 'glass' && !c.shattered && (hasJ('glassjaw') || Math.random() < .25)) {
       c.shattered = true; S.bag = S.bag.filter((/** @type {any} */ q) => q.uid !== c.p.uid);
       ui.pop(ui.cellEl(i), t('pop.shattered'), 'dim'); sfx.bad();
     }
@@ -270,17 +283,17 @@ async function runScore(ctx, label) {
   ui.setCalc(0, 0, '');
 }
 
-/** @param {number} li @param {number} simult @param {boolean} forked */
-async function scoreLine(li, simult, forked) {
+/** @param {number} li @param {number} simult @param {number} threatsOpen */
+async function scoreLine(li, simult, threatsOpen) {
   const l = geo().lines[li], v = lineValues(l.type);
-  await runScore({ type: l.type, cells: l.cells, chips: v.chips, mult: v.mult, simult, forked },
+  await runScore({ type: l.type, li, cells: l.cells, chips: v.chips, mult: v.mult, simult, forked: threatsOpen >= 2, threats: threatsOpen },
     `${tr(/** @type {any} */ (LINE_TYPES)[l.type].name)} <small>${t('lvl', { n: S.levels[l.type] })}</small>`);
   S.g.lines++;
 }
 async function scoreDraw() {
   const cells = S.board.map((/** @type {any} */ c, /** @type {number} */ i) => (c && c.t === 'X') ? i : -1).filter((/** @type {number} */ i) => i >= 0);
   const v = lineValues('draw');
-  await runScore({ type: 'draw', cells, chips: v.chips, mult: v.mult, simult: 0, forked: false },
+  await runScore({ type: 'draw', li: -1, cells, chips: v.chips, mult: v.mult, simult: 0, forked: false, threats: 0 },
     `${tr(LINE_TYPES.draw.name)} <small>${t('lvl', { n: S.levels.draw })}</small>`);
 }
 
@@ -349,17 +362,23 @@ function skipBlind() {
 /* =================================================================
    Shop
    ================================================================= */
+/** A Joker the run can use right now (board-size Jokers wait for a bigger board). @param {number} [edBoost] */
+function genJoker(edBoost = 1, /** @type {string[]} */ avoid = []) {
+  const rr = Math.random(), rar = rr < .1 ? 3 : rr < .38 ? 2 : 1;
+  const ok = (/** @type {string} */ id) => !hasJ(id) && !avoid.includes(id) && (!JOKERS[id].req || JOKERS[id].req())
+    && !(S.shop && S.shop.items.some((/** @type {any} */ it) => it.id === id));
+  let pool = Object.keys(JOKERS).filter(id => JOKERS[id].rar === rar && ok(id));
+  if (!pool.length) pool = Object.keys(JOKERS).filter(ok);
+  if (!pool.length) pool = Object.keys(JOKERS);
+  const id = rand(pool);
+  // One roll decides the finish: 3% polychrome, 6% holographic, 10% foil (boosted in Joker Packs).
+  let ed = null, edRoll = Math.random();
+  for (const k of ['poly', 'holo', 'foil']) { const ch = EDITIONS[k].chance * edBoost; if (edRoll < ch) { ed = k; break; } edRoll -= ch; }
+  return { kind: 'joker', id, ed, cost: JOKERS[id].cost + (ed ? EDITIONS[ed].cost : 0), sold: false };
+}
 function genItem() {
   const roll = Math.random();
-  if (roll < .5) {
-    const rr = Math.random(), rar = rr < .1 ? 3 : rr < .38 ? 2 : 1;
-    const taken = (/** @type {string} */ id) => hasJ(id) || (S.shop && S.shop.items.some((/** @type {any} */ it) => it.id === id));
-    let pool = Object.keys(JOKERS).filter(id => JOKERS[id].rar === rar && !taken(id));
-    if (!pool.length) pool = Object.keys(JOKERS).filter(id => !taken(id));
-    if (!pool.length) pool = Object.keys(JOKERS);
-    const id = rand(pool);
-    return { kind: 'joker', id, cost: JOKERS[id].cost, sold: false };
-  }
+  if (roll < .5) return genJoker();
   if (roll < .75) { const id = rand(SPECIALS); return { kind: 'piece', id, cost: /** @type {any} */ (PIECES)[id].cost, sold: false }; }
   const ids = Object.keys(ITEMS);
   const chalks = ids.filter(i => ITEMS[i].kind === 'chalk'), tools = ids.filter(i => ITEMS[i].kind === 'tool');
@@ -368,12 +387,14 @@ function genItem() {
 function makeShop() {
   S.shop = { items: [], tile: { kind: 'tile', id: rand(Object.keys(TILES)), cost: 4, sold: false }, voucher: null, vSold: false, reroll: S.vouchers.includes('coupon') ? 2 : 5, trimmed: false };
   for (let i = 0; i < 3; i++) S.shop.items.push(genItem());
+  const kinds = shuffle(Object.keys(PACKS));
+  S.shop.packs = kinds.slice(0, 2).map(type => ({ type, cost: PACKS[type].cost, sold: false }));
   const vs = Object.keys(VOUCHERS).filter(v => !S.vouchers.includes(v) && (!VOUCHERS[v].req || VOUCHERS[v].req()));
   if (vs.length && S.lastVoucherAnte !== S.ante) S.shop.voucher = rand(vs);
 }
 function buy(/** @type {string} */ key) {
   const sh = S.shop;
-  if (S.phase !== 'shop' || !sh || S.mode) return;
+  if (S.phase !== 'shop' || !sh || S.mode || S.pack) return;
   if (key === 'v') {
     if (!sh.voucher || sh.vSold) return;
     if (S.money < 10) { ui.toast(t('toast.noMoney')); return; }
@@ -386,7 +407,7 @@ function buy(/** @type {string} */ key) {
   if (S.money < it.cost) { ui.toast(t('toast.noMoney')); return; }
   if (it.kind === 'joker') {
     if (S.jokers.length >= S.jokerSlots) { ui.toast(t('toast.jokersFull')); return; }
-    S.jokers.push({ uid: nid(), id: it.id, data: {} });
+    S.jokers.push({ uid: nid(), id: it.id, ed: it.ed || null, data: {} });
   } else if (it.kind === 'piece') {
     S.bag.push(newPiece(it.id)); ui.toast(t('toast.pieceAdded', { name: tr(/** @type {any} */ (PIECES)[it.id].name) }));
   } else if (it.kind === 'tile') {
@@ -404,11 +425,14 @@ function applyTile(/** @type {string} */ arg) {
   const sq = S.squares[key] || (S.squares[key] = {});
   sq[S.pending] = (sq[S.pending] || 0) + 1;
   ui.toast(t('toast.tileApplied', { name: tr(/** @type {any} */ (TILES)[S.pending].name) }));
-  S.mode = null; S.pending = null; sfx.win(); settle();
+  S.mode = null; S.pending = null; S.shop.tileFromPack = false; sfx.win(); settle();
 }
 function cancelTile() {
   if (S.mode !== 'tile') return;
-  S.money += S.shop.tile.cost; S.shop.tile.sold = false; S.mode = null; S.pending = null; settle();
+  // A tile from the shop slot is refunded; one picked from a pack is simply dropped.
+  if (S.shop.tileFromPack) S.shop.tileFromPack = false;
+  else { S.money += S.shop.tile.cost; S.shop.tile.sold = false; }
+  S.mode = null; S.pending = null; settle();
 }
 function trim() {
   const sh = S.shop; if (!sh || sh.trimmed) return;
@@ -417,21 +441,65 @@ function trim() {
   S.bag.splice(k, 1); S.money -= 3; sh.trimmed = true; sfx.click(); ui.toast(t('toast.trimmed')); settle();
 }
 function reroll() {
-  const sh = S.shop; if (!sh || S.mode) return;
+  const sh = S.shop; if (!sh || S.mode || S.pack) return;
   if (S.money < sh.reroll) { ui.toast(t('toast.noMoney')); return; }
   S.money -= sh.reroll; sh.reroll++; sh.items = [];
   for (let i = 0; i < 3; i++) sh.items.push(genItem());
   sfx.click(); settle();
 }
-function nextRound() { if (S.phase !== 'shop' || S.mode) return; sfx.click(); S.phase = 'blind'; S.shop = null; settle(); }
+function nextRound() { if (S.phase !== 'shop' || S.mode || S.pack) return; sfx.click(); S.phase = 'blind'; S.shop = null; settle(); }
+
+
+/* ---------------- booster packs ---------------- */
+/** @param {string} type */
+function packOptions(type) {
+  const P = PACKS[type];
+  if (type === 'joker') { const out = []; for (let i = 0; i < P.show; i++) out.push(genJoker(2.5, out.map(o => o.id))); return out; }
+  if (type === 'piece') return shuffle([...SPECIALS]).slice(0, P.show).map(id => ({ kind: 'piece', id }));
+  if (type === 'chalk') return shuffle(Object.keys(ITEMS).filter(i => ITEMS[i].kind === 'chalk')).slice(0, P.show).map(id => ({ kind: 'item', id }));
+  if (type === 'builder') return shuffle(Object.keys(TILES)).slice(0, P.show).map(id => ({ kind: 'tile', id }));
+  return shuffle(Object.keys(ITEMS).filter(i => ITEMS[i].kind === 'tool')).slice(0, P.show).map(id => ({ kind: 'item', id }));
+}
+function buyPack(/** @type {string} */ arg) {
+  const sh = S.shop, pk = sh && sh.packs && sh.packs[+arg];
+  if (S.phase !== 'shop' || S.mode || S.pack || !pk || pk.sold) return;
+  if (S.money < pk.cost) { ui.toast(t('toast.noMoney')); return; }
+  S.money -= pk.cost; pk.sold = true; sfx.win();
+  S.pack = { type: pk.type, options: packOptions(pk.type), left: PACKS[pk.type].choose };
+  settle();
+}
+function takePack(/** @type {string} */ arg) {
+  const pk = S.pack; if (!pk) return;
+  const o = pk.options[+arg]; if (!o || o.taken) return;
+  if (o.kind === 'joker') {
+    if (S.jokers.length >= S.jokerSlots) { ui.toast(t('toast.jokersFull')); return; }
+    S.jokers.push({ uid: nid(), id: o.id, ed: o.ed || null, data: {} });
+  } else if (o.kind === 'piece') {
+    S.bag.push(newPiece(o.id)); ui.toast(t('toast.pieceAdded', { name: tr(/** @type {any} */ (PIECES)[o.id].name) }));
+  } else if (o.kind === 'tile') {
+    S.pack = null; S.mode = 'tile'; S.pending = o.id; S.shop.tileFromPack = true; sfx.win(); ui.render(); return;
+  } else if (ITEMS[o.id].kind === 'chalk') {
+    const d = ITEMS[o.id]; S.levels[d.lt]++;
+    ui.toast(t('toast.level', { name: tr(/** @type {any} */ (LINE_TYPES)[d.lt].name), n: S.levels[d.lt] }));
+  } else {
+    if (S.items.length >= S.itemSlots) { ui.toast(t('toast.itemsFull')); return; }
+    S.items.push({ uid: nid(), id: o.id });
+  }
+  o.taken = true; pk.left--; sfx.money();
+  if (pk.left <= 0) S.pack = null;
+  settle();
+}
+function skipPack() { if (!S.pack) return; S.pack = null; sfx.click(); settle(); }
 
 /* =================================================================
    Jokers and items in the rack
    ================================================================= */
+/** @param {any} j */
+export function jokerSellValue(j) { return Math.max(1, Math.floor((JOKERS[j.id].cost + (j.ed && EDITIONS[j.ed] ? EDITIONS[j.ed].cost : 0)) / 2)); }
 function sellJoker(/** @type {string} */ uid) {
   if (S.busy) return;
   const j = S.jokers.find((/** @type {any} */ x) => String(x.uid) === uid); if (!j) return;
-  S.money += Math.max(1, Math.floor(JOKERS[j.id].cost / 2));
+  S.money += jokerSellValue(j);
   S.jokers = S.jokers.filter((/** @type {any} */ x) => x !== j); sfx.money(); settle();
 }
 function sellItem(/** @type {string} */ uid) {
@@ -492,7 +560,7 @@ function toggleSound() { SET.sound = !SET.sound; saveSettings(); ui.render(); ui
 
 export const actions = {
   cell: onCell, selectPiece, discard, startBlind, skipBlind,
-  buy, reroll, trim, applyTile, cancelTile, nextRound, cashOut,
+  buy, reroll, trim, applyTile, cancelTile, nextRound, cashOut, buyPack, takePack, skipPack,
   sellJoker, sellItem, useItem, itemBlocked, cancelMode,
   newRun, continueRun, abandon, endless, toggleSpeed, toggleSound,
 };

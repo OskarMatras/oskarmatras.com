@@ -15,7 +15,8 @@
  */
 import { S, SET, best, hasSavedRun } from './state.js';
 import { geo, squareOf } from './geometry.js';
-import { LINE_TYPES, LINE_ORDER, PIECES, TILES, RARITY, JOKERS, ITEMS, VOUCHERS, BOSSES, hasJ } from './data.js';
+import { LINE_TYPES, LINE_ORDER, PIECES, TILES, RARITY, JOKERS, ITEMS, VOUCHERS, BOSSES, EDITIONS, PACKS, hasJ } from './data.js';
+import { punch } from './cardfx.js';
 import { blindInfo, lineValues, handMax } from './rules.js';
 import { t, tr, fmt, fmtM } from './strings.js';
 import { sfx } from './audio.js';
@@ -42,6 +43,7 @@ let abandonArmed = false;
    ================================================================= */
 export function render() {
   document.body.dataset.phase = S.phase;
+  if (tipFor && !document.body.contains(tipFor)) hideTip();
   renderSide(); renderRack(); renderStage(); renderOverlay();
 }
 
@@ -80,12 +82,12 @@ function renderSide() {
 function renderRack() {
   const js = S.jokers.map((/** @type {any} */ j) => {
     const d = JOKERS[j.id];
-    return `<button class="joker" style="--jc:${RARITY[d.rar].color}" data-act="inspectJoker" data-arg="${j.uid}" data-joker="${j.uid}" aria-label="${esc(d.name)}">
+    return `<button class="joker${j.ed ? ' ed-' + j.ed : ''}" style="--jc:${RARITY[d.rar].color}" data-tilt="j${j.uid}" data-tip="joker:${j.uid}" data-act="inspectJoker" data-arg="${j.uid}" data-joker="${j.uid}" aria-label="${esc(d.name)}${j.ed ? ' (' + esc(tr(EDITIONS[j.ed].name)) + ')' : ''}">
       <span class="gl">${d.gl}</span><span class="nm">${esc(d.name)}</span>${d.val ? `<span class="val">${d.val(j)}</span>` : ''}</button>`;
   }).join('');
   const its = S.items.map((/** @type {any} */ c) => {
     const d = ITEMS[c.id];
-    return `<button class="cons" style="--cc:${d.kind === 'chalk' ? 'var(--chalk)' : 'var(--tool)'}" data-act="inspectItem" data-arg="${c.uid}" data-item="${c.uid}" aria-label="${esc(tr(d.name))}">
+    return `<button class="cons" style="--cc:${d.kind === 'chalk' ? 'var(--chalk)' : 'var(--tool)'}" data-tilt="c${c.uid}" data-tip="item:${c.uid}" data-act="inspectItem" data-arg="${c.uid}" data-item="${c.uid}" aria-label="${esc(tr(d.name))}">
       <span class="gl">${d.gl}</span><span class="nm">${esc(tr(d.name))}</span></button>`;
   }).join('');
   el.rack.innerHTML = `<div class="tray jokers"><div class="lbl"><span>${t('ui.jokers')}</span><span>${S.jokers.length}/${S.jokerSlots}</span></div>
@@ -123,7 +125,8 @@ function boardHTML(id, board, act) {
       c.fresh = false;
     }
     const up = Object.keys(squareOf(i)).length ? ' up' : '';
-    return `<button class="cell ${cls}" data-act="${act}" data-arg="${i}" data-cell="${i}" aria-label="${t('aria.square', { n: i + 1 })}"><span class="slot${up}">${tilesHTML(i)}${inner}</span></button>`;
+    const tip = c && c.t === 'X' && act === 'cell' ? ` data-tip="piece:${c.p.type}"` : '';
+    return `<button class="cell ${cls}"${tip} data-act="${act}" data-arg="${i}" data-cell="${i}" aria-label="${t('aria.square', { n: i + 1 })}"><span class="slot${up}">${tilesHTML(i)}${inner}</span></button>`;
   }).join('');
   return `<div class="board" id="${id}" role="grid" aria-label="${t('aria.board')}" style="--n:${N}">${cells}</div>`;
 }
@@ -141,19 +144,15 @@ function renderPlay() {
   const allPlain = S.hand.every((/** @type {any} */ p) => p.type === 'plain');
   const noSpecials = allPlain && S.g.pile.every((/** @type {any} */ p) => p.type === 'plain');
   const hand = S.hand.map((/** @type {any} */ p, /** @type {number} */ k) =>
-    `<button class="hp${k === S.selIdx ? ' sel' : ''}${p.dealt ? ' deal' : ''}" data-act="selectPiece" data-arg="${k}" aria-pressed="${k === S.selIdx}" aria-label="${esc(tr(/** @type {any} */ (PIECES)[p.type].name))}">${pieceHTML(p)}</button>`).join('');
+    `<button class="hp${k === S.selIdx ? ' sel' : ''}${p.dealt ? ' deal' : ''}" data-tilt="h${p.uid}-${k}" data-tip="piece:${p.type}" data-act="selectPiece" data-arg="${k}" aria-pressed="${k === S.selIdx}" aria-label="${esc(tr(/** @type {any} */ (PIECES)[p.type].name))}">${pieceHTML(p)}</button>`).join('');
   S.hand.forEach((/** @type {any} */ p) => { p.dealt = false; });
-  let hint;
-  if (S.mode === 'erase') hint = `${t('hint.erase')} <button class="btn small" data-act="cancelMode">${t('btn.cancel')}</button>`;
-  else if (S.busy) hint = '&nbsp;';
-  else if (S.round.gameNo === 1 && S.ante === 1 && S.blindIdx === 0 && S.g.placements === 0) hint = t('hint.first');
-  else if (allPlain) hint = t('hint.tap');
-  else { const P = /** @type {any} */ (PIECES)[S.hand[S.selIdx].type]; hint = `<b>${esc(tr(P.name))}</b>: ${tr(P.desc)}`; }
+  // Instructions float over the board instead of sitting in the layout, so nothing below it moves.
+  const modeBar = S.mode === 'erase'
+    ? `<div class="modeBar" role="status">${t('hint.erase')} <button class="btn small" data-act="cancelMode">${t('btn.cancel')}</button></div>` : '';
   el.stage.innerHTML = `<div class="playArea">
     <div class="boardArea"><div class="boardWrap${armed ? ' armed' : ''}${S.mode === 'erase' ? ' erasing' : ''}" id="bw">
       ${boardHTML('board', S.board, 'cell')}
-      <svg id="strikes" viewBox="0 0 ${S.N} ${S.N}" preserveAspectRatio="none" aria-hidden="true">${strikes}</svg></div></div>
-    <div class="hint${S.mode ? ' must' : ''}" id="hint">${hint}</div>
+      <svg id="strikes" viewBox="0 0 ${S.N} ${S.N}" preserveAspectRatio="none" aria-hidden="true">${strikes}</svg>${modeBar}</div></div>
     <div class="handMeta"><span>${t('meta.game', { n: S.round.gameNo, m: S.round.gameNo + S.round.games - 1 })}</span>
       <span>${hasJ('overtime') ? t('meta.overtime') : t('meta.firstLine')}</span><span>${t('meta.bag', { n: S.g.pile.length })}</span></div>
     <div class="handRow"><div id="hand">${hand}</div>
@@ -178,11 +177,14 @@ function renderBlinds() {
 function itemView(it) {
   if (it.kind === 'joker') {
     const d = JOKERS[it.id];
-    return { vis: `<span class="joker" style="--jc:${RARITY[d.rar].color}"><span class="gl">${d.gl}</span></span>`, name: d.name, kind: t('kind.joker', { r: tr(RARITY[d.rar].name) }), desc: tr(d.desc({ data: {} })) };
+    const ed = it.ed && EDITIONS[it.ed];
+    return { vis: `<span class="joker${ed ? ' ed-' + it.ed : ''}" style="--jc:${RARITY[d.rar].color}" data-tilt="s${it.id}"><span class="gl">${d.gl}</span></span>`, name: d.name,
+      kind: (ed ? tr(ed.name) + ' ' : '') + t('kind.joker', { r: tr(RARITY[d.rar].name) }),
+      desc: tr(d.desc({ data: {} })) + (ed ? `<span class="edline ed-${it.ed}">${tr(ed.name)}: ${tr(ed.desc)}</span>` : '') };
   }
   if (it.kind === 'piece') {
     const P = /** @type {any} */ (PIECES)[it.id];
-    return { vis: `<span class="hpv">${pieceHTML({ type: it.id })}</span>`, name: tr(P.name), kind: t('kind.piece'), desc: tr(P.desc) };
+    return { vis: `<span class="hpv" data-tilt="sp${it.id}">${pieceHTML({ type: it.id })}</span>`, name: tr(P.name), kind: t('kind.piece'), desc: tr(P.desc) };
   }
   if (it.kind === 'tile') {
     const T = /** @type {any} */ (TILES)[it.id];
@@ -219,7 +221,14 @@ function renderShop() {
         <button class="btn" data-act="cancelTile">${t('btn.cancelRefund')}</button></div>`
     : '';
   const plainN = S.bag.filter((/** @type {any} */ p) => p.type === 'plain').length;
-  el.stage.innerHTML = `<div class="scrollPane"><div class="panelBox"><h2>${t('ui.shop')}</h2><div class="shopGrid">${cards}</div>${pick}
+  const packs = (sh.packs || []).map((/** @type {any} */ pk, /** @type {number} */ i) => {
+    const P = PACKS[pk.type];
+    return `<div class="sitem pack${pk.sold ? ' sold' : ''}"><span class="packArt" style="--pk:${P.color}" data-tilt="pk${i}${pk.type}"><span class="gl">${P.gl}</span><span class="pkName">${tr(P.name)}</span></span>
+      <div class="nm2">${tr(P.name)}</div><div class="kind">${t('kind.pack')}</div><div class="ds">${tr(P.desc)}</div><div class="price">$${pk.cost}</div>
+      <button class="btn gold" data-act="buyPack" data-arg="${i}" ${pk.sold || S.mode ? 'disabled' : ''}>${pk.sold ? t('btn.sold') : t('btn.open')}</button></div>`;
+  }).join('');
+  el.stage.innerHTML = `<div class="scrollPane"><div class="panelBox"><h2>${t('ui.shop')}</h2><div class="shopGrid">${cards}</div>
+    ${packs ? `<h3 class="sub">${t('ui.packs')}</h3><div class="shopGrid">${packs}</div>` : ''}${pick}
     <div class="shopBar"><div class="row">
       <button class="btn green big" data-act="reroll" ${S.mode ? 'disabled' : ''}>${t('btn.reroll', { n: sh.reroll })}</button>
       <button class="btn big" data-act="trim" title="${esc(t('trim.title'))}" ${(S.mode || plainN === 0 || S.bag.length <= 5 || sh.trimmed) ? 'disabled' : ''}>${t('btn.trim')}</button></div>
@@ -234,6 +243,7 @@ export function showModal(kind) { modal = kind; abandonArmed = false; renderOver
 function renderOverlay() {
   let kind = modal;
   if (!kind) kind = ({ title: 'title', cashout: 'cashout', over: 'over', won: 'won' })[/** @type {'title'} */ (S.phase)] || null;
+  if (!kind && S.phase === 'shop' && S.pack) kind = 'pack';
   if (!kind) { el.overlay.hidden = true; el.overlay.innerHTML = ''; return; }
   el.overlay.hidden = false;
   let h = '';
@@ -262,6 +272,16 @@ function renderOverlay() {
   } else if (kind === 'won') {
     h = `<div class="modal" role="dialog" aria-modal="true"><h2 class="good">${t('won.title')}</h2><p>${t('won.text', { s: fmt(S.stats.bestLine) })}</p>
       <div class="btnRow"><button class="btn gold big" data-act="endless">${t('btn.endless')}</button><button class="btn big" data-act="newRun">${t('btn.newRun')}</button></div></div>`;
+  } else if (kind === 'pack') {
+    const pk = S.pack, P = PACKS[pk.type];
+    const opts = pk.options.map((/** @type {any} */ o, /** @type {number} */ i) => {
+      const v = itemView(o.kind === 'item' ? { ...o } : o);
+      return `<div class="sitem${o.taken ? ' sold' : ''}">${v.vis}<div class="nm2">${esc(v.name)}</div><div class="kind">${v.kind}</div><div class="ds">${v.desc}</div>
+        <button class="btn gold" data-act="takePack" data-arg="${i}" ${o.taken ? 'disabled' : ''}>${o.taken ? t('btn.taken') : t('btn.take')}</button></div>`;
+    }).join('');
+    h = `<div class="modal wide packModal" role="dialog" aria-modal="true"><h2>${tr(P.name)}</h2><p>${pk.left === 1 ? t('pack.left1') : t('pack.left', { n: pk.left })}</p>
+      <div class="shopGrid">${opts}</div>
+      <div class="btnRow"><button class="btn big" data-act="skipPack">${t('btn.skipPack')}</button></div></div>`;
   } else if (kind === 'info') {
     const rows = LINE_ORDER.map(k => { const v = lineValues(k); return `<tr><td>${tr(/** @type {any} */ (LINE_TYPES)[k].name)}</td><td>${S.levels[k]}</td><td><i>${v.chips}</i> &times; <em>${v.mult}</em></td><td>${S.played[k]}</td></tr>`; }).join('');
     const vs = S.vouchers.length ? S.vouchers.map((/** @type {string} */ v) => tr(VOUCHERS[v].name)).join(', ') : t('info.noneYet');
@@ -299,8 +319,10 @@ function placeInsp(anchor) {
 /** @param {string} uid @param {HTMLElement} anchor */
 function inspectJoker(uid, anchor) {
   const j = S.jokers.find((/** @type {any} */ x) => String(x.uid) === uid); if (!j) return;
-  const d = JOKERS[j.id], sell = Math.max(1, Math.floor(d.cost / 2));
-  el.insp.innerHTML = `<h4>${esc(d.name)}</h4><span class="tag" style="--tc:${RARITY[d.rar].color}">${t('kind.joker', { r: tr(RARITY[d.rar].name) })}</span><p>${tr(d.desc(j))}</p>
+  const d = JOKERS[j.id], ed = j.ed && EDITIONS[j.ed];
+  const sell = Math.max(1, Math.floor((d.cost + (ed ? ed.cost : 0)) / 2));
+  el.insp.innerHTML = `<h4>${esc(d.name)}</h4><span class="tag" style="--tc:${RARITY[d.rar].color}">${t('kind.joker', { r: tr(RARITY[d.rar].name) })}</span>${ed ? ` <span class="tag ed-tag ed-${j.ed}">${tr(ed.name)}</span>` : ''}
+    <p>${tr(d.desc(j))}${ed ? `<span class="edline ed-${j.ed}">${tr(ed.name)}: ${tr(ed.desc)}</span>` : ''}</p>
     <div class="row"><button class="btn red" data-act="sellJoker" data-arg="${uid}" ${S.busy ? 'disabled' : ''}>${t('btn.sell', { n: sell })}</button>
     <button class="btn" data-act="hideInsp">${t('btn.close')}</button></div>`;
   placeInsp(anchor);
@@ -333,7 +355,51 @@ const local = {
   },
 };
 
+/* ---------------- hover tooltips (mouse only; touch uses tap) ---------------- */
+const tipEl = /** @type {HTMLElement} */ ($('#tip'));
+let tipFor = /** @type {HTMLElement|null} */ (null);
+/** @param {string} spec */
+function tipHTML(spec) {
+  const [kind, id] = spec.split(':');
+  if (kind === 'piece') { const P = /** @type {any} */ (PIECES)[id]; return P ? `<b>${esc(tr(P.name))}</b><span>${tr(P.desc)}</span>` : ''; }
+  if (kind === 'joker') {
+    const j = S.jokers.find((/** @type {any} */ x) => String(x.uid) === id); if (!j) return '';
+    const d = JOKERS[j.id], ed = j.ed && EDITIONS[j.ed];
+    return `<b>${esc(d.name)}</b><span>${tr(d.desc(j))}</span>${ed ? `<span class="edline ed-${j.ed}">${tr(ed.name)}: ${tr(ed.desc)}</span>` : ''}`;
+  }
+  if (kind === 'item') {
+    const c = S.items.find((/** @type {any} */ x) => String(x.uid) === id); if (!c) return '';
+    const d = ITEMS[c.id]; return `<b>${esc(tr(d.name))}</b><span>${itemDesc(d)}</span>`;
+  }
+  return '';
+}
+function hideTip() { tipEl.hidden = true; tipFor = null; }
+/** @param {HTMLElement} target */
+function showTip(target) {
+  const html = tipHTML(target.dataset.tip || '');
+  if (!html) { hideTip(); return; }
+  tipFor = target; tipEl.innerHTML = html; tipEl.hidden = false;
+  const r = target.getBoundingClientRect(), w = tipEl.offsetWidth, h = tipEl.offsetHeight;
+  const x = Math.max(10, Math.min(innerWidth - w - 10, r.left + r.width / 2 - w / 2));
+  let y = r.top - h - 10; if (y < 10) y = r.bottom + 10;
+  tipEl.style.left = x + 'px'; tipEl.style.top = y + 'px';
+}
+/** @param {string} type @param {HTMLElement} anchor */
+function inspectPiece(type, anchor) {
+  const P = /** @type {any} */ (PIECES)[type]; if (!P) return;
+  el.insp.innerHTML = `<h4>${esc(tr(P.name))}</h4><p>${tr(P.desc)}</p><div class="row"><button class="btn" data-act="hideInsp">${t('btn.close')}</button></div>`;
+  placeInsp(anchor);
+}
+
 export function initInput() {
+  document.addEventListener('pointerover', e => {
+    if (e.pointerType !== 'mouse') return;
+    const tgt = /** @type {HTMLElement|null} */ ((/** @type {HTMLElement} */ (e.target)).closest('[data-tip]'));
+    if (tgt && tgt !== tipFor) showTip(tgt);
+    else if (!tgt && tipFor) hideTip();
+  });
+  document.addEventListener('pointerdown', hideTip, true);
+  addEventListener('scroll', hideTip, true);
   document.addEventListener('click', e => {
     const target = /** @type {HTMLElement} */ (e.target);
     const btn = /** @type {HTMLElement|null} */ (target.closest('[data-act]'));
@@ -343,6 +409,10 @@ export function initInput() {
     }
     const act = btn.dataset.act || '', arg = btn.dataset.arg || '';
     if (!act.startsWith('inspect') && act !== 'hideInsp') hideInsp();
+    if (act === 'selectPiece' && S.phase === 'play' && !S.busy && +arg === S.selIdx) {
+      // Tapping the piece you already hold shows what it does (touch has no hover).
+      const p = S.hand[+arg]; if (p) inspectPiece(p.type, btn); return;
+    }
     if (local[act]) { local[act](arg, btn); return; }
     if (actions[act]) actions[act](arg);
   });
@@ -388,7 +458,7 @@ export function pop(target, text, cls) {
 /** @param {HTMLElement|null} e @param {string} cls */
 function retrigger(e, cls) { if (!e) return; e.classList.remove(cls); void e.offsetWidth; e.classList.add(cls); }
 export const bump = (/** @type {HTMLElement|null} */ e) => { retrigger(e, 'bump'); setTimeout(() => e && e.classList.remove('bump'), 90); };
-export const jig = (/** @type {HTMLElement|null} */ e) => retrigger(e, 'jig');
+export const jig = (/** @type {HTMLElement|null} */ e) => { retrigger(e, 'jig'); if (e) punch(e); };
 export const shake = () => retrigger($('#app'), 'shake');
 /** @param {number} chips @param {number} mult @param {string} [name] */
 export function setCalc(chips, mult, name) {

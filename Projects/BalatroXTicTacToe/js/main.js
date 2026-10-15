@@ -12,6 +12,7 @@
  *   strings.js    interface text, number formatting
  *   audio.js      Web Audio sound effects
  *   background.js WebGL felt background
+ *   cardfx.js     card tilt, idle sway and edition sheen
  *
  * No build step: the browser loads these ES modules directly, the same
  * way the rest of oskarmatras.com is plain files on Cloudflare Pages.
@@ -21,6 +22,7 @@ import { freshRun } from './rules.js';
 import { setLang } from './strings.js';
 import { unlock } from './audio.js';
 import { startBackground } from './background.js';
+import { startCardFx } from './cardfx.js';
 import * as ui from './ui.js';
 import { actions } from './engine.js';
 
@@ -34,6 +36,7 @@ ui.render();
 
 const bg = /** @type {HTMLCanvasElement|null} */ (document.getElementById('bg'));
 if (bg) startBackground(bg);
+startCardFx();
 
 // Sound may only start after a gesture (iOS Safari is strictest).
 addEventListener('pointerdown', unlock, { passive: true });

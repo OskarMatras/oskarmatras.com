@@ -7,7 +7,7 @@
  */
 import { S } from './state.js';
 
-/** @typedef {{cells:number[], type:'row'|'col'|'diag'}} Line */
+/** @typedef {{cells:number[], type:'row'|'col'|'diag', dr:number, dc:number}} Line */
 
 /** @type {Record<number, {N:number, lines:Line[], through:number[]}>} */
 const cache = {};
@@ -22,7 +22,7 @@ export function geo() {
   for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) for (const [dr, dc, type] of dirs) {
     const r2 = r + 2 * dr, c2 = c + 2 * dc;
     if (r2 < 0 || r2 >= N || c2 < 0 || c2 >= N) continue;
-    lines.push({ cells: [r * N + c, (r + dr) * N + c + dc, r2 * N + c2], type });
+    lines.push({ cells: [r * N + c, (r + dr) * N + c + dc, r2 * N + c2], type, dr, dc });
   }
   const through = Array(N * N).fill(0);
   lines.forEach(l => l.cells.forEach(i => through[i]++));
@@ -52,3 +52,20 @@ export function neighbours(i) {
   }
   return out;
 }
+
+/**
+ * How many X's in an unbroken run this line belongs to (3, 4 or 5), by
+ * walking outward from both ends in the line's own direction.
+ * @param {{cells:number[], dr:number, dc:number}} l
+ */
+export function runLength(l) {
+  const isX = (/** @type {number} */ r, /** @type {number} */ c) => r >= 0 && c >= 0 && r < S.N && c < S.N && S.board[r * S.N + c] && S.board[r * S.N + c].t === 'X';
+  let n = 3;
+  let [r, c] = rc(l.cells[0]);
+  while (isX(r - l.dr, c - l.dc)) { n++; r -= l.dr; c -= l.dc; }
+  [r, c] = rc(l.cells[2]);
+  while (isX(r + l.dr, c + l.dc)) { n++; r += l.dr; c += l.dc; }
+  return n;
+}
+/** The square opposite this one through the board's centre. @param {number} i */
+export const mirrorOf = i => S.N * S.N - 1 - i;

@@ -13,6 +13,10 @@
 
 /** @type {Record<string, string>} */
 const EN = {
+  'toast.first': 'Tap a square to place your X. Three in a row scores.',
+  'pop.mirror': 'Mirrored!',
+  'ui.packs': 'Packs', 'btn.open': 'Open', 'btn.take': 'Take', 'btn.taken': 'Taken', 'btn.skipPack': 'Skip the rest',
+  'pack.left': 'Pick {n} more', 'pack.left1': 'Pick 1', 'kind.pack': 'Booster pack', 'tip.selectAgain': 'Tap again for details',
   'blind.small': 'Small Blind', 'blind.big': 'Big Blind',
   'blind.smallDesc': 'A warm-up round', 'blind.bigDesc': 'Bigger target, bigger payout',
   'ui.scoreAtLeast': 'Score at least', 'ui.roundScore': 'Round score',
@@ -70,6 +74,10 @@ const EN = {
 
 /** @type {Record<string, string>} */
 const DA = {
+  'toast.first': 'Tryk på et felt for at lægge dit X. Tre på stribe scorer.',
+  'pop.mirror': 'Spejlet!',
+  'ui.packs': 'Pakker', 'btn.open': 'Åbn', 'btn.take': 'Tag', 'btn.taken': 'Taget', 'btn.skipPack': 'Spring resten over',
+  'pack.left': 'Vælg {n} mere', 'pack.left1': 'Vælg 1', 'kind.pack': 'Boosterpakke', 'tip.selectAgain': 'Tryk igen for detaljer',
   'blind.small': 'Lille blind', 'blind.big': 'Stor blind',
   'blind.smallDesc': 'En opvarmningsrunde', 'blind.bigDesc': 'Større mål, større gevinst',
   'ui.scoreAtLeast': 'Scor mindst', 'ui.roundScore': 'Rundens point',

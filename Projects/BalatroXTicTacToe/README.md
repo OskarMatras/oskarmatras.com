@@ -24,12 +24,22 @@ same as the rest of the site: Cloudflare Pages serves these files as they are.
 | `js/strings.js` | Interface text in Danish and English |
 | `js/audio.js` | Synthesised sound effects (Web Audio) |
 | `js/background.js` | WebGL felt background |
+| `js/cardfx.js` | Card feel: idle sway, lean toward the pointer, edition sheen |
 
 ## Adding content
 
 A new Joker is one entry in `JOKERS` in `js/data.js`. Give it a `line` hook
 (runs once per scored line) or an `x` hook (runs for every scoring X) that
 returns `{ chips, mult, xmult, money }`, and it shows up in the shop.
+
+## Card feel
+
+Cards sway on their own (sin/cos of time, phase-shifted per card), lean
+toward the pointer when hovered, and ease toward every target instead of
+jumping. `cardfx.js` writes the tilt into CSS variables; `game.css` turns
+them into a 3D rotation, a glare that slides opposite the lean and the
+Foil, Holographic and Polychrome finishes. Inspired by how Balatro's card
+feel is built (see the MIT-licensed mixandjam/balatro-feel breakdown).
 
 ## Layouts
 

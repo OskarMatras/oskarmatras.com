@@ -12,7 +12,7 @@
  * They return an effect { chips?, mult?, xmult?, money? } or null.
  */
 import { S } from './state.js';
-import { isCenter, isCorner, isEdge } from './geometry.js';
+import { isCenter, isCorner, isEdge, neighbours, runLength, geo } from './geometry.js';
 
 /** @typedef {{en:string, da:string}} Text */
 /** @typedef {{chips?:number, mult?:number, xmult?:number, money?:number}} Effect */
@@ -50,6 +50,8 @@ export const PIECES = {
     desc:{en:'<i>+5</i> Chips. When placed, blows up one rival O next to it', da:'<i>+5</i> chips. Sprænger et af modstanderens O ved siden af sig, når den lægges'} },
   ghost:{ name:{en:'Ghost X', da:'Spøgelses X'}, short:{en:'GHOST', da:'SPØGELSE'}, pc:'#7a52bd', chips:5, cost:6,
     desc:{en:'<i>+5</i> Chips. Your rival does not get to answer when you place it', da:'<i>+5</i> chips. Modstanderen får ikke et træk, når du lægger den'} },
+  mirror:{ name:{en:'Mirror X', da:'Spejl X'}, short:{en:'MIRROR', da:'SPEJL'}, pc:'#b0457e', chips:5, cost:6,
+    desc:{en:'<i>+5</i> Chips. Also drops a free Plain X on the square opposite it through the centre, if that square is empty', da:'<i>+5</i> chips. Lægger også et gratis almindeligt X på feltet overfor gennem midten, hvis det er tomt'} },
   twin: { name:{en:'Twin X', da:'Tvilling X'}, short:{en:'TWIN', da:'TVILLING'}, pc:'#1f8f8a', chips:5, retrig:1, cost:6,
     desc:{en:'<i>+5</i> Chips. Scores twice', da:'<i>+5</i> chips. Scorer to gange'} },
 };
@@ -164,8 +166,75 @@ export const JOKERS = {
   midas:    { name:'Midas', rar:3, cost:8, gl:'♕︎',
     desc:()=>({en:'Gold X give <em>X1.5</em> Mult when they score', da:'Guld X giver <em>X1,5</em> mult når de scorer'}),
     x:(/** @type {ScoreCtx} */ c, /** @type {number} */ i, /** @type {any} */ p)=>p.type==='gold'?{xmult:1.5}:null },
+  /* ---- board-expansion tactics: these come alive on 4×4 and 5×5 ---- */
+  longshot: { name:'Long Shot', rar:2, cost:7, gl:'\u27F7', req:()=>S.N>=4,
+    desc:()=>({en:'Lines that are part of 4 in a row score <em>X2</em> Mult, 5 in a row <em>X3</em>', da:'Linjer der er del af 4 på stribe scorer <em>X2</em> mult, 5 på stribe <em>X3</em>'}),
+    line:(/** @type {any} */ c)=>{ if (c.type==='draw') return null; const n=runLength(geo().lines[c.li]); return n>=4?{xmult:n-2}:null; } },
+  bigsky:   { name:'Big Sky', rar:2, cost:6, gl:'\u25A1', req:()=>S.N>=4,
+    desc:()=>({en:'<em>X1.5</em> Mult on a 4×4 board, <em>X2</em> on 5×5', da:'<em>X1,5</em> mult på et 4×4-bræt, <em>X2</em> på 5×5'}),
+    line:()=>S.N>3?{xmult:1+0.5*(S.N-3)}:null },
+  crossroads:{ name:'Crossroads', rar:2, cost:6, gl:'\u271A',
+    desc:()=>({en:'<em>+15</em> Mult for each X in the line that is also part of another scored line', da:'<em>+15</em> mult for hvert X i linjen der også er del af en anden scoret linje'}),
+    line:(/** @type {any} */ c)=>{ if (c.type==='draw') return null; const L=geo().lines; const n=c.cells.filter((/** @type {number} */ i)=>S.g.scored.some((/** @type {number} */ li)=>li!==c.li && L[li].cells.includes(i))).length; return n?{mult:15*n}:null; } },
+  cartographer:{ name:'Cartographer', rar:1, cost:5, gl:'\u2316',
+    desc:()=>({en:'<i>+8</i> Chips for each empty square on the board', da:'<i>+8</i> chips for hvert tomt felt på brættet'}),
+    line:()=>{ const n=S.board.filter((/** @type {any} */ x)=>!x).length; return n?{chips:8*n}:null; } },
+  landlord: { name:'Landlord', rar:1, cost:5, gl:'\u2302\uFE0E',
+    desc:()=>({en:'<em>+1</em> Mult for each of your X on the board', da:'<em>+1</em> mult for hvert af dine X på brættet'}),
+    line:()=>({mult:S.board.filter((/** @type {any} */ x)=>x&&x.t==='X').length}) },
+  pincer:   { name:'Pincer', rar:1, cost:5, gl:'\u2194',
+    desc:()=>({en:'<i>+25</i> Chips for each rival O touching the line', da:'<i>+25</i> chips for hvert af modstanderens O der rører linjen'}),
+    line:(/** @type {any} */ c)=>{ const os=new Set(); c.cells.forEach((/** @type {number} */ i)=>neighbours(i).forEach(k=>{ if(S.board[k]&&S.board[k].t==='O') os.add(k); })); return os.size?{chips:25*os.size}:null; } },
+  hermit:   { name:'Hermit', rar:2, cost:6, gl:'\u25CC',
+    desc:()=>({en:'<em>X2</em> Mult if no rival O touches the line', da:'<em>X2</em> mult hvis intet O rører linjen'}),
+    line:(/** @type {any} */ c)=>{ if (c.type==='draw') return null; const touched=c.cells.some((/** @type {number} */ i)=>neighbours(i).some(k=>S.board[k]&&S.board[k].t==='O')); return touched?null:{xmult:2}; } },
+  checkmate:{ name:'Checkmate', rar:3, cost:8, gl:'\u265A\uFE0E',
+    desc:()=>({en:'<em>X3</em> Mult if you had 3 or more winning threats open when you scored', da:'<em>X3</em> mult hvis du havde 3 eller flere vindertrusler åbne da du scorede'}),
+    line:(/** @type {any} */ c)=>c.threats>=3?{xmult:3}:null },
+  demolition:{ name:'Demolition', rar:2, cost:6, gl:'\u2739',
+    desc:(/** @type {any} */ j)=>{ const m=(j&&j.data.m)||0; return {en:`Gains <em>+3</em> Mult every time a Bomb X blows up an O (currently <em>+${m}</em>)`, da:`Får <em>+3</em> mult hver gang et Bombe X sprænger et O (lige nu <em>+${m}</em>)`}; },
+    line:(/** @type {any} */ c, /** @type {any} */ j)=>j.data.m?{mult:j.data.m}:null, val:(/** @type {any} */ j)=>'+'+(j.data.m||0) },
+  ghosttown:{ name:'Ghost Town', rar:2, cost:6, gl:'\u2601\uFE0E',
+    desc:()=>({en:'Ghost X give <em>X1.5</em> Mult when they score', da:'Spøgelses X giver <em>X1,5</em> mult når de scorer'}),
+    x:(/** @type {any} */ c, /** @type {number} */ i, /** @type {any} */ p)=>p.type==='ghost'?{xmult:1.5}:null },
+  glassjaw: { name:'Glass Jaw', rar:3, cost:7, gl:'\u25C8',
+    desc:()=>({en:'Glass X give <em>X3</em> instead of X2, but always shatter', da:'Glas X giver <em>X3</em> i stedet for X2, men splintres altid'}) },
+  reflection:{ name:'Reflection', rar:2, cost:6, gl:'\u29D6',
+    desc:()=>({en:'Mirror X and the X they drop give <em>+6</em> Mult when they score', da:'Spejl X og det X de lægger giver <em>+6</em> mult når de scorer'}),
+    x:(/** @type {any} */ c, /** @type {number} */ i, /** @type {any} */ p)=>(p.type==='mirror'||p.mirrored)?{mult:6}:null },
 };
 export { hasJ };
+
+/* ---------------- Joker editions ----------------
+ * A shop Joker sometimes comes in a special finish. The edition fires
+ * once per scored line, after the Joker's own effect, and the card gets
+ * the matching animated sheen (see cardfx.js and game.css). */
+/** @type {Record<string, any>} */
+export const EDITIONS = {
+  foil: { name:{en:'Foil', da:'Folie'}, chance:.10, cost:2, effect:{chips:50},
+    desc:{en:'<i>+50</i> Chips', da:'<i>+50</i> chips'} },
+  holo: { name:{en:'Holographic', da:'Holografisk'}, chance:.06, cost:3, effect:{mult:10},
+    desc:{en:'<em>+10</em> Mult', da:'<em>+10</em> mult'} },
+  poly: { name:{en:'Polychrome', da:'Polykrom'}, chance:.03, cost:5, effect:{xmult:1.5},
+    desc:{en:'<em>X1.5</em> Mult', da:'<em>X1,5</em> mult'} },
+};
+
+/* ---------------- booster packs ----------------
+ * Bought in the shop, opened on the spot: you see `show` cards and keep
+ * `choose` of them. */
+/** @type {Record<string, any>} */
+export const PACKS = {
+  joker:   { name:{en:'Joker Pack', da:'Jokerpakke'}, gl:'J', color:'#b4423d', cost:5, show:3, choose:1,
+    desc:{en:'Pick <u>1</u> of <u>3</u> Jokers. Better odds of a special finish', da:'Vælg <u>1</u> af <u>3</u> Jokere. Bedre chance for en speciel finish'} },
+  piece:   { name:{en:'Piece Pack', da:'Brikpakke'}, gl:'X', color:'#5b6f8a', cost:4, show:4, choose:2,
+    desc:{en:'Pick <u>2</u> of <u>4</u> special X pieces for your bag', da:'Vælg <u>2</u> af <u>4</u> specielle X-brikker til din pose'} },
+  chalk:   { name:{en:'Chalk Pack', da:'Kridtpakke'}, gl:'\u2550', color:'#2b8f9a', cost:4, show:3, choose:1,
+    desc:{en:'Pick <u>1</u> of <u>3</u> chalks. It levels up a score type right away', da:'Vælg <u>1</u> af <u>3</u> kridt. Det hæver en scoretype med det samme'} },
+  builder: { name:{en:'Builder Pack', da:'Byggepakke'}, gl:'\u25A6', color:'#a8742a', cost:5, show:3, choose:1,
+    desc:{en:'Pick <u>1</u> of <u>3</u> square upgrades and place it on the board', da:'Vælg <u>1</u> af <u>3</u> feltopgraderinger og placér den på brættet'} },
+  tool:    { name:{en:'Tool Pack', da:'Værktøjspakke'}, gl:'\u2692\uFE0E', color:'#7a4bb3', cost:3, show:2, choose:1,
+    desc:{en:'Pick <u>1</u> of <u>2</u> tools', da:'Vælg <u>1</u> af <u>2</u> værktøjer'} },
+};
 
 /* ---------------- items (chalk levels a score type, tools act right away) ---------------- */
 /** @type {Record<string, any>} */
