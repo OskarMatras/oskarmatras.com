@@ -6,3 +6,5 @@
 /projects/*          /Projects/:splat           301
 /TerraThroughTime    /Projects/TerraThroughTime 301
 /ColumnAtlas         /Projects                  301
+/BalatroXTicTacToe   /Projects/BalatroXTicTacToe/ 301
+/tictactoe           /Projects/BalatroXTicTacToe/ 301

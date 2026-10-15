@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Balatro X TicTacToe · Oskar Matras</title>
+<meta name="description" content="Et roguelike-spil der starter som almindeligt kryds og bolle og vokser til et regnestykke af synergier." data-da-content="Et roguelike-spil der starter som almindeligt kryds og bolle og vokser til et regnestykke af synergier." data-en-content="A roguelike that starts as plain tic-tac-toe and grows into a stack of synergies.">
+<link rel="canonical" href="https://OskarMatras.com/Projects/BalatroXTicTacToe/">
+<meta name="theme-color" content="#0d2724">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="format-detection" content="telephone=no">
+<meta property="og:title" content="Balatro X TicTacToe">
+<meta property="og:description" content="A roguelike that starts as plain tic-tac-toe and grows into a stack of synergies.">
+<meta property="og:image" content="https://OskarMatras.com/Projects/balatro-x-tictactoe-preview.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&family=Lilita+One&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/Projects/BalatroXTicTacToe/game.css">
+<link rel="modulepreload" href="/Projects/BalatroXTicTacToe/js/engine.js">
+<link rel="modulepreload" href="/Projects/BalatroXTicTacToe/js/ui.js">
+<script src="/i18n.js" defer></script>
+<script type="module" src="/Projects/BalatroXTicTacToe/js/main.js"></script>
+</head>
+<body data-phase="title">
+<canvas id="bg" aria-hidden="true"></canvas>
+
+<header class="bar">
+  <a href="/" class="home">Oskar Matras</a>
+  <span aria-hidden="true">/</span>
+  <a href="/Projects" data-da="Projekter" data-en="Projects">Projekter</a>
+  <span aria-hidden="true">/</span>
+  <span class="crumb">Balatro X TicTacToe</span>
+  <span class="bar-lang" data-lang-switch></span>
+</header>
+
+<div id="app">
+  <aside id="side" aria-label="Status"></aside>
+  <main id="main">
+    <section id="rack" aria-label="Jokers"></section>
+    <section id="stage"></section>
+  </main>
+</div>
+
+<div id="overlay" hidden></div>
+<div id="insp" hidden role="dialog"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<noscript>
+  <p style="padding:24px;font-family:system-ui,sans-serif;color:#f5efe0">
+    Spillet kræver JavaScript. / The game needs JavaScript.
+  </p>
+</noscript>
+</body>
+</html>
