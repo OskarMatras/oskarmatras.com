@@ -327,7 +327,7 @@
                placeholder="Describe the task: e.g. scrape a website, read a PDF…">
         <kbd aria-hidden="true">/</kbd>
       </label>
-      <button class="toggle" id="f-pick" type="button" aria-pressed="false">★ <span>Picks only</span></button>
+      <button class="toggle" id="f-pick" type="button" aria-pressed="false"><span aria-hidden="true">★</span> <span>Picks only</span></button>
       <button class="toggle" id="f-official" type="button" aria-pressed="false"><span>Official only</span></button>
       <span class="count" id="count" aria-live="polite"></span>
     </div>
@@ -998,6 +998,25 @@
     var pick = false, off = false;
 
     function stem(w){ return w.length > 4 ? w.replace(/(ing|ers|er|ed|es|s|e)$/, '') : w; }
+    /* A term has to start a word, not sit inside one. Without this a two
+       letter term such as 'en' matches wh[en], op[en] and ag[en]t, so any
+       query carrying one returned almost the whole atlas - and the page's
+       own example, 'read a PDF', was such a query in Danish.
+
+       Longer terms may still match a prefix, so the stem 'scrap' keeps
+       finding 'scraping'. One and two letter terms have to be the whole
+       word, or 'en' would match [en]gine and [en]vironment just as
+       indiscriminately as it matched wh[en]. */
+    function hit(text, t){
+      var whole = t.length <= 2;
+      for(var i = text.indexOf(t); i > -1; i = text.indexOf(t, i + 1)){
+        if(i !== 0 && /[a-z0-9]/.test(text.charAt(i - 1))) continue;
+        if(!whole) return true;
+        var end = i + t.length;
+        if(end >= text.length || !/[a-z0-9]/.test(text.charAt(end))) return true;
+      }
+      return false;
+    }
 
     function apply(){
       var raw = q.value.toLowerCase().replace(/[^a-z0-9æøå.+# -]/g, ' ');
@@ -1008,7 +1027,7 @@
         var score = 0;
         if(ok && terms.length){
           var text = el.getAttribute('data-text');
-          terms.forEach(function(t){ if(text.indexOf(t) > -1) score++; });
+          terms.forEach(function(t){ if(hit(text, t)) score++; });
           ok = score > 0;
         }
         el.hidden = !ok;
