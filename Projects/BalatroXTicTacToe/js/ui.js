@@ -16,7 +16,7 @@
 import { S, SET, best, hasSavedRun } from './state.js';
 import { geo, squareOf } from './geometry.js';
 import { LINE_TYPES, LINE_ORDER, PIECES, TILES, RARITY, JOKERS, ITEMS, VOUCHERS, BOSSES, EDITIONS, EDITS, PACKS, hasJ } from './data.js';
-import { sync as syncCoach } from './coach.js';
+import { sync as syncCoach, ollie } from './coach.js';
 import { punch } from './cardfx.js';
 import { blindInfo, lineValues, handMax } from './rules.js';
 import { t, tr, fmt, fmtM, getLang } from './strings.js';
@@ -165,6 +165,35 @@ function renderPlay() {
     <div class="handRow"><div id="hand">${hand}</div>
       <button class="btn red" data-act="discard" ${(!S.hand.length || !S.round.discards || S.busy || S.mode || noSpecials) ? 'disabled' : ''}>${t('btn.discard')}</button></div>
   </div>`;
+  if (S.growAnim) scheduleGrow();
+}
+
+/* ---------------- the board grows ----------------
+ * The first time a bigger board is drawn, the board stretches into place and the new squares
+ * pop in outward from the old ones. It waits a beat for the screen to settle (starting a game
+ * redraws several times), plays once, and is skipped for anyone who asked for reduced motion. */
+let growTimer = /** @type {any} */ (null);
+function scheduleGrow() {
+  if (growTimer) return;
+  growTimer = setTimeout(() => { growTimer = null; playGrow(); }, 320);
+}
+function playGrow() {
+  const g = S.growAnim;
+  if (!g || S.phase !== 'play') return;
+  S.growAnim = null;   // once only: later renders (a move, a discard) must not replay it
+  banner(t('banner.grow', { n: g.to }));
+  sfx.win();
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const bw = $('#bw'); if (!bw || !bw.animate) return;
+  bw.animate([{ transform: 'scale(.74)', opacity: 0 }, { transform: 'scale(1.035)', opacity: 1, offset: .62 }, { transform: 'scale(1)', opacity: 1 }],
+    { duration: 820, easing: 'cubic-bezier(.2,.8,.25,1)' });
+  bw.querySelectorAll('.cell').forEach(c => {
+    const i = +(/** @type {HTMLElement} */ (c).dataset.cell), r = Math.floor(i / g.to), k = i % g.to;
+    if (r < g.from && k < g.from) return;                      // an old square: it just sits there
+    const ring = Math.max(r, k) - g.from + 1;                  // 1 = the first new row or column, 2 = the next...
+    c.animate([{ transform: 'scale(.15)', opacity: 0 }, { transform: 'scale(1.14)', opacity: 1, offset: .62 }, { transform: 'scale(1)', opacity: 1 }],
+      { duration: 520, delay: 420 + ring * 130 + (r + k) * 28, easing: 'ease-out', fill: 'backwards' });
+  });
 }
 
 function renderBlinds() {
@@ -280,7 +309,7 @@ function renderPackScene() {
 
 /* ---------------- overlays ---------------- */
 /** @param {string|null} kind */
-export function showModal(kind) { modal = kind; abandonArmed = false; renderOverlay(); }
+export function showModal(kind) { modal = kind; abandonArmed = false; renderOverlay(); syncCoach(); }   // Ollie steps aside for a dialog, and comes back after it
 
 function renderOverlay() {
   let kind = modal;
@@ -294,7 +323,7 @@ function renderOverlay() {
       <h1 class="title" id="mt"><span>BALATRO</span> <span class="x">X</span> <span>TICTACTOE</span></h1>
       <p class="subtitle">${t('title.sub')}${b.ante ? ' ' + t('title.best', { a: b.ante, s: fmt(b.score) }) : ''}</p>
       ${SET.tips && !(SET.seen && SET.seen.welcome)
-        ? `<p class="tipsLine">${t('title.tipsLine')}</p>`   // new players get taught as they play, not up front
+        ? `<div class="titleOllie"><span class="tOllie">${ollie('wink')}</span><p>${t('title.tipsLine')}</p></div>`   // new players get taught as they play, not up front
         : `<div class="howto"><div>${t('how.1')}</div><div>${t('how.2')}</div><div>${t('how.3')}</div><div>${t('how.4')}</div></div>`}
       <div class="btnRow">${hasSavedRun() ? `<button class="btn gold big" data-act="continueRun">${t('btn.continue')}</button>` : ''}
         <button class="btn ${hasSavedRun() ? '' : 'gold '}big" data-act="newRun">${t('btn.newRun')}</button></div></div>`;

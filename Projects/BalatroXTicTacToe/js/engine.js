@@ -7,7 +7,7 @@
  * whole length, so taps during scoring are ignored and a save never
  * captures a half-finished turn.
  */
-import { S, SET, nid, saveRun, clearRun, saveBest, loadRun, saveSettings } from './state.js';
+import { S, SET, nid, saveRun, clearRun, saveBest, loadRun, saveSettings, growBoard } from './state.js';
 import { geo, rc, squareOf, neighbours, isCenter, mirrorOf } from './geometry.js';
 import { PIECES, SPECIALS, TILES, JOKERS, ITEMS, VOUCHERS, LINE_TYPES, EDITIONS, EDITS, PACKS, hasJ } from './data.js';
 import {
@@ -326,6 +326,12 @@ function gameOver() {
   saveBest(); clearRun(); sfx.bad(); ui.render();
 }
 
+/**
+ * Antes that open with a bigger board, whatever the player bought: { ante: board size }.
+ * The game starts as plain 3×3 and picks up complexity quickly, so by ante 4 everyone has 4×4.
+ */
+const BOARD_GROWS = { 4: 4 };
+
 function winBlind() {
   sfx.win();
   const r = S.round, rows = [], notes = [];
@@ -341,6 +347,9 @@ function winBlind() {
   if (S.blindIdx === 2) {
     S.cashout.finalWin = S.ante === 8 && !S.endless;
     S.ante++; S.blindIdx = 0; nextBoss();
+    // Before makeShop(), so the shop (and its voucher roll) already knows the new board size.
+    const to = /** @type {Record<number, number>} */ (BOARD_GROWS)[S.ante];
+    if (to) growBoard(to);
   } else S.blindIdx++;
   saveBest(); makeShop(); settle();
 }

@@ -73,6 +73,20 @@ export function replaceState(data, nextUid) {
 }
 export function snapshot() { return { S: JSON.parse(JSON.stringify(S)), uid }; }
 
+/**
+ * Make the board n×n. Squares keep their places (the old board becomes the top-left corner of
+ * the new one). `growAnim` tells the play screen to animate the new squares in the next time it
+ * draws the board, so a bigger board is never a silent change, however it came about (an ante
+ * that opens with a bigger board, or a voucher).
+ * @param {number} n @returns {boolean} whether the board actually grew
+ */
+export function growBoard(n) {
+  if (n <= S.N) return false;
+  S.growAnim = { from: S.N, to: n };
+  S.N = n;
+  return true;
+}
+
 export function best() { return read(KEY_BEST) || { ante: 0, score: 0 }; }
 export function saveBest() {
   const b = best();

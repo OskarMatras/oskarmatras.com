@@ -536,24 +536,51 @@ table.lv th{font-weight:500;color:var(--ink-dim);font-size:13px}
 .ed-tag::before{display:none}
 @media (prefers-reduced-motion: reduce){ [data-tilt]{transform:none} }
 
-/* ---------- tips (the tutorial) ----------
-   A small bubble that never blocks play: it sits at the top or bottom of the screen, whichever
-   is further from the thing it is about, and that thing gets a soft pulsing outline. */
-.tipsLine{margin:14px 0;text-align:center;font-size:16px;line-height:1.45;color:var(--ink-dim)}
-#coach{position:fixed;left:50%;transform:translateX(-50%);z-index:55;width:min(520px, calc(100vw - 24px));
-  background:var(--panel);border:2px solid var(--gold);border-radius:14px;padding:12px 14px 10px;cursor:pointer;
-  box-shadow:0 10px 0 rgba(0,0,0,.4),0 0 0 4px rgba(246,185,44,.18);animation:coachIn .28s cubic-bezier(.2,.9,.3,1.2)}
+/* ---------- Ollie, the tutorial ----------
+   A small round character in a corner, with a speech bubble. He never blocks play: the bubble is
+   click-through (only his face and "Skip tips" take clicks), coach.js parks him in the emptiest
+   corner, and the thing he is talking about gets a soft outline. */
+.titleOllie{display:flex;align-items:center;gap:12px;margin:14px 0;text-align:left}
+.titleOllie .tOllie{flex:none;width:54px;height:54px;filter:drop-shadow(0 4px 0 rgba(0,0,0,.4))}
+.titleOllie .tOllie svg{display:block;width:100%;height:100%}
+.titleOllie p{margin:0;font-size:15px;line-height:1.45;color:var(--ink-dim)}
+
+#coach{position:fixed;z-index:55;display:flex;align-items:flex-end;gap:10px;pointer-events:none;max-width:calc(100vw - 24px)}
 #coach[hidden]{display:none}
-#coach.bottom{bottom:calc(20px + env(safe-area-inset-bottom, 0px))}
-#coach.top{top:62px}
-#coach p{margin:0;font-size:15px;line-height:1.45}
-#coach .cFoot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:8px;font-size:12px;color:var(--ink-mute)}
-#coach .cSkip{background:none;border:0;padding:2px 4px;font:inherit;color:var(--ink-dim);text-decoration:underline;cursor:pointer}
+#coach[data-corner="bl"]{left:12px;bottom:calc(12px + env(safe-area-inset-bottom, 0px))}
+#coach[data-corner="br"]{right:12px;bottom:calc(12px + env(safe-area-inset-bottom, 0px));flex-direction:row-reverse}
+#coach[data-corner="tl"]{left:12px;top:62px;align-items:flex-start}
+#coach[data-corner="tr"]{right:12px;top:62px;flex-direction:row-reverse;align-items:flex-start}
+#coach .cAvatar{pointer-events:auto;flex:none;width:58px;height:58px;padding:0;border:0;background:none;cursor:pointer;
+  filter:drop-shadow(0 4px 0 rgba(0,0,0,.4));animation:ollieBob 3.2s ease-in-out infinite, ollieIn .35s cubic-bezier(.2,1.2,.3,1)}
+#coach .cAvatar svg{display:block;width:100%;height:100%}
+#coach .cAvatar:focus-visible{outline:3px solid var(--gold);outline-offset:2px;border-radius:50%}
+#coach .cBubble{position:relative;width:min(300px, calc(100vw - 110px));padding:8px 12px 6px;background:var(--panel);
+  border:2px solid var(--o);border-radius:14px;box-shadow:0 6px 0 rgba(0,0,0,.4);animation:ollieIn .3s ease-out}
+/* the little tail, pointing at Ollie */
+#coach .cBubble::before{content:'';position:absolute;bottom:14px;width:10px;height:10px;background:var(--panel);transform:rotate(45deg)}
+#coach[data-corner="bl"] .cBubble::before,#coach[data-corner="tl"] .cBubble::before{left:-7px;border-left:2px solid var(--o);border-bottom:2px solid var(--o)}
+#coach[data-corner="br"] .cBubble::before,#coach[data-corner="tr"] .cBubble::before{right:-7px;border-right:2px solid var(--o);border-top:2px solid var(--o)}
+#coach .cWho{font-family:var(--f-num);font-weight:400;font-size:13px;letter-spacing:.04em;color:var(--o)}
+#coach .cText{margin:2px 0 0;font-size:14px;line-height:1.4}
+#coach .cText b{color:var(--gold);font-weight:600}
+#coach .cFoot{margin-top:2px;text-align:right;line-height:1}
+#coach .cSkip{pointer-events:auto;padding:3px 2px;border:0;background:none;font:inherit;font-size:11.5px;color:var(--ink-dim);text-decoration:underline;cursor:pointer}
 #coach .cSkip:hover{color:var(--ink)}
-@keyframes coachIn{from{opacity:0;translate:0 10px}}
-.coach-hl{outline:3px solid var(--gold);outline-offset:3px;border-radius:12px;animation:coachPulse 1.6s ease-in-out infinite}
-@keyframes coachPulse{50%{outline-color:rgba(246,185,44,.35);outline-offset:6px}}
-@media (prefers-reduced-motion: reduce){ #coach{animation:none} .coach-hl{animation:none} }
+@keyframes ollieBob{50%{transform:translateY(-3px)}}
+@keyframes ollieIn{from{opacity:0;scale:.7}}
+.coach-hl{outline:2px solid var(--o);outline-offset:3px;border-radius:12px;animation:coachPulse 2.2s ease-in-out infinite}
+@keyframes coachPulse{50%{outline-color:rgba(255,123,58,.35);outline-offset:6px}}
+/* On a phone there is no empty corner, so he gets smaller: a narrower bubble, smaller type. */
+@media (max-width: 480px){
+  #coach{gap:7px}
+  #coach .cAvatar{width:44px;height:44px}
+  #coach .cBubble{width:min(236px, calc(100vw - 82px));padding:6px 10px 4px}
+  #coach .cWho{font-size:12px}
+  #coach .cText{font-size:12.5px;line-height:1.35}
+  #coach .cSkip{font-size:11px}
+}
+@media (prefers-reduced-motion: reduce){ #coach .cAvatar,#coach .cBubble{animation:none} .coach-hl{animation:none} }
 
 /* ---------- hover tooltip ---------- */
 #tip{position:fixed;z-index:45;pointer-events:none;width:max-content;max-width:min(260px, calc(100vw - 20px));

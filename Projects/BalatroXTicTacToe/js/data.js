@@ -11,7 +11,7 @@
  * Hooks receive the scoring context and read the run state from state.js.
  * They return an effect { chips?, mult?, xmult?, money? } or null.
  */
-import { S } from './state.js';
+import { S, growBoard } from './state.js';
 import { isCenter, isCorner, isEdge, neighbours, runLength, geo } from './geometry.js';
 
 /** @typedef {{en:string, da:string}} Text */
@@ -278,8 +278,8 @@ export const VOUCHERS = {
   rack:     { name:{en:'Joker Rack', da:'Jokerhylde'}, gl:'+J', desc:{en:'<u>+1</u> Joker slot', da:'<u>+1</u> Joker-plads'}, apply:()=>{ S.jokerSlots++; } },
   satchel:  { name:{en:'Satchel', da:'Taske'}, gl:'+C', desc:{en:'<u>+1</u> item slot', da:'<u>+1</u> genstandsplads'}, apply:()=>{ S.itemSlots++; } },
   coupon:   { name:{en:'Coupon', da:'Kupon'}, gl:'%', desc:{en:'Shop rerolls start at <u>$2</u>', da:'Nye varer i butikken starter ved <u>$2</u>'}, apply:()=>{} },
-  board4:   { name:{en:'Bigger Board', da:'Større bræt'}, gl:'4×4', desc:{en:'The board grows to <b>4×4</b>. Still three in a row, so many more lines', da:'Brættet vokser til <b>4×4</b>. Stadig tre på stribe, så mange flere linjer'}, apply:()=>{ S.N=4; }, req:()=>S.N===3 && S.ante>=2 },
-  board5:   { name:{en:'Huge Board', da:'Kæmpebræt'}, gl:'5×5', desc:{en:'The board grows to <b>5×5</b>', da:'Brættet vokser til <b>5×5</b>'}, apply:()=>{ S.N=5; }, req:()=>S.N===4 },
+  board4:   { name:{en:'Bigger Board', da:'Større bræt'}, gl:'4×4', desc:{en:'The board grows to <b>4×4</b>. Still three in a row, so many more lines', da:'Brættet vokser til <b>4×4</b>. Stadig tre på stribe, så mange flere linjer'}, apply:()=>{ growBoard(4); }, req:()=>S.N===3 && S.ante>=2 },   // an early way to 4×4; every run gets it at ante 4 anyway (see engine.js)
+  board5:   { name:{en:'Huge Board', da:'Kæmpebræt'}, gl:'5×5', desc:{en:'The board grows to <b>5×5</b>', da:'Brættet vokser til <b>5×5</b>'}, apply:()=>{ growBoard(5); }, req:()=>S.N===4 && S.ante>=5 },   // not before ante 5: ante 4 is when the board first grows
 };
 
 /* ---------------- boss blinds ---------------- */
