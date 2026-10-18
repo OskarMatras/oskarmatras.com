@@ -19,7 +19,7 @@ import { LINE_TYPES, LINE_ORDER, PIECES, TILES, RARITY, JOKERS, ITEMS, VOUCHERS,
 import { sync as syncCoach } from './coach.js';
 import { punch } from './cardfx.js';
 import { blindInfo, lineValues, handMax } from './rules.js';
-import { t, tr, fmt, fmtM } from './strings.js';
+import { t, tr, fmt, fmtM, getLang } from './strings.js';
 import { sfx } from './audio.js';
 
 /** @type {Record<string, (arg?: string) => any>} */
@@ -326,7 +326,8 @@ function renderOverlay() {
         <button class="btn" data-act="toggleSound" aria-pressed="${SET.sound}">${SET.sound ? t('ui.soundOn') : t('ui.soundOff')}</button>
         <button class="btn" data-act="toggleCrt" aria-pressed="${SET.crt}">${SET.crt ? t('ui.crtOn') : t('ui.crtOff')}</button></div>
       <div class="btnRow"><button class="btn" data-act="toggleTips" aria-pressed="${SET.tips}">${SET.tips ? t('ui.tipsOn') : t('ui.tipsOff')}</button>
-        <button class="btn" data-act="replayTips">${t('ui.tipsReplay')}</button></div>
+        <button class="btn" data-act="replayTips">${t('ui.tipsReplay')}</button>
+        <button class="btn" data-act="toggleLang" lang="${getLang()}">${t('ui.lang')}</button></div>
       <div class="btnRow"><button class="btn big" data-act="closeModal">${t('btn.close')}</button>
         <button class="btn red" data-act="abandon">${abandonArmed ? t('btn.abandonSure') : t('btn.abandon')}</button></div></div>`;
   } else if (kind === 'bag') {
@@ -424,6 +425,8 @@ const local = {
   inspectItem: (a, el2) => inspectItem(a, el2),
   inspectShop: (a, el2) => inspectShop(a, el2),
   inspectPackOpt: (a, el2) => inspectPackOpt(a, el2),
+  // Same switch as the one in the top bar: i18n.js stores the choice and fires `langchange`, which re-renders.
+  toggleLang: () => { const w = /** @type {any} */ (window); if (w.I18N) w.I18N.set(getLang() === 'da' ? 'en' : 'da'); },
   hideInsp: () => hideInsp(),
   openInfo: () => showModal('info'),
   openBag: () => showModal('bag'),

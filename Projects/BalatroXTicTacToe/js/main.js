@@ -43,7 +43,8 @@ startCardFx();
 addEventListener('pointerdown', unlock, { passive: true });
 addEventListener('keydown', unlock);
 
-// The site-wide DA / EN switch in the top bar.
+// The DA / EN switch in the top bar (and Run info's language button): i18n.js stores the choice
+// under this page's own key and tells us here.
 document.addEventListener('langchange', e => {
   setLang(/** @type {CustomEvent} */ (e).detail.lang);
   ui.render();

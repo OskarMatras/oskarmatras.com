@@ -2,9 +2,13 @@
 /**
  * Interface text in Danish and English.
  *
- * The site's own /i18n.js owns the language choice (stored under
- * "om-lang" and shown as the DA / EN switch in the top bar). This module
- * reads the same choice and listens for the site's `langchange` event,
+ * The game's standard language is English; Danish is an option. The page
+ * keeps its own choice (stored under "bxt-lang", see the data-lang-key on
+ * <html> in index.html), apart from the rest of the site, so a first visit
+ * is always English whatever the browser says, and playing in one language
+ * never changes the language of the site's other pages. /i18n.js owns the
+ * choice and shows it as the DA / EN switch in the top bar; Run info has the
+ * same option. This module reads it and listens for the `langchange` event,
  * so the game and the page around it always agree.
  *
  * Content text (Jokers, pieces, bosses) lives in data.js as {en, da}
@@ -35,6 +39,7 @@ const EN = {
   'toast.smelted': 'Smelted into a {name}', 'toast.twinned': 'Copied: another {name} in your bag',
   'toast.scrapped': 'Scrapped for $3', 'toast.bagMin': 'Keep at least 5 X in your bag',
   'ui.tipsOn': 'Tips on', 'ui.tipsOff': 'Tips off', 'ui.tipsReplay': 'Replay tips', 'toast.tipsReplay': 'Tips will start again',
+  'ui.lang': 'Language: English',
   'title.tipsLine': 'New here? Just play. Tips will pop up as you go, one at a time.',
   'coach.tap': 'Click to continue', 'coach.skip': 'Skip tips',
   'coach.welcome': 'Welcome! Clear three blinds to finish an ante. Start with the Small Blind, a gentle warm-up. You have got this.',
@@ -123,6 +128,7 @@ const DA = {
   'toast.smelted': 'Smeltet til {name}', 'toast.twinned': 'Kopieret: endnu et {name} i din pose',
   'toast.scrapped': 'Skrottet for $3', 'toast.bagMin': 'Behold mindst 5 X i din pose',
   'ui.tipsOn': 'Tips til', 'ui.tipsOff': 'Tips fra', 'ui.tipsReplay': 'Afspil tips igen', 'toast.tipsReplay': 'Tips starter forfra',
+  'ui.lang': 'Sprog: Dansk',
   'title.tipsLine': 'Ny her? Spil bare. Tips dukker op undervejs, ét ad gangen.',
   'coach.tap': 'Klik for at fortsætte', 'coach.skip': 'Spring tips over',
   'coach.welcome': 'Velkommen! Klar tre blinds for at gennemføre en ante. Start med den lille blind, en blid opvarmning. Du kan godt finde ud af det.',
@@ -192,16 +198,10 @@ function detect() {
   try {
     const w = /** @type {any} */ (window);
     if (w.I18N && (w.I18N.lang === 'da' || w.I18N.lang === 'en')) return w.I18N.lang;
-    const v = localStorage.getItem('om-lang');
+    const v = localStorage.getItem('bxt-lang');
     if (v === 'da' || v === 'en') return v;
   } catch (e) { /* ignore */ }
-  const list = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || 'en'];
-  for (const l of list) {
-    const s = String(l).toLowerCase();
-    if (s.startsWith('da')) return 'da';
-    if (s.startsWith('en')) return 'en';
-  }
-  return 'en';
+  return 'en';   // deliberately not guessed from the browser: English is the standard
 }
 
 let lang = detect();

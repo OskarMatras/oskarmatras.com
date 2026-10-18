@@ -20,12 +20,24 @@
    that their browser's. Someone arriving with an English browser lands
    in English without touching anything, which is the point - the switch
    is there to override a wrong guess, not to be a required first step.
+
+   A page can keep its own language, apart from the rest of the site:
+
+     <html data-lang-key="bxt-lang" data-lang-default="en">
+
+   The key is where that page remembers its choice, and the default is what
+   a first-time visitor gets instead of a guess from their browser. The game
+   uses this to start in English without flipping the site's Danish pages to
+   English for everyone who plays it. Pages without these attributes behave
+   exactly as before.
    --------------------------------------------------------------- */
 (function () {
   'use strict';
 
   var LANGS = ['da', 'en'];
-  var KEY = 'om-lang';
+  var html = document.documentElement;
+  var KEY = html.getAttribute('data-lang-key') || 'om-lang';
+  var DEFAULT = html.getAttribute('data-lang-default');
   var ATTRS = ['alt', 'aria-label', 'title', 'placeholder', 'content'];
 
   function stored() {
@@ -49,7 +61,7 @@
     return 'en';
   }
 
-  var lang = stored() || fromBrowser();
+  var lang = stored() || (LANGS.indexOf(DEFAULT) >= 0 ? DEFAULT : fromBrowser());
 
   function apply(root) {
     root = root || document;
