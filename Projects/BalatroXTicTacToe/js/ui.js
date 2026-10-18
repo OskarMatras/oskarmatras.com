@@ -17,6 +17,7 @@ import { S, SET, best, hasSavedRun } from './state.js';
 import { geo, squareOf } from './geometry.js';
 import { LINE_TYPES, LINE_ORDER, PIECES, TILES, RARITY, JOKERS, ITEMS, VOUCHERS, BOSSES, EDITIONS, EDITS, PACKS, hasJ } from './data.js';
 import { sync as syncCoach, ollie } from './coach.js';
+import * as fx from './fx.js';
 import { punch } from './cardfx.js';
 import { blindInfo, lineValues, handMax } from './rules.js';
 import { t, tr, fmt, fmtM, getLang } from './strings.js';
@@ -121,14 +122,17 @@ function tilesHTML(i) {
   return b ? `<span class="tiles">${b}</span>` : '';
 }
 /** @param {string} id @param {any[]} board @param {string} act */
+/** Pieces placed since the board was last drawn: renderPlay() drops them in with an impact once they are on screen. */
+let justPlaced = /** @type {{ i: number, kind: 'x'|'o' }[]} */ ([]);
 function boardHTML(id, board, act) {
   const N = S.N;
   const cells = board.map((c, i) => {
     let inner = '', cls = 'empty';
     if (c) {
-      if (c.t === 'X') { cls = 'x'; inner = pieceHTML(c.p, (c.fresh ? ' popIn' : '') + (c.shattered ? ' shattered' : '')); }
-      else if (c.t === 'O') { cls = 'o'; inner = `<span class="oMark${c.fresh ? ' popIn' : ''}"></span>`; }
+      if (c.t === 'X') { cls = 'x'; inner = pieceHTML(c.p, c.shattered ? ' shattered' : ''); }
+      else if (c.t === 'O') { cls = 'o'; inner = `<span class="oMark"></span>`; }
       else { cls = 's'; inner = `<span class="stone">${t('stone')}</span>`; }
+      if (c.fresh && id === 'board' && (c.t === 'X' || c.t === 'O')) justPlaced.push({ i, kind: c.t === 'O' ? 'o' : 'x' });
       c.fresh = false;
     }
     const up = Object.keys(squareOf(i)).length ? ' up' : '';
@@ -151,8 +155,8 @@ function renderPlay() {
   const allPlain = S.hand.every((/** @type {any} */ p) => p.type === 'plain');
   const noSpecials = allPlain && S.g.pile.every((/** @type {any} */ p) => p.type === 'plain');
   const hand = S.hand.map((/** @type {any} */ p, /** @type {number} */ k) =>
-    `<button class="hp${k === S.selIdx ? ' sel' : ''}${p.dealt ? ' deal' : ''}" data-tilt="h${p.uid}-${k}" data-tip="piece:${p.type}" data-act="selectPiece" data-arg="${k}" aria-pressed="${k === S.selIdx}" aria-label="${esc(tr(/** @type {any} */ (PIECES)[p.type].name))}">${pieceHTML(p)}</button>`).join('');
-  S.hand.forEach((/** @type {any} */ p) => { p.dealt = false; });
+    `<button class="hp${k === S.selIdx ? ' sel' : ''}${p.dealt ? ' deal' : ''}" style="--k:${k};--fan:${(k - (S.hand.length - 1) / 2).toFixed(2)}" data-tilt="h${p.uid}-${k}" data-tip="piece:${p.type}" data-act="selectPiece" data-arg="${k}" aria-pressed="${k === S.selIdx}" aria-label="${esc(tr(/** @type {any} */ (PIECES)[p.type].name))}">${pieceHTML(p)}</button>`).join('');
+  S.hand.forEach((/** @type {any} */ p, /** @type {number} */ k) => { if (p.dealt) setTimeout(() => sfx.deal(k), k * 70 / speedK()); p.dealt = false; });
   // Instructions float over the board instead of sitting in the layout, so nothing below it moves.
   const modeBar = S.mode === 'erase'
     ? `<div class="modeBar" role="status">${t('hint.erase')} <button class="btn small" data-act="cancelMode">${t('btn.cancel')}</button></div>` : '';
@@ -165,6 +169,8 @@ function renderPlay() {
     <div class="handRow"><div id="hand">${hand}</div>
       <button class="btn red" data-act="discard" ${(!S.hand.length || !S.round.discards || S.busy || S.mode || noSpecials) ? 'disabled' : ''}>${t('btn.discard')}</button></div>
   </div>`;
+  const placed = justPlaced; justPlaced = [];
+  placed.forEach(p => impact(p.i, p.kind));
   if (S.growAnim) scheduleGrow();
 }
 
@@ -277,6 +283,8 @@ function renderShop() {
 /** An opened booster pack. It is its own scene, so the Joker and item trays above stay clickable. */
 function renderPackScene() {
   const pk = S.pack, P = PACKS[pk.type];
+  const firstLook = !pk.revealed;   // the cards flip up the first time only, not on every redraw
+  pk.revealed = true;
   /** @param {any} o */
   const view = o => {
     if (o.kind !== 'edit') return itemView(o);
@@ -286,7 +294,7 @@ function renderPackScene() {
   const opts = pk.options.map((/** @type {any} */ o, /** @type {number} */ i) => {
     const v = view(o), armed = pk.armed === i;
     // Edits need an X to act on, so tapping one readies it; everything else opens its menu.
-    return `<button type="button" class="sitem${o.taken ? ' sold' : ''}${armed ? ' armed' : ''}" data-act="${o.kind === 'edit' ? 'armPack' : 'inspectPackOpt'}" data-arg="${i}" ${o.taken ? 'disabled' : ''}${o.kind === 'edit' ? ` aria-pressed="${armed}"` : ''} aria-label="${esc(v.name)}">${v.vis}<span class="nm2">${esc(v.name)}</span><span class="kind">${v.kind}</span><span class="ds">${v.desc}</span></button>`;
+    return `<button type="button" class="sitem${o.taken ? ' sold' : ''}${armed ? ' armed' : ''}${firstLook ? ' reveal' : ''}" style="--i:${i}" data-act="${o.kind === 'edit' ? 'armPack' : 'inspectPackOpt'}" data-arg="${i}" ${o.taken ? 'disabled' : ''}${o.kind === 'edit' ? ` aria-pressed="${armed}"` : ''} aria-label="${esc(v.name)}">${v.vis}<span class="nm2">${esc(v.name)}</span><span class="kind">${v.kind}</span><span class="ds">${v.desc}</span></button>`;
   }).join('');
   const open = pk.options.filter((/** @type {any} */ o) => !o.taken);
   const hint = S.jokers.length >= S.jokerSlots && open.some((/** @type {any} */ o) => o.kind === 'joker') ? t('pack.sellJoker')
@@ -305,6 +313,11 @@ function renderPackScene() {
     <p class="packSub">${pk.left === 1 ? t('pack.left1') : t('pack.left', { n: pk.left })}</p>
     <div class="shopGrid">${opts}</div>${hint ? `<p class="packHint">${hint}</p>` : ''}${targets}
     <div class="shopBar packBar"><button class="btn big" data-act="skipPack">${t('btn.skipPack')}</button></div></div></div>`;
+  if (firstLook) {   // the pack bursts open
+    sfx.sparkle();
+    const c = fx.centreOf(el.stage.querySelector('.packScene .shopGrid'));
+    if (c) { fx.ring(c.x, c.y, P.color, 24); fx.burst(c.x, c.y, [P.color, '#ffe08a', '#fff'], 22, { speed: 260, up: 90 }); }
+  }
 }
 
 /* ---------------- overlays ---------------- */
@@ -329,8 +342,11 @@ function renderOverlay() {
         <button class="btn ${hasSavedRun() ? '' : 'gold '}big" data-act="newRun">${t('btn.newRun')}</button></div></div>`;
   } else if (kind === 'cashout') {
     const c = S.cashout;
+    const tally = !c.revealed;   // the sheet totals up line by line the first time only, not on every redraw
+    c.revealed = true;
+    if (tally) c.rows.forEach((/** @type {any} */ r, /** @type {number} */ i) => { if (r[1] > 0) setTimeout(() => sfx.money(), (250 + i * 170) / speedK()); });
     h = `<div class="modal" role="dialog" aria-modal="true"><h2>${t('cash.title')}</h2><p>${t('cash.final', { a: fmt(S.round.score), b: fmt(S.round.target) })}</p>
-      <div class="rowsList">${c.rows.map((/** @type {any} */ r) => `<div class="rr"><span>${r[0]}</span><b>${r[1] > 0 ? '$' + r[1] : '-'}</b></div>`).join('')}</div>
+      <div class="rowsList">${c.rows.map((/** @type {any} */ r, /** @type {number} */ i) => `<div class="rr${tally ? ' tally' : ''}" style="--i:${i}"><span>${r[0]}</span><b>${r[1] > 0 ? '$' + r[1] : '-'}</b></div>`).join('')}</div>
       ${c.notes.map((/** @type {string} */ n) => `<p>${n}</p>`).join('')}
       <div class="btnRow"><button class="btn gold big" data-act="cashOut">${t('cash.btn', { n: c.total })}</button></div></div>`;
   } else if (kind === 'over') {
@@ -563,6 +579,7 @@ export function pop(target, text, cls) {
   p.className = 'pop ' + cls; p.textContent = text;
   p.style.left = (r.left + r.width / 2) + 'px'; p.style.top = (r.top + r.height * 0.3) + 'px';
   p.style.animationDuration = (0.8 / Math.max(1, SET.speed * 0.7)) + 's';
+  p.style.setProperty('--rot', ((Math.random() < .5 ? -1 : 1) * (3 + Math.random() * 5)).toFixed(1) + 'deg');   // each label tips its own way
   document.body.appendChild(p);
   setTimeout(() => p.remove(), 1000);
 }
@@ -585,7 +602,91 @@ export function setCalc(chips, mult, name) {
   if (m) m.textContent = fmtM(mult);
   if (h && name !== undefined) h.innerHTML = name || '&nbsp;';
 }
-export const bumpCalc = (/** @type {'chips'|'mult'} */ which) => bump($('#' + which));
+export const bumpCalc = (/** @type {'chips'|'mult'} */ which) => bumpCounter(which, 1.22);
+
+/* ---------------- the choreography of a score ----------------
+ * When something scores, it should feel like it hit: the card jumps and lands with a squash,
+ * sparks burst from it, a short stream of points flies into the counter it feeds, and the counter
+ * pops (hard when the effect fires, softer again when the stream arrives). Bigger effects, and
+ * multipliers above all, get more of everything. All of it is decoration on top of the engine's
+ * timing, so the sequence takes exactly as long as before. */
+const calmMotion = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+const speedK = () => Math.min(3, Math.max(1, SET.speed || 1));
+/** @param {'chips'|'mult'|'xmult'|'money'} kind */
+const counterFor = kind => (kind === 'chips' ? '#chips' : kind === 'money' ? '#money' : '#mult');
+
+/** Pop a counter: it swells, tips a little and flashes. @param {'chips'|'mult'|'xmult'|'money'} kind @param {number} [power] */
+function bumpCounter(kind, power = 1.3) {
+  const e = $(counterFor(kind));
+  if (!e || !e.animate || calmMotion()) return;
+  const tip = kind === 'chips' ? -4 : 4;
+  e.animate([{ scale: '1', rotate: '0deg', filter: 'brightness(1)' }, { scale: String(power), rotate: tip + 'deg', filter: 'brightness(1.6)', offset: .3 }, { scale: '1', rotate: '0deg', filter: 'brightness(1)' }],
+    { duration: 320 / speedK(), easing: 'cubic-bezier(.3,1.6,.5,1)' });
+}
+
+/** An X jumps, tips and lands with a squash. @param {HTMLElement|null} target @param {number} [power] */
+function jump(target, power = 1) {
+  const el = target && target.classList.contains('cell') ? target.querySelector('.piece') : null;
+  if (!el || !el.animate || calmMotion()) return;
+  const rot = (Math.random() < .5 ? -1 : 1) * (3 + Math.random() * 4), up = 1 + .14 * power;
+  el.animate([
+    { translate: '0 0', scale: '1 1', rotate: '0deg' },
+    { translate: `0 ${-14 * power}px`, scale: `${up} ${up}`, rotate: rot + 'deg', offset: .36 },
+    { translate: '0 0', scale: `${1 + .1 * power} ${1 - .12 * power}`, rotate: (-rot / 3) + 'deg', offset: .66 },
+    { translate: '0 0', scale: '1 1', rotate: '0deg' },
+  ], { duration: 420 / speedK(), easing: 'cubic-bezier(.3,1.4,.5,1)' });
+}
+
+/**
+ * Something just scored.
+ * @param {HTMLElement|null} target the card, square or Joker that did it
+ * @param {'chips'|'mult'|'xmult'|'money'} kind @param {number} [amount]
+ */
+export function hit(target, kind, amount = 1) {
+  bumpCounter(kind, kind === 'xmult' ? 1.5 : 1.3);
+  const c = fx.centreOf(target);
+  if (!c) return;
+  const colors = fx.PALETTE[kind], big = kind === 'xmult' ? 1.6 : 1;
+  fx.burst(c.x, c.y, colors, Math.round((12 + Math.min(12, Math.log10(1 + Math.abs(amount)) * 5)) * big), { speed: 210 * big });
+  fx.ring(c.x, c.y, colors[1], kind === 'xmult' ? 22 : 14);
+  const dest = fx.centreOf($(counterFor(kind)));
+  if (dest) fx.stream(c, dest, colors, kind === 'xmult' ? 10 : 7, () => bumpCounter(kind, 1.12));
+  jump(target, kind === 'xmult' ? 1.35 : 1);
+}
+
+/** The line's total lands: a burst over the board, bigger the closer it gets to (or the further it passes) the target. @param {number} ratio total / blind target */
+export function celebrate(ratio) {
+  const c = fx.centreOf($('#bw'));
+  if (!c) return;
+  const r = Math.min(3, Math.max(0.2, ratio));
+  fx.ring(c.x, c.y, '#f6b92c', 30);
+  fx.burst(c.x, c.y, ratio >= 1 ? fx.PALETTE.win : fx.PALETTE.money, Math.round(12 + r * 12), { speed: 230 + r * 60, up: 80, size: 1.15 });
+}
+
+/** A piece has been placed: it drops onto the board with a squash, a ring and dust where it lands. @param {number} i @param {'x'|'o'} kind */
+function impact(i, kind) {
+  if (calmMotion()) return;
+  const cell = cellEl(i);
+  const el = cell && cell.querySelector(kind === 'o' ? '.oMark' : '.piece');
+  if (!cell || !el || !el.animate) return;
+  const d = 360 / speedK();
+  el.animate([
+    { translate: '0 -26px', scale: '1.55', rotate: kind === 'o' ? '-120deg' : '-6deg', opacity: 0 },
+    { translate: '0 0', scale: '1 1', rotate: '0deg', opacity: 1, offset: .46 },
+    { scale: '1.1 .86', offset: .6 },
+    { scale: '.97 1.04', offset: .78 },
+    { scale: '1 1', rotate: '0deg', opacity: 1 },
+  ], { duration: d, easing: 'cubic-bezier(.3,.9,.4,1)', fill: 'backwards' });
+  setTimeout(() => {     // the moment it lands
+    const c = fx.centreOf(cell);
+    if (!c) return;
+    fx.ring(c.x, c.y + c.h * .2, kind === 'o' ? '#ff7b3a' : '#f5efe0', 12);
+    fx.dust(c.x, c.y + c.h * .38, c.w * .7);
+    const bw = $('#bw');
+    if (bw && bw.animate) bw.animate([{ translate: '0 0' }, { translate: '0 3px' }, { translate: '0 0' }], { duration: 150 });
+    sfx.thud();
+  }, d * .46);
+}
 /** @param {number} total */
 export function showTotal(total) { const h = $('#hname'); if (h) h.innerHTML = `<span class="gold">+${fmt(total)}</span>`; }
 export function setMoney() { const e = $('#money'); if (e) e.textContent = '$' + S.money; }

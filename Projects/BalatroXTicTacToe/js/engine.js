@@ -208,10 +208,12 @@ function aiMove() {
 /** Apply one effect with its popup and sound. @param {any} ctx @param {any} e @param {HTMLElement|null} target */
 async function apply(ctx, e, target) {
   if (target && target.classList.contains('joker')) ui.jig(target);
-  if (e.chips) { ctx.chips += e.chips; ui.pop(target, '+' + fmt(e.chips), 'chips'); sfx.chips(); ui.setCalc(ctx.chips, ctx.mult); ui.bumpCalc('chips'); await sleep(e.mult || e.xmult || e.money ? 190 : 280); }
-  if (e.mult) { ctx.mult += e.mult; ui.pop(target, t('pop.mult', { n: fmtM(e.mult) }), 'mult'); sfx.mult(); ui.setCalc(ctx.chips, ctx.mult); ui.bumpCalc('mult'); await sleep(e.xmult || e.money ? 190 : 280); }
-  if (e.xmult) { ctx.mult *= e.xmult; ui.pop(target, t('pop.xmult', { n: fmtM(e.xmult) }), 'xmult'); sfx.xmult(); ui.setCalc(ctx.chips, ctx.mult); ui.bumpCalc('mult'); await sleep(e.money ? 220 : 360); }
-  if (e.money) { S.money += e.money; ui.pop(target, '+$' + e.money, 'money'); sfx.money(); ui.setMoney(); await sleep(260); }
+  // ui.hit() is the juice: the card jumps, sparks burst, points fly into the counter and it pops.
+  // It is pure decoration, so the sleeps below (the pacing of the sequence) are unchanged.
+  if (e.chips) { ctx.chips += e.chips; ui.pop(target, '+' + fmt(e.chips), 'chips'); sfx.chips(); ui.setCalc(ctx.chips, ctx.mult); ui.hit(target, 'chips', e.chips); await sleep(e.mult || e.xmult || e.money ? 190 : 280); }
+  if (e.mult) { ctx.mult += e.mult; ui.pop(target, t('pop.mult', { n: fmtM(e.mult) }), 'mult'); sfx.mult(); ui.setCalc(ctx.chips, ctx.mult); ui.hit(target, 'mult', e.mult); await sleep(e.xmult || e.money ? 190 : 280); }
+  if (e.xmult) { ctx.mult *= e.xmult; ui.pop(target, t('pop.xmult', { n: fmtM(e.xmult) }), 'xmult'); sfx.xmult(); ui.setCalc(ctx.chips, ctx.mult); ui.hit(target, 'xmult', ctx.mult); ui.shake(.1); await sleep(e.money ? 220 : 360); }
+  if (e.money) { S.money += e.money; ui.pop(target, '+$' + e.money, 'money'); sfx.money(); ui.setMoney(); ui.hit(target, 'money', e.money); await sleep(260); }
 }
 
 /** One X scoring, including its retriggers. @param {any} ctx @param {number} i @param {boolean} isFirst */
@@ -267,6 +269,7 @@ async function runScore(ctx, label) {
   // Half the blind's target is a nudge; the whole target (or more) is the full shake.
   const hit = total / Math.max(1, S.round.target);
   if (hit > 0.5) ui.shake((hit - 0.5) * 2);
+  ui.celebrate(hit);
   const from = S.round.score; S.round.score += total;
   for (let s = 1; s <= 14; s++) { ui.setRoundScore(from + total * s / 14); await sleep(28); }
 
@@ -333,7 +336,7 @@ function gameOver() {
 const BOARD_GROWS = { 4: 4 };
 
 function winBlind() {
-  sfx.win();
+  sfx.win(); ui.celebrate(2.4);   // a big burst over the board, before the screen changes under it
   const r = S.round, rows = [], notes = [];
   rows.push([t('cash.cleared', { name: r.name }), r.reward]);
   const left = Math.max(0, r.games - 1);

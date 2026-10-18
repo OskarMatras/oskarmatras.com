@@ -53,4 +53,10 @@ export const sfx = {
   win: () => { [523, 659, 784, 1046].forEach((f, i) => later(i * 90, () => tone(f, .18, 'triangle', .07))); },
   line: () => tone(440, .1, 'triangle', .06, 1.5),
   boom: () => tone(90, .3, 'sawtooth', .08, .4),
+  /** The weight of a piece landing on the board: a short low thump with a click on top. */
+  thud: () => { tone(95, .11, 'sine', .11, .55); tone(240, .03, 'square', .03); },
+  /** Cards sweeping into a hand: a quick airy tick, one per card. @param {number} [i] */
+  deal: (i = 0) => tone(520 + i * 70, .035, 'triangle', .03, 1.4),
+  /** A pack opening: a little rising sparkle. */
+  sparkle: () => { [880, 1175, 1568].forEach((f, i) => later(i * 55, () => tone(f, .09, 'triangle', .04))); },
 };
