@@ -173,6 +173,7 @@ b{font-weight:600}
 .tb{font-family:var(--f-num);font-size:11px;line-height:1;padding:2px 3px;border-radius:4px;color:#fff;box-shadow:0 1px 0 rgba(0,0,0,.4)}
 .tb.big{font-size:17px;padding:4px 7px}
 .tb.hot{background:var(--mult)} .tb.rich{background:var(--chips)} .tb.gild{background:var(--gold);color:#2a1d00} .tb.echo{background:#1f8f8a}
+.tb.star{background:linear-gradient(135deg,#ff5a3c,#f6b92c);color:#2a1100} .tb.safe{background:#3c8a5e} .tb.trap{background:#8a2e4a}
 .cell.scoring .piece{box-shadow:0 0 0 4px var(--gold),0 6px 0 rgba(0,0,0,.3);transform:translateY(-3px) scale(1.05)}
 .cell.held .piece{box-shadow:0 0 0 3px #9fb2bb,0 4px 0 rgba(0,0,0,.3)}
 #strikes{position:absolute;inset:clamp(5px,1.4cqmin,10px);width:auto;height:auto;pointer-events:none}
@@ -192,6 +193,9 @@ b{font-weight:600}
 .piece.t-steel{--pbg:linear-gradient(135deg,#dfe5e8,#aab5ba 50%,#e8edef)}
 .piece.t-bomb{--pbg:#2c2a28} .piece.t-ghost{--pbg:linear-gradient(#efe6fb,#d9c8f2)} .piece.t-lucky{--pbg:linear-gradient(#f7f2e7,#d6f2dc)}
 .piece.t-red{--pbg:linear-gradient(#f7f2e7,#fbd9d5)} .piece.t-blue{--pbg:linear-gradient(#f7f2e7,#d7e8fb)} .piece.t-twin{--pbg:linear-gradient(#f7f2e7,#cdeeea)}
+.piece.t-sprout{--pbg:linear-gradient(#f7f2e7,#d3efc7)} .piece.t-cursed{--pbg:linear-gradient(#3b1d4a,#1f1030)} .piece.t-cursed .pl{background:#a45cd1}
+.piece.t-turncoat{--pbg:linear-gradient(#f7f2e7,#f3d2c2)} .piece.t-hunter{--pbg:linear-gradient(#f7f2e7,#e6d6b5)}
+.piece.t-cursed .xg{text-shadow:0 0 calc(var(--psz) * .14) #c07bff}
 .piece.t-twin .xg{text-shadow:calc(var(--psz) * .06) calc(var(--psz) * .05) 0 rgba(31,143,138,.45)}
 .piece.shattered{opacity:.4;filter:grayscale(1)}
 
@@ -631,3 +635,194 @@ table.lv th{font-weight:500;color:var(--ink-dim);font-size:13px}
 .packModal{max-width:760px}
 .packModal .shopGrid{margin-top:10px}
 .panelBox h3.sub{margin:16px 0 8px;font-family:var(--f-num);font-weight:400;font-size:19px;letter-spacing:.02em;color:var(--ink-dim)}
+
+/* =====================================================================
+   FINISH
+   Heavier, more saturated and more physical: chunky outlines with a hard
+   shadow underneath, glossy cards, a vivid painted backdrop that changes
+   colour with the blind. Every rule here only restyles; nothing moves a
+   control or changes what it does.
+   ===================================================================== */
+:root{
+  --panel:#1d2c31; --panel-2:#2c3f46; --panel-3:#3f5861; --line:#86a0a8; --edge:#081012;
+  --card-edge:#cbbf9f;
+}
+body{background:#0a2420}
+.bar{background:rgba(6,16,18,.8)}
+#side,.tray,.boardWrap,.shopCat,.bcard{
+  border-width:3px;
+  box-shadow:0 0 0 2px var(--edge), 0 7px 0 2px var(--edge), inset 0 3px 0 rgba(255,255,255,.1);
+}
+#side{background:linear-gradient(180deg,#24373d,#1b2a2f);border-color:var(--line)}
+.tray{background:rgba(5,13,15,.62);border:3px solid rgba(255,255,255,.16);box-shadow:0 0 0 2px var(--edge), inset 0 5px 14px rgba(0,0,0,.45)}
+.boardWrap{background:radial-gradient(circle at 50% 40%,rgba(18,40,44,.62),rgba(6,16,18,.78));border-color:var(--line)}
+.slot{background:rgba(0,0,0,.22);border:2px solid rgba(255,255,255,.14);box-shadow:inset 0 5px 0 rgba(0,0,0,.38), inset 0 -2px 0 rgba(255,255,255,.05)}
+.stat,.roundScore,.calc,.moneyBox{box-shadow:inset 0 3px 0 rgba(0,0,0,.28), 0 2px 0 rgba(255,255,255,.07)}
+.blindTag{box-shadow:inset 0 -5px 0 rgba(0,0,0,.28), inset 0 3px 0 rgba(255,255,255,.22), 0 0 0 2px var(--edge)}
+.blindTag .bname{text-shadow:0 3px 0 rgba(0,0,0,.45)}
+.chipsBox,.multBox{text-shadow:0 2px 0 rgba(0,0,0,.35);box-shadow:inset 0 -5px 0 rgba(0,0,0,.28), inset 0 3px 0 rgba(255,255,255,.28), 0 0 0 2px var(--edge)}
+.moneyBox{text-shadow:0 3px 0 var(--gold-dk), 0 0 18px rgba(246,185,44,.35)}
+
+.btn{box-shadow:0 5px 0 rgba(0,0,0,.5), 0 0 0 2px var(--edge), inset 0 3px 0 rgba(255,255,255,.22);border-radius:10px}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.5), 0 0 0 2px var(--edge), inset 0 2px 0 rgba(255,255,255,.18)}
+.btn.gold{background:linear-gradient(#ffd25a,#f6b92c)} .btn.red{background:linear-gradient(#ff6a5c,#e0392e)}
+.btn.big{text-shadow:0 2px 0 rgba(0,0,0,.25)}
+
+/* cards: a lighter face, a thicker edge, a glossy corner and a heavier drop shadow */
+.piece{box-shadow:0 6px 0 rgba(0,0,0,.42), 0 0 0 2px var(--edge), inset 0 0 0 3px var(--card-edge)}
+.piece::after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;
+  background:linear-gradient(125deg,rgba(255,255,255,.5) 0%,rgba(255,255,255,.12) 30%,rgba(255,255,255,0) 46%)}
+.hp{filter:drop-shadow(0 8px 0 rgba(0,0,0,.28))}
+.joker,.cons{box-shadow:var(--sx,0px) var(--sy,5px) 0 rgba(0,0,0,.5), 0 0 0 2px var(--edge), inset 0 0 0 3px rgba(255,255,255,.22), inset 0 -6px 0 rgba(0,0,0,.14)}
+.joker .gl,.cons .gl{text-shadow:0 4px 0 rgba(0,0,0,.38), 0 0 14px rgba(255,255,255,.25)}
+
+/* blind and shop cards */
+.bcard{background:linear-gradient(180deg,var(--panel-3),var(--panel-2));border-color:rgba(255,255,255,.18)}
+.bcard.cur{border-color:var(--gold);box-shadow:0 0 0 2px var(--edge), 0 7px 0 2px var(--edge), 0 0 26px rgba(246,185,44,.35), inset 0 3px 0 rgba(255,255,255,.14)}
+.bchip{box-shadow:inset 0 -6px 0 rgba(0,0,0,.32), inset 0 3px 0 rgba(255,255,255,.35), 0 0 0 4px var(--edge), 0 0 0 7px rgba(255,255,255,.14)}
+.sitem{background:linear-gradient(180deg,var(--panel-3),var(--panel-2));border:3px solid rgba(255,255,255,.14);box-shadow:0 0 0 2px var(--edge), 0 6px 0 2px var(--edge), inset 0 3px 0 rgba(255,255,255,.12)}
+.sitem .price{text-shadow:0 2px 0 rgba(0,0,0,.4)}
+
+.tb{box-shadow:0 2px 0 rgba(0,0,0,.5), 0 0 0 1.5px var(--edge)}
+.banner{background:linear-gradient(#26373d,#1a272b);box-shadow:0 0 0 3px var(--edge), 0 10px 0 3px var(--edge), 0 0 40px rgba(246,185,44,.25)}
+
+/* motion: screens arrive with a bounce, blind cards rise one after another, the live blind's coin bobs */
+@keyframes phaseIn{from{translate:0 34px;scale:.965;opacity:0}60%{opacity:1}}
+@keyframes cardRise{from{translate:0 46px;scale:.9;opacity:0}}
+@keyframes coinBob{50%{translate:0 -6px;rotate:-4deg}}
+@media (prefers-reduced-motion:no-preference){
+  .phaseIn{animation:phaseIn .55s cubic-bezier(.2,1.35,.4,1) both}
+  .entering .blinds .bcard{animation:cardRise .6s cubic-bezier(.2,1.4,.4,1) both}
+  .entering .blinds .bcard:nth-child(2){animation-delay:.1s} .entering .blinds .bcard:nth-child(3){animation-delay:.2s}
+  .bcard.cur .bchip{animation:coinBob 1.8s ease-in-out infinite}
+  .entering .shopCat .sitem:not(.reveal){animation:cardRise .5s cubic-bezier(.2,1.4,.4,1) both}
+  .entering .shopGrid .sitem:nth-child(2){animation-delay:.07s} .entering .shopGrid .sitem:nth-child(3){animation-delay:.14s}
+}
+
+/* counters that run hot: the bigger the number, the more it glows and shakes */
+@keyframes fireJitter{0%,100%{translate:0 0}25%{translate:-1px 1px}50%{translate:1px -1px}75%{translate:1px 1px}}
+.chipsBox[data-tier="1"]{box-shadow:inset 0 -5px 0 rgba(0,0,0,.28), inset 0 3px 0 rgba(255,255,255,.3), 0 0 0 2px var(--edge), 0 0 14px rgba(90,168,255,.55)}
+.multBox[data-tier="1"]{box-shadow:inset 0 -5px 0 rgba(0,0,0,.28), inset 0 3px 0 rgba(255,255,255,.3), 0 0 0 2px var(--edge), 0 0 14px rgba(255,106,74,.6)}
+.chipsBox[data-tier="2"]{background:linear-gradient(#5aa8ff,#2f8ff0);box-shadow:inset 0 -5px 0 rgba(0,0,0,.25), 0 0 0 2px var(--edge), 0 0 22px rgba(120,190,255,.9)}
+.multBox[data-tier="2"]{background:linear-gradient(#ff8a5c,#f0463a);box-shadow:inset 0 -5px 0 rgba(0,0,0,.25), 0 0 0 2px var(--edge), 0 0 22px rgba(255,130,80,.95)}
+.chipsBox[data-tier="3"],.multBox[data-tier="3"]{box-shadow:inset 0 -5px 0 rgba(0,0,0,.2), 0 0 0 2px #fff3c4, 0 0 30px rgba(255,208,90,1), 0 0 60px rgba(255,140,60,.7)}
+.multBox[data-tier="3"]{background:linear-gradient(#ffb04a,#f0463a)}
+@media (prefers-reduced-motion:no-preference){
+  .chipsBox[data-tier="2"],.multBox[data-tier="2"]{animation:fireJitter .22s steps(2) infinite}
+  .chipsBox[data-tier="3"],.multBox[data-tier="3"]{animation:fireJitter .12s steps(2) infinite}
+}
+
+/* small fixes from the playtest list */
+#insp{z-index:58}                                   /* a card's menu sits above Ollie's bubble */
+.packBar{position:sticky;bottom:0;padding:8px 0 2px;background:linear-gradient(transparent,var(--panel) 40%);z-index:4}   /* Skip stays reachable on a short phone */
+.modal .btnRow{justify-content:center}
+.piece.t-mirror{--pbg:linear-gradient(135deg,#fbeaf3,#e6b5cf 50%,#fbeaf3)}
+
+/* a faint X shows where the selected piece would go */
+@media (hover:hover){
+  .armed .cell.empty:hover .slot::after{content:'X';font-family:var(--f-pixel);font-weight:700;color:var(--selpc);opacity:.38;font-size:calc(100cqw / var(--n) * .5);line-height:1}
+}
+/* shop cards idle on the shelf */
+@keyframes shelfBob{50%{translate:0 -4px}}
+@media (prefers-reduced-motion:no-preference){
+  .shopGrid .sitem:not(.sold) > :first-child{animation:shelfBob 3.2s ease-in-out infinite}
+  .shopGrid .sitem:nth-child(2) > :first-child{animation-delay:-1.1s} .shopGrid .sitem:nth-child(3) > :first-child{animation-delay:-2.1s}
+}
+
+/* ---- popups: bigger, outlined, easier to read in the middle of a chain ---- */
+.pop{font-size:27px;padding:3px 13px;border-radius:9px;box-shadow:0 4px 0 rgba(0,0,0,.45), 0 0 0 3px var(--edge);text-shadow:0 2px 0 rgba(0,0,0,.35)}
+.pop.xmult{font-size:34px;padding:4px 16px;background:linear-gradient(#ff7a4a,#d3312a);border:0;box-shadow:0 5px 0 rgba(0,0,0,.5), 0 0 0 3px #fff3c4, 0 0 24px rgba(255,150,70,.9)}
+.pop.chips{background:linear-gradient(#5aa8ff,#2f8ff0)} .pop.mult{background:linear-gradient(#ff7c6e,#e0392e)} .pop.money{background:linear-gradient(#ffd96a,#f6b92c)}
+
+/* ---- title screen: a splash, not a dialog ---- */
+#overlay:has(.splash){background:radial-gradient(ellipse at 50% 40%, rgba(10,40,36,.93), rgba(2,8,8,.97));overflow:hidden}
+.modal.splash{background:transparent;border:0;box-shadow:none;max-width:720px;text-align:center;position:relative;z-index:1;overflow:visible}
+.splash .title{font-size:clamp(34px,8.5vw,76px);margin:0 0 10px;-webkit-text-stroke:4px var(--edge);paint-order:stroke fill;text-shadow:0 7px 0 var(--edge), 0 0 40px rgba(246,185,44,.28)}
+.splash .title span{color:#fff7e0;display:inline-block}
+.splash .title span.x{color:#ff5a3c}
+.splash .subtitle{font-size:18px;color:#e7efe9;text-shadow:0 2px 0 rgba(0,0,0,.6)}
+.splash .btnRow{justify-content:center;margin-top:22px}
+.splash .btn.big{font-size:24px;padding:14px 34px;min-height:56px}
+.splash .titleOllie,.splash .howto{background:rgba(6,16,18,.6);border:3px solid rgba(255,255,255,.14);border-radius:14px;padding:10px 14px;text-align:left}
+.floaters{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.flo{position:absolute;bottom:-12vh;width:var(--s);height:var(--s);display:flex;align-items:center;justify-content:center;opacity:.9}
+.flo.x{background:linear-gradient(135deg,#fffaf0,#e7dcc2);border-radius:20%;color:#1c2427;font-family:var(--f-pixel);font-weight:700;font-size:calc(var(--s) * .62);box-shadow:0 5px 0 rgba(0,0,0,.4), 0 0 0 2px var(--edge)}
+.flo.o{border:calc(var(--s) * .2) solid var(--o);border-radius:50%;box-shadow:0 4px 0 #8a3510}
+@keyframes drift{from{translate:0 0;rotate:var(--r)}to{translate:0 -125vh;rotate:calc(var(--r) * -2)}}
+@media (prefers-reduced-motion:no-preference){ .flo{animation:drift var(--d) linear var(--dl) infinite} }
+@media (prefers-reduced-motion:reduce){ .flo{bottom:auto;top:calc(var(--s) * 2)} }
+
+/* ---- blind cards: the colour of the blind runs through the whole card ---- */
+.bcard{background:linear-gradient(180deg,color-mix(in srgb,var(--bc,#3f5861) 46%,var(--panel-3)),var(--panel-2) 62%)}
+.bchip{width:64px;height:64px;font-size:17px;text-shadow:0 2px 0 rgba(0,0,0,.45)}
+.bcard h3{text-shadow:0 3px 0 rgba(0,0,0,.4)}
+.bcard.cur{translate:0 -6px;scale:1.02}
+.bcard:not(.cur):not(.done){filter:saturate(.8) brightness(.92)}
+.bcard.done .bchip::after{content:'\2713';position:absolute;font-size:34px;color:#fff;text-shadow:0 3px 0 rgba(0,0,0,.5)}
+.bcard.done .bchip{position:relative;filter:brightness(.7)}
+
+/* ---- packs: tall cards, a little fan, a lift on hover ---- */
+.packScene{--jw:clamp(92px,9.5vw,128px)}
+.packScene .shopGrid{gap:18px;padding:14px 4px 6px}
+.packScene .sitem{padding:18px 12px 14px;background:radial-gradient(ellipse at 50% 20%,color-mix(in srgb,var(--panel-3) 70%,#fff 8%),var(--panel-2))}
+.packScene .sitem .joker,.packScene .sitem .cons,.packScene .sitem .hpv{--jw:clamp(92px,9.5vw,128px);width:var(--jw)}
+.packScene .sitem .hpv{height:var(--jw);--psz:var(--jw)}
+.packScene .sitem .nm2{font-size:20px}
+.packScene .sitem .ds{font-size:14px}
+@media (hover:hover){ .packScene .sitem:not(:disabled):hover{translate:0 -10px;rotate:0deg} }
+@media (min-width:700px){ .packScene .shopGrid .sitem:nth-child(odd):not(:hover){rotate:-1.2deg} .packScene .shopGrid .sitem:nth-child(even):not(:hover){rotate:1.2deg} }
+
+/* squares worth a glance */
+@keyframes dangerPulse{50%{box-shadow:inset 0 5px 0 rgba(0,0,0,.38), 0 0 0 3px rgba(255,90,74,.7), 0 0 18px rgba(255,90,74,.75)}}
+.cell.danger .slot{border:3px solid #ff5a4a;background:rgba(255,90,74,.3);box-shadow:inset 0 5px 0 rgba(0,0,0,.25), 0 0 14px rgba(255,90,74,.6)}
+.cell.chance .slot{border:3px solid rgba(246,185,44,.9);background:rgba(246,185,44,.17)}
+@media (prefers-reduced-motion:no-preference){ .cell.danger .slot{animation:dangerPulse 1.1s ease-in-out infinite} }
+/* a hand of real cards: a little bigger on roomy screens */
+:root{--pw:clamp(54px,7.2vw,92px)}
+@media (max-height:700px){ :root{--pw:clamp(50px,6.2vw,74px)} }
+
+/* run summary */
+.modal.summary{max-width:600px}
+.miniJokers{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0 4px}
+.joker.mini{--jw:46px;width:46px;cursor:default}
+.joker.mini .gl{font-size:20px}
+.newBest{display:inline-block;background:linear-gradient(#ffd96a,#f6b92c);color:#2a1d00;font-family:var(--f-num);font-size:15px;padding:3px 12px;border-radius:8px;margin:0 0 6px;box-shadow:0 3px 0 rgba(0,0,0,.4),0 0 0 2px var(--edge);rotate:-2deg}
+@media (prefers-reduced-motion:no-preference){ .newBest{animation:coinBob 1.6s ease-in-out infinite} }
+
+/* buttons lean into the pointer; a flash of colour for the big moments */
+@media (hover:hover) and (prefers-reduced-motion:no-preference){
+  .btn{transition:transform .06s, filter .1s, scale .12s cubic-bezier(.3,1.6,.5,1)}
+  .btn:not(:disabled):hover{scale:1.05}
+  .btn:not(:disabled):active{scale:.97}
+}
+.flash{position:fixed;inset:0;z-index:47;pointer-events:none;background:radial-gradient(ellipse at 50% 45%,var(--fc,#fff) 0%,transparent 70%);opacity:0}
+
+/* Negative: the card turns to a photographic negative, with a pale glow */
+.joker.ed-negative{filter:invert(.92) hue-rotate(180deg) contrast(1.1);box-shadow:var(--sx,0px) var(--sy,5px) 0 rgba(0,0,0,.5), 0 0 0 2px #fff, 0 0 18px rgba(255,255,255,.7)}
+.edline.ed-negative{color:#ffffff;text-shadow:0 0 8px rgba(255,255,255,.8);filter:none}
+.ed-tag.ed-negative{background:linear-gradient(90deg,#222,#666) !important;color:#fff}
+
+/* starting sets */
+.deckGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:14px 0 4px}
+.deckCard{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding:14px 10px;border-radius:12px;color:inherit;font:inherit;cursor:pointer;
+  background:linear-gradient(180deg,var(--panel-3),var(--panel-2));border:3px solid rgba(255,255,255,.14);box-shadow:0 0 0 2px var(--edge), 0 5px 0 2px var(--edge), inset 0 3px 0 rgba(255,255,255,.12);transition:translate .12s,border-color .12s}
+.deckCard:not(:disabled):hover,.deckCard:not(:disabled):focus-visible{border-color:var(--gold);translate:0 -4px}
+.deckCard.locked{opacity:.5;cursor:default}
+.dGl{width:46px;height:46px;border-radius:10px;background:linear-gradient(#fffaf0,#e7dcc2);color:#1c2427;font-family:var(--f-pixel);font-weight:700;font-size:26px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 0 rgba(0,0,0,.4),0 0 0 2px var(--edge)}
+.deckCard.locked .dGl{background:var(--panel);color:var(--ink-mute)}
+.dNm{font-family:var(--f-num);font-size:19px;letter-spacing:.02em}
+.dDs{font-size:13px;color:var(--ink-dim);line-height:1.3}
+
+/* Joker faces: a halo behind the symbol, a woven pattern and an inner frame, so they read as cards */
+.joker{background:
+  radial-gradient(circle at 50% 40%, rgba(255,255,255,.34), transparent 55%),
+  repeating-linear-gradient(135deg, rgba(255,255,255,.09) 0 5px, transparent 5px 10px),
+  linear-gradient(160deg, color-mix(in srgb, var(--jc) 78%, #fff 22%), var(--jc) 55%, color-mix(in srgb, var(--jc) 70%, #000 30%));
+  outline:2px solid rgba(255,255,255,.26);outline-offset:-7px}
+.joker.mini{outline-offset:-4px}
+.joker .nm{background:rgba(0,0,0,.28);border-radius:4px;padding:1px 4px;width:calc(100% - 6px)}
+
+.anteBanner{position:fixed;left:0;right:0;top:34%;z-index:46;pointer-events:none;display:flex;align-items:baseline;justify-content:center;gap:14px;
+  font-family:var(--f-num);color:#fff7e0;-webkit-text-stroke:4px var(--edge);paint-order:stroke fill;text-shadow:0 8px 0 var(--edge), 0 0 40px rgba(255,210,90,.6)}
+.anteBanner .aSmall{font-size:clamp(20px,4vw,38px);letter-spacing:.12em;text-transform:uppercase}
+.anteBanner .aNum{font-size:clamp(70px,16vw,160px);line-height:.9;color:#ffd25a}

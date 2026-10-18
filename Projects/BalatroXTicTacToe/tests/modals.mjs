@@ -1,0 +1,15 @@
+import { launch } from './cdp.mjs';
+const W = +(process.argv[2] || 1280), H = +(process.argv[3] || 800), lang = process.argv[4] || 'en', tag = process.argv[5] || 'md';
+const b = await launch({ width: W, height: H, url: 'http://localhost:8099/Projects/BalatroXTicTacToe/' });
+await b.eval(`(async()=>{ localStorage.setItem('bxt-lang','${lang}'); })()`);
+await b.goto('http://localhost:8099/Projects/BalatroXTicTacToe/');
+await b.eval(`(async()=>{ const E = await import('/Projects/BalatroXTicTacToe/js/engine.js'); const st = await import('/Projects/BalatroXTicTacToe/js/state.js'); const UI = await import('/Projects/BalatroXTicTacToe/js/ui.js'); window.__E=E; window.__S=st.S; window.__UI=UI; st.SET.tips=false; E.actions.newRun(); })()`);
+await b.sleep(800);
+await b.eval(`(()=>{const S=__S; S.jokers.push({uid:901,id:'jester',ed:'foil',data:{}},{uid:902,id:'hotstreak',ed:null,data:{n:2}},{uid:903,id:'copycat',ed:'holo',data:{}}); S.bag.push({uid:950,type:'red'},{uid:951,type:'cursed'},{uid:952,type:'hunter'},{uid:953,type:'sprout'},{uid:954,type:'turncoat'}); S.levels.row=3; S.vouchers.push('extragame','coupon'); __UI.showModal('info');})()`);
+await b.sleep(700); await b.shot(`shots/${tag}-info.png`);
+await b.eval(`__UI.showModal('bag')`); await b.sleep(500); await b.shot(`shots/${tag}-bag.png`);
+await b.eval(`__UI.showModal(null); const S=__S; S.round={score:850,target:1500,games:0,discards:0,gameNo:4,reward:3,name:'Big Blind'}; S.stats.bestLine=4200; S.stats.bestType='row'; S.stats.lines=9; S.ante=4; S.blindIdx=2; S.phase='over'; __UI.render();`);
+await b.sleep(700); await b.shot(`shots/${tag}-over.png`);
+await b.eval(`__S.phase='won'; __UI.render()`); await b.sleep(700); await b.shot(`shots/${tag}-won.png`);
+console.log(b.errors());
+b.close();

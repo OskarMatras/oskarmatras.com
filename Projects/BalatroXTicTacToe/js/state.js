@@ -14,7 +14,7 @@
 export const S = {};
 
 /** Per-device preferences, separate from the run. */
-export const SET = { speed: 1, sound: true, crt: true, tips: true, seen: /** @type {Record<string, number>} */ ({}), baselined: false };
+export const SET = { speed: 1, sound: true, music: true, crt: true, tips: true, seen: /** @type {Record<string, number>} */ ({}), baselined: false };
 
 const KEY_RUN = 'bxt-run-v3';
 const KEY_SET = 'bxt-settings';

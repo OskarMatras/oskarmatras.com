@@ -4,9 +4,9 @@
  * run, blind targets, score-type values, board queries. Nothing here
  * touches the DOM or waits on animation.
  */
-import { S, nid } from './state.js';
+import { S, nid, best } from './state.js';
 import { geo } from './geometry.js';
-import { BOSSES, ANTE_BASE, LINE_TYPES, hasJ } from './data.js';
+import { BOSSES, ANTE_BASE, LINE_TYPES, DECKS, hasJ } from './data.js';
 import { t, tr } from './strings.js';
 
 /** @template T @param {T[]} a @returns {T} */
@@ -27,7 +27,11 @@ function pickBoss() {
 }
 export function nextBoss() { S.boss = pickBoss(); S.usedBosses.push(S.boss.id); }
 
-export function freshRun() {
+/** The starting sets you can pick now. */
+export const unlockedDecks = () => Object.keys(DECKS).filter(k => (best().ante || 0) >= DECKS[k].unlock);
+
+/** @param {string} [deck] id from DECKS */
+export function freshRun(deck = 'plain') {
   for (const k of Object.keys(S)) delete S[k];
   Object.assign(S, {
     phase: 'blind', ante: 1, blindIdx: 0, money: 4, N: 3,
@@ -36,9 +40,10 @@ export function freshRun() {
     vouchers: [], maxGames: 4, maxDiscards: 3, handSize: 3, jokerSlots: 5, itemSlots: 2,
     usedBosses: [], boss: null, round: null, board: Array(9).fill(null), g: null, shop: null,
     mode: null, pending: null, anteVoucher: null, growAnim: null,
-    stats: { bestLine: 0, bestType: '', lines: 0, wins: 0 }, endless: false, busy: false, cashout: null,
+    stats: { bestLine: 0, bestType: '', lines: 0, wins: 0 }, endless: false, busy: false, cashout: null, deck: 'plain',
   });
   nextBoss();
+  if (DECKS[deck]) { S.deck = deck; DECKS[deck].apply(); }
 }
 
 /** Target, reward and label for blind 0 (small), 1 (big) or 2 (boss) of the current ante. @param {number} idx */
@@ -61,7 +66,24 @@ export function lineValues(type) {
   return { chips: h.c + h.dc * (l - 1), mult: h.m + h.dm * (l - 1) };
 }
 
-export const handMax = () => S.handSize + (hasJ('scout') ? 1 : 0);
+/** Pieces in hand: the base size, Scout, minus one under The Clamp (never fewer than one). */
+export const handMax = () => Math.max(1, S.handSize + (hasJ('scout') ? 1 : 0) - (isBoss('clamp') ? 1 : 0));
+
+/**
+ * Whether finishing a line keeps the game going. On a 3×3 board a line ends the game (the board is
+ * nearly used up anyway); from OPEN_PLAY_FROM up it does not, so a bigger board means several lines
+ * per game, with the rival still hunting for its own. Overtime gives the same on any board.
+ */
+export const OPEN_PLAY_FROM = 4;
+export const openPlay = () => S.N >= OPEN_PLAY_FROM || hasJ('overtime');
+
+/** Joker slots: the base, vouchers, and one more for every Negative Joker you own. */
+export const jokerSlots = () => S.jokerSlots + S.jokers.filter((/** @type {any} */ j) => j.ed === 'negative').length;
+
+/** The ante voucher costs $6 in ante 1, $8 in ante 2 and $10 from ante 3, so the first one is within reach. */
+export const voucherCost = () => Math.min(10, 4 + 2 * (S.ante || 1));
+/** How much interest a cash-out can pay: $5, plus $5 each for Compound Interest and the Banker. */
+export const interestCap = () => (S.interestCap || 5) + (hasJ('banker') ? 5 : 0);
 /** Boss effects only apply while the boss blind is being played. @param {string} id */
 export const isBoss = id => S.phase === 'play' && S.blindIdx === 2 && S.boss && S.boss.id === id;
 
@@ -73,6 +95,21 @@ const cellsOf = li => geo().lines[li].cells.map(i => S.board[i]);
 export const oWon = () => geo().lines.some(l => l.cells.every(i => S.board[i] && S.board[i].t === 'O'));
 /** Lines that just became three X's and have not scored yet. */
 export const newXLines = () => allLines().filter(li => !S.g.scored.includes(li) && cellsOf(li).every(c => c && c.t === 'X'));
+/** Squares where the rival would complete three in a row right now. */
+export const oThreats = () => geo().lines.filter(l => {
+  const cs = l.cells.map(i => S.board[i]);
+  return cs.filter(c => c && c.t === 'O').length === 2 && cs.filter(c => !c).length === 1;
+}).length;
+/** Empty squares where `who` ('X' or 'O') would complete a line right now. @param {'X'|'O'} who */
+export function winCells(who) {
+  const out = new Set();
+  geo().lines.forEach((l, li) => {
+    if (who === 'X' && S.g && S.g.scored.includes(li)) return;
+    const cs = l.cells.map(i => S.board[i]);
+    if (cs.filter(c => c && c.t === who).length === 2 && cs.filter(c => !c).length === 1) out.add(l.cells.find(i => !S.board[i]));
+  });
+  return out;
+}
 /** Lines X could still complete. */
 export const viableLines = () => allLines().filter(li => !S.g.scored.includes(li) && cellsOf(li).every(c => !c || c.t === 'X'));
 /** Lines one X away from scoring. */

@@ -20,7 +20,7 @@
 import { S, loadSettings, saveRun } from './state.js';
 import { freshRun } from './rules.js';
 import { setLang } from './strings.js';
-import { unlock } from './audio.js';
+import { unlock, syncMusic } from './audio.js';
 import { startBackground } from './background.js';
 import { startCardFx } from './cardfx.js';
 import * as ui from './ui.js';
@@ -52,6 +52,6 @@ document.addEventListener('langchange', e => {
 
 // Phones and tablets often close a tab by switching away from it.
 addEventListener('pagehide', saveRun);
-document.addEventListener('visibilitychange', () => { if (document.hidden) saveRun(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden) saveRun(); syncMusic(); });
 
 document.documentElement.classList.add('ready');

@@ -15,13 +15,14 @@
  */
 import { S, SET, best, hasSavedRun } from './state.js';
 import { geo, squareOf } from './geometry.js';
-import { LINE_TYPES, LINE_ORDER, PIECES, TILES, RARITY, JOKERS, ITEMS, VOUCHERS, BOSSES, EDITIONS, EDITS, PACKS, hasJ } from './data.js';
-import { sync as syncCoach, ollie } from './coach.js';
+import { LINE_TYPES, LINE_ORDER, PIECES, TILES, RARITY, JOKERS, ITEMS, VOUCHERS, BOSSES, EDITIONS, EDITS, PACKS, DECKS, hasJ } from './data.js';
+import { sync as syncCoach, ollie, react as ollieReact } from './coach.js';
 import * as fx from './fx.js';
 import { punch } from './cardfx.js';
-import { blindInfo, lineValues, handMax } from './rules.js';
+import { blindInfo, lineValues, handMax, voucherCost, openPlay, winCells, jokerSlots } from './rules.js';
 import { t, tr, fmt, fmtM, getLang } from './strings.js';
-import { sfx } from './audio.js';
+import { sfx, setMood } from './audio.js';
+import { setBackdrop, pulseBackdrop } from './background.js';
 
 /** @type {Record<string, (arg?: string) => any>} */
 let actions = {};
@@ -43,13 +44,51 @@ let abandonArmed = false;
 /* =================================================================
    Rendering
    ================================================================= */
+/** The soundtrack's mood for the screen. */
+function moodFor() {
+  if (S.phase === 'play') return S.blindIdx === 2 ? 'boss' : 'play';
+  if (S.phase === 'shop' || S.phase === 'cashout' || S.phase === 'won') return 'shop';
+  return 'calm';
+}
+/** The colour the room takes on: the blind you are facing, the shop's red, the cash-out gold. */
+function backdropFor() {
+  if (S.phase === 'play' && S.round) return blindInfo(S.blindIdx).color;
+  if (S.phase === 'shop') return '#a8323f';
+  if (S.phase === 'cashout' || S.phase === 'won') return '#c79a22';
+  if (S.phase === 'over') return '#5a5f6a';
+  if (S.phase === 'blind') return '#2f8a6a';
+  return '#2f8a6a';
+}
+let lastPhase = '';
+let lastAnte = 0;
+/** The next render is a screen (or shelf) arriving, so its cards should rise in rather than just appear. */
+let enterNext = false;
+export const markEnter = () => { enterNext = true; };
 export function render() {
   document.body.dataset.phase = S.phase;
+  const changed = S.phase !== lastPhase;
+  const entering = changed || enterNext; enterNext = false;
+  if (changed) {
+    lastPhase = S.phase; setBackdrop(backdropFor()); setMood(moodFor());
+    if (S.phase === 'blind' && S.blindIdx === 0 && S.ante !== lastAnte && !modal) { lastAnte = S.ante; anteBanner(S.ante); }
+  }
   if (tipFor && !document.body.contains(tipFor)) hideTip();
+  // The whole screen is redrawn, which would drop keyboard focus: remember the control and find it again.
+  const ae = /** @type {HTMLElement|null} */ (document.activeElement);
+  const refocus = ae && ae !== document.body && ae.dataset && ae.dataset.act && ae.matches(':focus-visible') ? { act: ae.dataset.act, arg: ae.dataset.arg || '' } : null;
   renderSide(); renderRack(); renderStage(); renderOverlay();
+  el.stage.classList.toggle('entering', entering);
+  if (refocus && (!document.activeElement || document.activeElement === document.body)) {
+    const next = /** @type {HTMLElement|null} */ (document.querySelector(`[data-act="${refocus.act}"][data-arg="${refocus.arg}"]:not(:disabled)`) || el.stage.querySelector('button:not(:disabled)'));
+    if (next) next.focus({ preventScroll: true });
+  }
+  // A new screen arrives with a bounce instead of just appearing.
+  if (changed) for (const n of [el.stage, el.side]) { n.classList.remove('phaseIn'); void n.offsetWidth; n.classList.add('phaseIn'); }
   syncCoach();   // the tutorial reads the game state and shows, moves or retires a tip
 }
 export { replay as replayTips } from './coach.js';
+/** Ollie heckles. @param {string} kind */
+export const react = kind => ollieReact(kind);
 
 function renderSide() {
   const inPlay = S.phase === 'play' && S.round;
@@ -80,6 +119,7 @@ function renderSide() {
       <button class="btn" data-act="openBag">${t('ui.bag')}</button>
       <button class="btn opt" data-act="toggleSpeed">${t('ui.speed', { n: SET.speed })}</button>
       <button class="btn opt" data-act="toggleSound" aria-pressed="${SET.sound}">${SET.sound ? t('ui.soundOn') : t('ui.soundOff')}</button>
+      <button class="btn opt" data-act="toggleMusic" aria-pressed="${SET.music !== false}">${SET.music !== false ? t('ui.musicOn') : t('ui.musicOff')}</button>
       <button class="btn opt" data-act="toggleCrt" aria-pressed="${SET.crt}">${SET.crt ? t('ui.crtOn') : t('ui.crtOff')}</button>
     </div>`;
 }
@@ -95,7 +135,7 @@ function renderRack() {
     return `<button class="cons" style="--cc:${d.kind === 'chalk' ? 'var(--chalk)' : 'var(--tool)'}" data-tilt="c${c.uid}" data-tip="item:${c.uid}" data-act="inspectItem" data-arg="${c.uid}" data-item="${c.uid}" aria-label="${esc(tr(d.name))}">
       <span class="gl">${d.gl}</span><span class="nm">${esc(tr(d.name))}</span></button>`;
   }).join('');
-  el.rack.innerHTML = `<div class="tray jokers"><div class="lbl"><span>${t('ui.jokers')}</span><span>${S.jokers.length}/${S.jokerSlots}</span></div>
+  el.rack.innerHTML = `<div class="tray jokers"><div class="lbl"><span>${t('ui.jokers')}</span><span>${S.jokers.length}/${jokerSlots()}</span></div>
       <div class="slots">${js || `<div class="empty">${t('ui.noJokers')}</div>`}</div></div>
     <div class="tray items"><div class="lbl"><span>${t('ui.items')}</span><span>${S.items.length}/${S.itemSlots}</span></div><div class="slots">${its}</div></div>`;
 }
@@ -126,6 +166,9 @@ function tilesHTML(i) {
 let justPlaced = /** @type {{ i: number, kind: 'x'|'o' }[]} */ ([]);
 function boardHTML(id, board, act) {
   const N = S.N;
+  // Squares worth a glance: where the rival would win (red), and where you would score (gold).
+  const live = id === 'board' && S.phase === 'play' && S.g;
+  const danger = live ? winCells('O') : new Set(), chance = live ? winCells('X') : new Set();
   const cells = board.map((c, i) => {
     let inner = '', cls = 'empty';
     if (c) {
@@ -137,6 +180,7 @@ function boardHTML(id, board, act) {
     }
     const up = Object.keys(squareOf(i)).length ? ' up' : '';
     const tip = c && c.t === 'X' && act === 'cell' ? ` data-tip="piece:${c.p.type}"` : '';
+    if (!c && danger.has(i)) cls += ' danger'; else if (!c && chance.has(i)) cls += ' chance';
     return `<button class="cell ${cls}"${tip} data-act="${act}" data-arg="${i}" data-cell="${i}" aria-label="${t('aria.square', { n: i + 1 })}"><span class="slot${up}">${tilesHTML(i)}${inner}</span></button>`;
   }).join('');
   return `<div class="board" id="${id}" role="grid" aria-label="${t('aria.board')}" style="--n:${N}">${cells}</div>`;
@@ -161,11 +205,11 @@ function renderPlay() {
   const modeBar = S.mode === 'erase'
     ? `<div class="modeBar" role="status">${t('hint.erase')} <button class="btn small" data-act="cancelMode">${t('btn.cancel')}</button></div>` : '';
   el.stage.innerHTML = `<div class="playArea">
-    <div class="boardArea"><div class="boardWrap${armed ? ' armed' : ''}${S.mode === 'erase' ? ' erasing' : ''}" id="bw">
+    <div class="boardArea"><div class="boardWrap${armed ? ' armed' : ''}${S.mode === 'erase' ? ' erasing' : ''}" id="bw" style="--selpc:${S.hand[S.selIdx] ? /** @type {any} */ (PIECES)[S.hand[S.selIdx].type].pc : 'transparent'}">
       ${boardHTML('board', S.board, 'cell')}
       <svg id="strikes" viewBox="0 0 ${S.N} ${S.N}" preserveAspectRatio="none" aria-hidden="true">${strikes}</svg>${modeBar}</div></div>
     <div class="handMeta"><span>${t('meta.game', { n: S.round.gameNo, m: S.round.gameNo + S.round.games - 1 })}</span>
-      <span>${hasJ('overtime') ? t('meta.overtime') : t('meta.firstLine')}</span><span>${t('meta.bag', { n: S.g.pile.length })}</span></div>
+      <span>${openPlay() ? t('meta.openPlay') : t('meta.firstLine')}</span><span>${t('meta.bag', { n: S.g.pile.length })}</span></div>
     <div class="handRow"><div id="hand">${hand}</div>
       <button class="btn red" data-act="discard" ${(!S.hand.length || !S.round.discards || S.busy || S.mode || noSpecials) ? 'disabled' : ''}>${t('btn.discard')}</button></div>
   </div>`;
@@ -208,7 +252,7 @@ function renderBlinds() {
     const btns = cur
       ? `<button class="btn gold big" data-act="startBlind">${t('btn.play')}</button>${i < 2 ? `<button class="btn" data-act="skipBlind">${t('btn.skip')}</button>` : ''}`
       : `<button class="btn" disabled>${done ? t('btn.defeated') : t('btn.upcoming')}</button>`;
-    return `<div class="bcard${cur ? ' cur' : ''}${done ? ' done' : ''}"><div class="bchip" style="--bc:${b.color}">${i === 2 ? t('ui.boss') : i === 0 ? 'S' : 'B'}</div>
+    return `<div class="bcard${cur ? ' cur' : ''}${done ? ' done' : ''}" style="--bc:${b.color}"><div class="bchip">${i === 2 ? t('ui.boss') : i === 0 ? 'S' : 'B'}</div>
       <h3>${esc(b.name)}</h3><div class="t">${t('ui.scoreAtLeast')}<b>${fmt(b.target)}</b>${t('ui.reward')} <span class="gold">${'$'.repeat(b.reward)}</span></div>
       <div class="eff">${esc(b.desc)}</div>${btns}</div>`;
   }).join('');
@@ -221,7 +265,7 @@ function itemView(it) {
     const d = JOKERS[it.id];
     const ed = it.ed && EDITIONS[it.ed];
     return { vis: `<span class="joker${ed ? ' ed-' + it.ed : ''}" style="--jc:${RARITY[d.rar].color}" data-tilt="s${it.id}"><span class="gl">${d.gl}</span></span>`, name: d.name,
-      kind: (ed ? tr(ed.name) + ' ' : '') + t('kind.joker', { r: tr(RARITY[d.rar].name) }),
+      kind: t('kind.joker', { r: tr(RARITY[d.rar].name) }) + (ed ? ' · ' + tr(ed.name) : ''),
       desc: tr(d.desc({ data: {} })) + (ed ? `<span class="edline ed-${it.ed}">${tr(ed.name)}: ${tr(ed.desc)}</span>` : '') };
   }
   if (it.kind === 'piece') {
@@ -242,6 +286,7 @@ function itemView(it) {
 /** @param {any} d */
 export function itemDesc(d) {
   if (d.kind !== 'chalk') return tr(d.desc);
+  if (d.lts) return t('chalk.descAll');
   const L = /** @type {any} */ (LINE_TYPES)[d.lt];
   return t('chalk.desc', { name: tr(L.name), c: L.dc, m: L.dm });
 }
@@ -259,11 +304,11 @@ function renderShop() {
   const shelf = (cls, title, hint, body) => `<section class="shopCat ${cls}"><h3>${title}</h3><p class="catHint">${hint}</p>${body ? `<div class="shopGrid">${body}</div>` : ''}</section>`;
   const cards = sh.items.map((/** @type {any} */ it, /** @type {number} */ i) => card(it, 'i' + i)).join('');
   const voucherHint = !sh.voucher ? t('shop.voucherNone') : sh.vSold ? t('shop.voucherSold') : t('shop.voucherHint');
-  const voucher = sh.voucher ? card({ kind: 'voucher', id: sh.voucher, cost: 10, sold: sh.vSold }, 'v') : '';
+  const voucher = sh.voucher ? card({ kind: 'voucher', id: sh.voucher, cost: voucherCost(), sold: sh.vSold }, 'v') : '';
   const pick = S.mode === 'tile'
     ? `<div class="tilePick"><div class="hint">${t('tile.pick', { name: tr(/** @type {any} */ (TILES)[S.pending].name) })}</div>
         <div class="boardWrap tiling small">${boardHTML('tileBoard', Array(S.N * S.N).fill(null), 'applyTile')}</div>
-        <button class="btn" data-act="cancelTile">${t('btn.cancelRefund')}</button></div>`
+        <button class="btn" data-act="cancelTile">${S.shop && S.shop.tileFromPack ? t('btn.cancelLost') : t('btn.cancelRefund')}</button></div>`
     : '';
   const plainN = S.bag.filter((/** @type {any} */ p) => p.type === 'plain').length;
   const packs = (sh.packs || []).map((/** @type {any} */ pk, /** @type {number} */ i) => {
@@ -297,7 +342,7 @@ function renderPackScene() {
     return `<button type="button" class="sitem${o.taken ? ' sold' : ''}${armed ? ' armed' : ''}${firstLook ? ' reveal' : ''}" style="--i:${i}" data-act="${o.kind === 'edit' ? 'armPack' : 'inspectPackOpt'}" data-arg="${i}" ${o.taken ? 'disabled' : ''}${o.kind === 'edit' ? ` aria-pressed="${armed}"` : ''} aria-label="${esc(v.name)}">${v.vis}<span class="nm2">${esc(v.name)}</span><span class="kind">${v.kind}</span><span class="ds">${v.desc}</span></button>`;
   }).join('');
   const open = pk.options.filter((/** @type {any} */ o) => !o.taken);
-  const hint = S.jokers.length >= S.jokerSlots && open.some((/** @type {any} */ o) => o.kind === 'joker') ? t('pack.sellJoker')
+  const hint = S.jokers.length >= jokerSlots() && open.some((/** @type {any} */ o) => o.kind === 'joker') ? t('pack.sellJoker')
     : S.items.length >= S.itemSlots && open.some((/** @type {any} */ o) => o.kind === 'item' && ITEMS[o.id].kind !== 'chalk') ? t('pack.sellItem') : '';
   let targets = '';
   if (pk.targets) {
@@ -320,7 +365,35 @@ function renderPackScene() {
   }
 }
 
+/** The end-of-run sheet: what you did and what you built. */
+function summaryRows() {
+  const played = Object.entries(S.played || {}).sort((a, b) => /** @type {number} */ (b[1]) - /** @type {number} */ (a[1]))[0];
+  const special = S.bag.filter((/** @type {any} */ p) => p.type !== 'plain').length;
+  const jokers = S.jokers.map((/** @type {any} */ j) => {
+    const d = JOKERS[j.id];
+    return `<span class="joker mini${j.ed ? ' ed-' + j.ed : ''}" style="--jc:${RARITY[d.rar].color}" title="${esc(d.name)}"><span class="gl">${d.gl}</span></span>`;
+  }).join('');
+  return `<div class="rowsList"><div class="rr"><span>${t('over.cleared')}</span><b>${(S.ante - 1) * 3 + S.blindIdx}</b></div>
+    <div class="rr"><span>${t('over.best')}</span><b>${fmt(S.stats.bestLine)}${S.stats.bestType ? ` (${tr(/** @type {any} */ (LINE_TYPES)[S.stats.bestType].name)})` : ''}</b></div>
+    <div class="rr"><span>${t('over.lines')}</span><b>${S.stats.lines}</b></div>
+    ${played && played[1] ? `<div class="rr"><span>${t('over.fav')}</span><b>${tr(/** @type {any} */ (LINE_TYPES)[played[0]].name)} &times;${played[1]}</b></div>` : ''}
+    <div class="rr"><span>${t('over.deck')}</span><b class="plain">${tr(DECKS[S.deck || 'plain'].name)}</b></div>
+    <div class="rr"><span>${t('over.bag')}</span><b class="plain">${t('over.bagVal', { n: S.bag.length, k: special })}</b></div></div>
+    <div class="miniJokers">${jokers || `<span class="dim">${t('none')}</span>`}</div>`;
+}
+
 /* ---------------- overlays ---------------- */
+/** Drifting X pieces and O rings behind the title, each with its own size, speed and tilt. */
+function floaters() {
+  let out = '';
+  for (let i = 0; i < 16; i++) {
+    const x = (i * 37 + 11) % 100, s = 26 + (i * 13) % 34, d = 14 + (i * 7) % 12, delay = -((i * 5) % d), r = ((i * 29) % 50) - 25;
+    out += i % 3 === 2
+      ? `<span class="flo o" style="left:${x}%;--s:${s}px;--d:${d}s;--dl:${delay}s;--r:${r}deg"></span>`
+      : `<span class="flo x" style="left:${x}%;--s:${s}px;--d:${d}s;--dl:${delay}s;--r:${r}deg">X</span>`;
+  }
+  return `<div class="floaters" aria-hidden="true">${out}</div>`;
+}
 /** @param {string|null} kind */
 export function showModal(kind) { modal = kind; abandonArmed = false; renderOverlay(); syncCoach(); }   // Ollie steps aside for a dialog, and comes back after it
 
@@ -332,7 +405,7 @@ function renderOverlay() {
   let h = '';
   if (kind === 'title') {
     const b = best();
-    h = `<div class="modal wide" role="dialog" aria-modal="true" aria-labelledby="mt">
+    h = `${floaters()}<div class="modal wide splash" role="dialog" aria-modal="true" aria-labelledby="mt">
       <h1 class="title" id="mt"><span>BALATRO</span> <span class="x">X</span> <span>TICTACTOE</span></h1>
       <p class="subtitle">${t('title.sub')}${b.ante ? ' ' + t('title.best', { a: b.ante, s: fmt(b.score) }) : ''}</p>
       ${SET.tips && !(SET.seen && SET.seen.welcome)
@@ -351,24 +424,35 @@ function renderOverlay() {
       <div class="btnRow"><button class="btn gold big" data-act="cashOut">${t('cash.btn', { n: c.total })}</button></div></div>`;
   } else if (kind === 'over') {
     const r = S.round || { score: 0, target: 0 };
-    h = `<div class="modal" role="dialog" aria-modal="true"><h2 class="bad">${t('over.title')}</h2>
+    h = `<div class="modal summary" role="dialog" aria-modal="true"><h2 class="bad">${t('over.title')}</h2>
+      ${S.stats.newBest ? `<span class="newBest">${t('over.newBest')}</span>` : ''}
       <p>${t('over.text', { name: esc(blindInfo(S.blindIdx).name), a: S.ante, s: fmt(r.score), t: fmt(r.target) })}</p>
-      <div class="rowsList"><div class="rr"><span>${t('over.best')}</span><b>${fmt(S.stats.bestLine)}${S.stats.bestType ? ` (${tr(/** @type {any} */ (LINE_TYPES)[S.stats.bestType].name)})` : ''}</b></div>
-        <div class="rr"><span>${t('over.lines')}</span><b>${S.stats.lines}</b></div>
-        <div class="rr"><span>${t('over.jokers')}</span><b class="plain">${S.jokers.map((/** @type {any} */ j) => esc(JOKERS[j.id].name)).join(', ') || t('none')}</b></div></div>
+      ${summaryRows()}
       <div class="btnRow"><button class="btn gold big" data-act="newRun">${t('btn.newRun')}</button></div></div>`;
   } else if (kind === 'won') {
-    h = `<div class="modal" role="dialog" aria-modal="true"><h2 class="good">${t('won.title')}</h2><p>${t('won.text', { s: fmt(S.stats.bestLine) })}</p>
+    h = `<div class="modal summary" role="dialog" aria-modal="true"><h2 class="good">${t('won.title')}</h2><p>${t('won.text', { s: fmt(S.stats.bestLine) })}</p>
+      ${summaryRows()}
       <div class="btnRow"><button class="btn gold big" data-act="endless">${t('btn.endless')}</button><button class="btn big" data-act="newRun">${t('btn.newRun')}</button></div></div>`;
+  } else if (kind === 'deck') {
+    const bestAnte = best().ante || 0;
+    const cards = Object.keys(DECKS).map(k => {
+      const d = DECKS[k], open = bestAnte >= d.unlock;
+      return `<button type="button" class="deckCard${open ? '' : ' locked'}" data-act="newRun" data-arg="${k}" ${open ? '' : 'disabled'}>
+        <span class="dGl">${open ? d.gl : '?'}</span><span class="dNm">${open ? tr(d.name) : t('deck.locked')}</span>
+        <span class="dDs">${open ? tr(d.desc) : t('deck.reach', { n: d.unlock })}</span></button>`;
+    }).join('');
+    h = `<div class="modal wide" role="dialog" aria-modal="true"><h2>${t('deck.title')}</h2><p>${t('deck.sub')}</p>
+      <div class="deckGrid">${cards}</div><div class="btnRow"><button class="btn" data-act="closeModal">${t('btn.close')}</button></div></div>`;
   } else if (kind === 'info') {
     const rows = LINE_ORDER.map(k => { const v = lineValues(k); return `<tr><td>${tr(/** @type {any} */ (LINE_TYPES)[k].name)}</td><td>${S.levels[k]}</td><td><i>${v.chips}</i> &times; <em>${v.mult}</em></td><td>${S.played[k]}</td></tr>`; }).join('');
     const vs = S.vouchers.length ? S.vouchers.map((/** @type {string} */ v) => tr(VOUCHERS[v].name)).join(', ') : t('info.noneYet');
     const boss = BOSSES[S.boss.id];
     h = `<div class="modal" role="dialog" aria-modal="true"><h2>${t('info.title')}</h2>
       <div class="tblWrap"><table class="lv"><tr><th>${t('info.type')}</th><th>${t('info.level')}</th><th>${t('info.base')}</th><th>${t('info.scored')}</th></tr>${rows}</table></div>
-      <p>${t('info.p1', { n: S.N })}</p><p>${t('info.boss', { name: tr(boss.name), desc: tr(boss.desc) })}</p><p>${t('info.vouchers', { list: vs })}</p>
+      <p>${t('info.p1', { n: S.N })} ${openPlay() ? t('info.open') : t('info.first')}</p><p>${t('info.boss', { name: tr(boss.name), desc: tr(boss.desc) })}</p><p>${t('info.vouchers', { list: vs })}</p>
       <div class="btnRow"><button class="btn" data-act="toggleSpeed">${t('ui.speed', { n: SET.speed })}</button>
         <button class="btn" data-act="toggleSound" aria-pressed="${SET.sound}">${SET.sound ? t('ui.soundOn') : t('ui.soundOff')}</button>
+        <button class="btn" data-act="toggleMusic" aria-pressed="${SET.music !== false}">${SET.music !== false ? t('ui.musicOn') : t('ui.musicOff')}</button>
         <button class="btn" data-act="toggleCrt" aria-pressed="${SET.crt}">${SET.crt ? t('ui.crtOn') : t('ui.crtOff')}</button></div>
       <div class="btnRow"><button class="btn" data-act="toggleTips" aria-pressed="${SET.tips}">${SET.tips ? t('ui.tipsOn') : t('ui.tipsOff')}</button>
         <button class="btn" data-act="replayTips">${t('ui.tipsReplay')}</button>
@@ -412,7 +496,7 @@ function inspectShop(key, anchor) {
   const sh = S.shop; if (!sh) return;
   const isPack = key[0] === 'p';
   const pk = isPack ? sh.packs[+key.slice(1)] : null;
-  const it = isPack ? null : key === 'v' ? { kind: 'voucher', id: sh.voucher, cost: 10, sold: sh.vSold } : sh.items[+key.slice(1)];
+  const it = isPack ? null : key === 'v' ? { kind: 'voucher', id: sh.voucher, cost: voucherCost(), sold: sh.vSold } : sh.items[+key.slice(1)];
   if (isPack ? !pk || pk.sold : !it || it.sold) return;
   const cost = isPack ? pk.cost : it.cost;
   let head;
@@ -420,7 +504,7 @@ function inspectShop(key, anchor) {
   else { const v = itemView(it); head = `<h4>${esc(v.name)}</h4><span class="tag" style="--tc:var(--gold)">${v.kind}</span><p>${v.desc}</p>`; }
   // A full tray is fixed by selling something in the tray, which a menu opened over it could
   // cover (it flips upward when the card is low on screen). So say it in a toast, not a menu.
-  const full = it && it.kind === 'joker' && S.jokers.length >= S.jokerSlots ? t('toast.jokersFull')
+  const full = it && it.kind === 'joker' && S.jokers.length >= jokerSlots() ? t('toast.jokersFull')
     : it && it.kind === 'item' && S.items.length >= S.itemSlots ? t('toast.itemsFull') : '';
   if (full && S.money >= cost) { hideInsp(); toast(full); return; }
   const why = S.money < cost ? t('why.need', { n: cost - S.money }) : '';
@@ -434,7 +518,7 @@ function inspectPackOpt(i, anchor) {
   const v = itemView(o);
   // No room: the banner in the scene already explains, and the tray must stay reachable to sell
   // from, so a toast, not a menu that could land on top of it.
-  const full = o.kind === 'joker' && S.jokers.length >= S.jokerSlots ? t('pack.sellJoker')
+  const full = o.kind === 'joker' && S.jokers.length >= jokerSlots() ? t('pack.sellJoker')
     : o.kind === 'item' && ITEMS[o.id].kind !== 'chalk' && S.items.length >= S.itemSlots ? t('pack.sellItem') : '';
   if (full) { hideInsp(); toast(full); return; }
   el.insp.innerHTML = `<h4>${esc(v.name)}</h4><span class="tag" style="--tc:var(--gold)">${v.kind}</span><p>${v.desc}</p>
@@ -444,11 +528,13 @@ function inspectPackOpt(i, anchor) {
 /** @param {string} uid @param {HTMLElement} anchor */
 function inspectJoker(uid, anchor) {
   const j = S.jokers.find((/** @type {any} */ x) => String(x.uid) === uid); if (!j) return;
-  const d = JOKERS[j.id], ed = j.ed && EDITIONS[j.ed];
+  const d = JOKERS[j.id], ed = j.ed && EDITIONS[j.ed], idx = S.jokers.indexOf(j);
   const sell = Math.max(1, Math.floor((d.cost + (ed ? ed.cost : 0)) / 2));
   el.insp.innerHTML = `<h4>${esc(d.name)}</h4><span class="tag" style="--tc:${RARITY[d.rar].color}">${t('kind.joker', { r: tr(RARITY[d.rar].name) })}</span>${ed ? ` <span class="tag ed-tag ed-${j.ed}">${tr(ed.name)}</span>` : ''}
     <p>${tr(d.desc(j))}${ed ? `<span class="edline ed-${j.ed}">${tr(ed.name)}: ${tr(ed.desc)}</span>` : ''}</p>
-    <div class="row"><button class="btn red" data-act="sellJoker" data-arg="${uid}" ${S.busy ? 'disabled' : ''}>${t('btn.sell', { n: sell })}</button></div>`;
+    <div class="row"><button class="btn red" data-act="sellJoker" data-arg="${uid}" ${S.busy ? 'disabled' : ''}>${t('btn.sell', { n: sell })}</button>
+      ${S.jokers.length > 1 ? `<button class="btn small" data-act="moveJoker" data-arg="${uid}:-1" ${S.busy || idx === 0 ? 'disabled' : ''} aria-label="${t('btn.moveLeft')}" title="${t('btn.moveLeft')}">&#9664;</button><button class="btn small" data-act="moveJoker" data-arg="${uid}:1" ${S.busy || idx === S.jokers.length - 1 ? 'disabled' : ''} aria-label="${t('btn.moveRight')}" title="${t('btn.moveRight')}">&#9654;</button>` : ''}</div>
+    ${S.jokers.length > 1 ? `<p class="why">${t('hint.order')}</p>` : ''}`;
   placeInsp(anchor);
 }
 /** @param {string} uid @param {HTMLElement} anchor */
@@ -457,7 +543,7 @@ function inspectItem(uid, anchor) {
   const d = ITEMS[c.id], why = actions.itemBlocked ? actions.itemBlocked(uid) : '';
   el.insp.innerHTML = `<h4>${esc(tr(d.name))}</h4><span class="tag" style="--tc:${d.kind === 'chalk' ? 'var(--chalk)' : 'var(--tool)'}">${d.kind === 'chalk' ? t('tag.chalk') : t('tag.tool')}</span><p>${itemDesc(d)}</p>
     ${why ? `<p class="why">${why}</p>` : ''}
-    <div class="row"><button class="btn gold" data-act="useItem" data-arg="${uid}" ${why ? 'disabled' : ''}>${t('btn.use')}</button>
+    <div class="row">${d.need === 'passive' ? '' : `<button class="btn gold" data-act="useItem" data-arg="${uid}" ${why ? 'disabled' : ''}>${t('btn.use')}</button>`}
     <button class="btn red" data-act="sellItem" data-arg="${uid}" ${S.busy ? 'disabled' : ''}>${t('btn.sell', { n: 1 })}</button></div>`;
   placeInsp(anchor);
 }
@@ -535,6 +621,11 @@ export function initInput() {
       return;
     }
     const act = btn.dataset.act || '', arg = btn.dataset.arg || '';
+    if (act === 'moveJoker') {   // the menu stays open on the same Joker, so it can be walked along the tray
+      actions.moveJoker(arg);
+      const again = jokerEl(+arg.split(':')[0]); if (again) inspectJoker(arg.split(':')[0], again);
+      return;
+    }
     if (!act.startsWith('inspect') && act !== 'hideInsp') hideInsp();
     if (act === 'selectPiece' && S.phase === 'play' && !S.busy && +arg === S.selIdx) {
       // Tapping the piece you already hold shows what it does (touch has no hover).
@@ -543,7 +634,7 @@ export function initInput() {
     if (local[act]) { local[act](arg, btn); return; }
     if (actions[act]) actions[act](arg);
   });
-  el.overlay.addEventListener('click', e => { if (e.target === el.overlay && (modal === 'info' || modal === 'bag')) showModal(null); });
+  el.overlay.addEventListener('click', e => { if (e.target === el.overlay && (modal === 'info' || modal === 'bag' || modal === 'deck')) showModal(null); });
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
       hideInsp();
@@ -563,6 +654,9 @@ export function initInput() {
    ================================================================= */
 export const cellEl = (/** @type {number} */ i) => /** @type {HTMLElement|null} */ (document.querySelector(`#board [data-cell="${i}"]`));
 export const jokerEl = (/** @type {number} */ uid) => /** @type {HTMLElement|null} */ (document.querySelector(`[data-joker="${uid}"]`));
+export const itemEl = (/** @type {number|string} */ uid) => /** @type {HTMLElement|null} */ (document.querySelector(`[data-item="${uid}"]`));
+/** A card on the shop shelf, by its key ('i0', 'v', 'p1'). @param {string} key */
+export const shopEl = key => /** @type {HTMLElement|null} */ (document.querySelector(`.sitem[data-arg="${key}"] > :first-child`));
 export const boardEl = () => $('#bw');
 
 let toastTimer = 0;
@@ -595,11 +689,28 @@ export const shake = (power = 1) => {
 };
 /** The CRT layer is pure CSS, switched by a class on <html>. */
 export const applyCrt = () => document.documentElement.classList.toggle('crt', !!SET.crt);
+/** Counters count up to their new value instead of snapping to it. @type {WeakMap<HTMLElement, number>} */
+const rolls = new WeakMap();
+/** @param {HTMLElement} e @param {number} to @param {(n:number) => string} show */
+function roll(e, to, show) {
+  const from = Number(e.dataset.v || 0); e.dataset.v = String(to);
+  const prev = rolls.get(e); if (prev) cancelAnimationFrame(prev);
+  if (!to || to <= from || calmMotion() || to - from < 3) { e.textContent = show(to); return; }
+  const t0 = performance.now(), d = 220 / speedK();
+  const step = (/** @type {number} */ now) => {
+    const k = Math.min(1, (now - t0) / d);
+    e.textContent = show(from + (to - from) * (1 - Math.pow(1 - k, 3)));
+    if (k < 1) rolls.set(e, requestAnimationFrame(step)); else rolls.delete(e);
+  };
+  rolls.set(e, requestAnimationFrame(step));
+}
+/** How "on fire" a counter is: 0 calm, 1 warm, 2 hot, 3 blazing. The CSS turns the tier into glow and shaking. @param {number} v @param {number[]} steps */
+const tierOf = (v, steps) => steps.filter(s => v >= s).length;
 /** @param {number} chips @param {number} mult @param {string} [name] */
 export function setCalc(chips, mult, name) {
   const c = $('#chips'), m = $('#mult'), h = $('#hname');
-  if (c) c.textContent = fmt(chips);
-  if (m) m.textContent = fmtM(mult);
+  if (c) { roll(c, chips, fmt); c.dataset.tier = String(tierOf(chips, [100, 600, 3000])); }
+  if (m) { roll(m, mult, fmtM); m.dataset.tier = String(tierOf(mult, [10, 60, 300])); }
   if (h && name !== undefined) h.innerHTML = name || '&nbsp;';
 }
 export const bumpCalc = (/** @type {'chips'|'mult'} */ which) => bumpCounter(which, 1.22);
@@ -644,6 +755,7 @@ function jump(target, power = 1) {
  */
 export function hit(target, kind, amount = 1) {
   bumpCounter(kind, kind === 'xmult' ? 1.5 : 1.3);
+  pulseBackdrop(kind === 'xmult' ? .55 : kind === 'mult' ? .22 : .12, kind === 'chips' ? '#5aa8ff' : kind === 'money' ? '#ffd25a' : '#ff6a4a');
   const c = fx.centreOf(target);
   if (!c) return;
   const colors = fx.PALETTE[kind], big = kind === 'xmult' ? 1.6 : 1;
@@ -659,6 +771,7 @@ export function celebrate(ratio) {
   const c = fx.centreOf($('#bw'));
   if (!c) return;
   const r = Math.min(3, Math.max(0.2, ratio));
+  pulseBackdrop(Math.min(1, .35 + r * .3), '#ffd25a');
   fx.ring(c.x, c.y, '#f6b92c', 30);
   fx.burst(c.x, c.y, ratio >= 1 ? fx.PALETTE.win : fx.PALETTE.money, Math.round(12 + r * 12), { speed: 230 + r * 60, up: 80, size: 1.15 });
 }
@@ -703,3 +816,103 @@ export function banner(msg, bad) {
 }
 export function refreshRack() { renderRack(); }
 export function refreshModal() { renderOverlay(); }
+
+/* ---------------- breaking things, buying things, selling things ---------------- */
+/** A piece shatters: glittering shards fly out of its square and the board takes a knock. @param {HTMLElement|null} target */
+export function shatter(target) {
+  const c = fx.centreOf(target);
+  if (!c) return;
+  fx.burst(c.x, c.y, ['#e6f4ff', '#9fd0f5', '#ffffff', '#5aa8e0'], 26, { speed: 330, up: 120, gravity: 900, size: 1.3 });
+  fx.ring(c.x, c.y, '#bfe3ff', 20);
+  shake(.35); pulseBackdrop(.3, '#9fd0f5');
+}
+/**
+ * A copy of a card leaves where it was and flies to the tray it now lives in. The real card is
+ * drawn by the next render() as usual; this is only the trip.
+ * @param {Element|null} from @param {string} toSel selector of the destination @param {string} [colour]
+ */
+export function flyFrom(from, toSel, colour = '#f6b92c') {
+  const to = $(toSel);
+  if (!from || !to || !from.animate || calmMotion()) return;
+  const a = from.getBoundingClientRect(), b = to.getBoundingClientRect();
+  const ghost = /** @type {HTMLElement} */ (from.cloneNode(true));
+  ghost.removeAttribute('data-act'); ghost.removeAttribute('data-arg'); ghost.removeAttribute('id');
+  Object.assign(ghost.style, { position: 'fixed', left: a.left + 'px', top: a.top + 'px', width: a.width + 'px', height: a.height + 'px', margin: '0', zIndex: '60', pointerEvents: 'none', transformOrigin: '50% 50%' });
+  document.body.appendChild(ghost);
+  const dx = b.left + b.width / 2 - (a.left + a.width / 2), dy = b.top + b.height / 2 - (a.top + a.height / 2);
+  const d = 520 / speedK();
+  const anim = ghost.animate([
+    { translate: '0 0', scale: '1', rotate: '0deg', opacity: 1 },
+    { translate: `${dx * .15}px ${-30}px`, scale: '1.12', rotate: '-6deg', opacity: 1, offset: .22 },
+    { translate: `${dx}px ${dy}px`, scale: '.35', rotate: '14deg', opacity: .9 },
+  ], { duration: d, easing: 'cubic-bezier(.5,0,.3,1)', fill: 'forwards' });
+  anim.onfinish = () => {
+    ghost.remove();
+    const c = fx.centreOf(to);
+    if (c) { fx.burst(c.x, c.y, [colour, '#fff3c4', '#ffe08a'], 14, { speed: 200 }); fx.ring(c.x, c.y, colour, 16); }
+    if (to.animate) to.animate([{ scale: '1' }, { scale: '1.04' }, { scale: '1' }], { duration: 240, easing: 'cubic-bezier(.3,1.6,.5,1)' });
+    sfx.thud();
+  };
+}
+/** A card was sold: it rises, spins, and bursts into coins where it hung. @param {Element|null} from */
+export function sellFx(from) {
+  const c = fx.centreOf(from);
+  if (!c || calmMotion()) return;
+  fx.burst(c.x, c.y, fx.PALETTE.money, 18, { speed: 260, up: 140, gravity: 700 });
+  fx.ring(c.x, c.y, '#f6b92c', 18);
+  const dest = fx.centreOf($('#money'));
+  if (dest) fx.stream(c, dest, fx.PALETTE.money, 8, () => bumpCounter('money', 1.25));
+}
+
+/** A chalk was used: the new level pops up over the score counters in a burst of colour. @param {string[]} labels */
+export function levelFx(labels) {
+  const anchor = $('.calc') || $('#side');
+  labels.forEach((text, i) => setTimeout(() => pop(anchor, text, 'xmult'), i * 140));
+  const c = fx.centreOf(anchor);
+  if (c) { fx.burst(c.x, c.y, fx.PALETTE.win, 24, { speed: 260, up: 90 }); fx.ring(c.x, c.y, '#f6b92c', 26); }
+  pulseBackdrop(.4, '#9fd0f5');
+}
+
+/** A brief wash of colour over the whole screen, for the biggest moments. @param {string} colour @param {number} [power] 0..1 */
+export function flash(colour, power = .5) {
+  if (calmMotion()) return;
+  const f = document.createElement('div');
+  f.className = 'flash'; f.style.setProperty('--fc', colour);
+  document.body.appendChild(f);
+  const a = f.animate([{ opacity: 0 }, { opacity: Math.min(.7, .15 + power * .5), offset: .18 }, { opacity: 0 }], { duration: 420 / speedK(), easing: 'ease-out' });
+  a.onfinish = () => f.remove();
+}
+/** Where each Joker is on screen, so a reorder can slide them to their new places. @returns {Map<string, DOMRect>} */
+export function rackRects() {
+  /** @type {Map<string, DOMRect>} */ const m = new Map();
+  document.querySelectorAll('#rack [data-joker]').forEach(e => m.set(/** @type {HTMLElement} */ (e).dataset.joker || '', e.getBoundingClientRect()));
+  return m;
+}
+/** After the tray was redrawn in a new order: each Joker starts where it was and glides home (FLIP). @param {Map<string, DOMRect>} before */
+export function flipRack(before) {
+  if (calmMotion()) return;
+  document.querySelectorAll('#rack [data-joker]').forEach(e => {
+    const was = before.get(/** @type {HTMLElement} */ (e).dataset.joker || '');
+    if (!was || !e.animate) return;
+    const now = e.getBoundingClientRect(), dx = was.left - now.left;
+    if (Math.abs(dx) < 2) return;
+    e.animate([{ translate: `${dx}px 0`, scale: '1.08' }, { translate: '0 0', scale: '1' }], { duration: 260, easing: 'cubic-bezier(.3,1.3,.5,1)' });
+  });
+}
+
+/** A new ante opens: its number sweeps across the screen. @param {number} n */
+function anteBanner(n) {
+  if (calmMotion()) return;
+  const b = document.createElement('div');
+  b.className = 'anteBanner'; b.setAttribute('aria-hidden', 'true');
+  b.innerHTML = `<span class="aSmall">${t('ante.word')}</span><span class="aNum">${n}</span><span class="aSmall">${t('ante.of')}</span>`;
+  document.body.appendChild(b);
+  sfx.sparkle(); pulseBackdrop(.5, '#ffd25a');
+  const a = b.animate([
+    { translate: '-60vw 0', scale: '2.2', opacity: 0 },
+    { translate: '0 0', scale: '1', opacity: 1, offset: .22, easing: 'cubic-bezier(.2,1.5,.4,1)' },
+    { translate: '0 0', scale: '1.04', opacity: 1, offset: .72 },
+    { translate: '60vw 0', scale: '.8', opacity: 0 },
+  ], { duration: 1500 / speedK(), easing: 'ease-out' });
+  a.onfinish = () => b.remove();
+}

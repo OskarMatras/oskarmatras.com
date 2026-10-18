@@ -21,8 +21,9 @@
  */
 import { S, SET, saveSettings } from './state.js';
 import { t, getLang } from './strings.js';
+import { winCells } from './rules.js';
 
-/** @typedef {{ id: string, mood: string, anchor: string, when: () => boolean, keep?: () => boolean, vars?: () => Record<string, any> }} Step */
+/** @typedef {{ id: string, mood: string, anchor: string, when: () => boolean, keep?: () => boolean, vars?: () => Record<string, any>, text?: string, react?: boolean }} Step */
 
 const inPlay = () => S.phase === 'play' && !!S.round && !S.busy;
 const hasX = () => Array.isArray(S.board) && S.board.some((/** @type {any} */ c) => c && c.t === 'X');
@@ -37,6 +38,8 @@ const STEPS = [
   { id: 'place', mood: 'smug', anchor: '#bw', when: () => inPlay() && !hasX() },
   // Once an X is down the "place" line is moot, so the hand line follows whether or not it was ever said.
   { id: 'hand', mood: 'smug', anchor: '#hand', when: () => inPlay() && hasX() && S.stats.lines === 0 && S.hand.length > 0 },
+  // The first time the board shows a square where the rival would win (red) or you would score (gold).
+  { id: 'danger', mood: 'smug', anchor: '#bw', when: () => inPlay() && hasX() && winCells('O').size > 0 },
   { id: 'score', mood: 'shock', anchor: '.calc', when: () => inPlay() && S.stats.lines >= 1 },
   { id: 'games', mood: 'sweat', anchor: '.stat.games', when: () => inPlay() && S.round.games < S.maxGames },
   { id: 'boss', mood: 'sweat', anchor: '.blindTag', when: () => inPlay() && S.blindIdx === 2 },
@@ -51,7 +54,7 @@ const STEPS = [
 ];
 
 /** Basics a returning player already knows, so a saved run in progress does not re-teach them. */
-const BASICS = ['welcome', 'place', 'hand', 'score', 'games', 'shop', 'money', 'joker'];
+const BASICS = ['welcome', 'place', 'hand', 'danger', 'score', 'games', 'shop', 'money', 'joker'];
 
 /* ---------------- Ollie's face ----------------
  * An orange ring like the rival's O on the board, with a face in the hole. The mood is only the
@@ -103,7 +106,7 @@ function ensure() {
 /** Put the line (in the current language) and Ollie's mood into the bubble. @param {Step} step */
 function fill(step) {
   const r = ensure();
-  const text = t('coach.' + step.id, step.vars ? step.vars() : undefined);
+  const text = step.text || t('coach.' + step.id, step.vars ? step.vars() : undefined);
   /** @type {HTMLElement} */ (r.querySelector('.cText')).innerHTML = text;
   const av = /** @type {HTMLElement} */ (r.querySelector('.cAvatar'));
   av.innerHTML = ollie(step.mood); av.setAttribute('aria-label', t('coach.dismiss'));
@@ -118,7 +121,7 @@ function clearHighlight() { document.querySelectorAll('.coach-hl').forEach(n => 
 /** @param {Step} step */
 function highlight(step) {
   clearHighlight();
-  const target = document.querySelector(step.anchor);
+  const target = step.anchor ? document.querySelector(step.anchor) : null;
   if (target) target.classList.add('coach-hl');
 }
 
@@ -170,7 +173,7 @@ function show(step) {
   const r = ensure();
   const text = fill(step);
   r.hidden = false;
-  current = { step, timer: setTimeout(finish, readTime(text)), corner: null, lang: getLang() };
+  current = { step, timer: setTimeout(finish, step.react ? 3400 + text.replace(/<[^>]*>/g, '').length * 42 : readTime(text)), corner: null, lang: getLang() };
   place(step);
 }
 
@@ -213,6 +216,25 @@ export function sync() {
   if (dialogOpen() || Date.now() < quietUntil) return;
   const next = STEPS.find(s => !seen(s.id) && s.when());
   if (next) show(next);
+}
+
+/* ---------------- Ollie's asides ----------------
+ * Apart from teaching, he heckles: a short line when something notable happens (he wins, you score
+ * big, you spring a trap). They are rate-limited so they stay a treat, never run over a tutorial
+ * line, and switch off with the rest of the tips. */
+let lastAside = 0;
+/** @type {Record<string, number>} */ const asides = {};
+/** @type {Record<string, string>} */
+const ASIDE_MOOD = { bust: 'smug', bigscore: 'shock', blindwon: 'sweat', bosswon: 'shock', cursed: 'smug', turncoat: 'shock', trap: 'shock', net: 'sweat' };
+/** @param {string} kind bust | bigscore | blindwon | bosswon | cursed | turncoat | trap | net */
+export function react(kind) {
+  if (!SET.tips || current || dialogOpen() || Date.now() - lastAside < 14000) return;
+  if (asides[kind] && Math.random() < 0.45) return;   // the first time always; after that, only now and then
+  const lines = [];
+  for (let i = 0; i < 6; i++) { const k = 'react.' + kind + '.' + i, s = t(k); if (s !== k) lines.push(s); }
+  if (!lines.length) return;
+  asides[kind] = (asides[kind] || 0) + 1; lastAside = Date.now();
+  show({ id: 'react', mood: ASIDE_MOOD[kind] || 'smug', anchor: '', when: () => true, keep: () => true, react: true, text: lines[Math.floor(Math.random() * lines.length)] });
 }
 
 /** Say everything again, from the start. */
