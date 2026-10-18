@@ -234,6 +234,22 @@ export const PACKS = {
     desc:{en:'Pick <u>1</u> of <u>3</u> square upgrades and place it on the board', da:'Vælg <u>1</u> af <u>3</u> feltopgraderinger og placér den på brættet'} },
   tool:    { name:{en:'Tool Pack', da:'Værktøjspakke'}, gl:'\u2692\uFE0E', color:'#7a4bb3', cost:3, show:2, choose:1,
     desc:{en:'Pick <u>1</u> of <u>2</u> tools', da:'Vælg <u>1</u> af <u>2</u> værktøjer'} },
+  // Shows `targets` random X from your bag next to the edits: pick an edit, then the X it changes.
+  forge:   { name:{en:'Forge Pack', da:'Smedjepakke'}, gl:'⚙︎', color:'#c0572b', cost:6, show:3, choose:1, targets:7,
+    desc:{en:'Pick <u>1</u> of <u>3</u> edits, then one of <u>7</u> random X from your bag to change', da:'Vælg <u>1</u> af <u>3</u> ændringer, og så et af <u>7</u> tilfældige X fra din pose'} },
+};
+
+/* ---------------- Forge Pack edits ----------------
+ * Each one changes a single X you choose from the bag. They are used up on the
+ * spot, so (unlike tools) they never take an item slot. */
+/** @type {Record<string, any>} */
+export const EDITS = {
+  smelt: { name:{en:'Smelt', da:'Smelt'}, gl:'⚒︎',
+    desc:{en:'Turn an X into a random <em>special</em> X', da:'Gør et X til et tilfældigt <em>specielt</em> X'} },
+  twin:  { name:{en:'Twin', da:'Tvilling'}, gl:'2×',
+    desc:{en:'Add a <u>copy</u> of an X to your bag', da:'Læg en <u>kopi</u> af et X i din pose'} },
+  scrap: { name:{en:'Scrap', da:'Skrot'}, gl:'✕',
+    desc:{en:'Destroy an X and gain <u>$3</u>', da:'Ødelæg et X og få <u>$3</u>'} },
 };
 
 /* ---------------- items (chalk levels a score type, tools act right away) ---------------- */

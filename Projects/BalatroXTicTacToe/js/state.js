@@ -14,7 +14,7 @@
 export const S = {};
 
 /** Per-device preferences, separate from the run. */
-export const SET = { speed: 1, sound: true, crt: true };
+export const SET = { speed: 1, sound: true, crt: true, tips: true, seen: /** @type {Record<string, number>} */ ({}), baselined: false };
 
 const KEY_RUN = 'bxt-run-v3';
 const KEY_SET = 'bxt-settings';
@@ -44,7 +44,25 @@ export function loadRun() {
   const d = read(KEY_RUN);
   if (!d || d.v !== 3 || !d.S || !d.S.bag) return false;
   replaceState(d.S, d.uid);
+  upgradeOldShop();
   return true;
+}
+/**
+ * The shop used to hold three cards plus a separate square-upgrade slot, and re-rolled
+ * its voucher on every visit (tracked by S.lastVoucherAnte). It now holds two cards and
+ * keeps one voucher per ante in S.anteVoucher. A run saved in the old shape still loads:
+ * extra cards are trimmed, and the ante's voucher is carried over (or marked bought).
+ */
+function upgradeOldShop() {
+  const sh = S.shop;
+  if (sh) {
+    delete sh.tile;
+    if (Array.isArray(sh.items) && sh.items.length > 2) sh.items.length = 2;
+  }
+  if (!S.anteVoucher && (sh || S.lastVoucherAnte === S.ante)) {
+    S.anteVoucher = { ante: S.ante, id: (sh && sh.voucher) || null, bought: !!(sh && sh.vSold) || S.lastVoucherAnte === S.ante };
+  }
+  delete S.lastVoucherAnte;
 }
 /** @param {any} data @param {number} [nextUid] */
 export function replaceState(data, nextUid) {

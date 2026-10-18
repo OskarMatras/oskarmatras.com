@@ -35,7 +35,7 @@ export function freshRun() {
     jokers: [], items: [], levels: { row: 1, col: 1, diag: 1, draw: 1 }, played: { row: 0, col: 0, diag: 0, draw: 0 },
     vouchers: [], maxGames: 4, maxDiscards: 3, handSize: 3, jokerSlots: 5, itemSlots: 2,
     usedBosses: [], boss: null, round: null, board: Array(9).fill(null), g: null, shop: null,
-    mode: null, pending: null, lastVoucherAnte: 0,
+    mode: null, pending: null, anteVoucher: null,
     stats: { bestLine: 0, bestType: '', lines: 0, wins: 0 }, endless: false, busy: false, cashout: null,
   });
   nextBoss();

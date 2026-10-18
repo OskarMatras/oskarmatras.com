@@ -9,7 +9,7 @@
  */
 import { S, SET, nid, saveRun, clearRun, saveBest, loadRun, saveSettings } from './state.js';
 import { geo, rc, squareOf, neighbours, isCenter, mirrorOf } from './geometry.js';
-import { PIECES, SPECIALS, TILES, JOKERS, ITEMS, VOUCHERS, LINE_TYPES, EDITIONS, PACKS, hasJ } from './data.js';
+import { PIECES, SPECIALS, TILES, JOKERS, ITEMS, VOUCHERS, LINE_TYPES, EDITIONS, EDITS, PACKS, hasJ } from './data.js';
 import {
   rand, shuffle, newPiece, freshRun, nextBoss, blindInfo, lineValues, handMax, isBoss,
   emptyCells, oWon, newXLines, viableLines, threats,
@@ -378,33 +378,45 @@ function genJoker(edBoost = 1, /** @type {string[]} */ avoid = []) {
   for (const k of ['poly', 'holo', 'foil']) { const ch = EDITIONS[k].chance * edBoost; if (edRoll < ch) { ed = k; break; } edRoll -= ch; }
   return { kind: 'joker', id, ed, cost: JOKERS[id].cost + (ed ? EDITIONS[ed].cost : 0), sold: false };
 }
+/** The shop always offers this many random cards, one ante voucher and this many packs. */
+const CARD_SLOTS = 2, PACK_SLOTS = 2;
+
+/** One random card: a Joker, a piece, a square upgrade, or a chalk/tool. */
 function genItem() {
   const roll = Math.random();
-  if (roll < .5) return genJoker();
-  if (roll < .75) { const id = rand(SPECIALS); return { kind: 'piece', id, cost: /** @type {any} */ (PIECES)[id].cost, sold: false }; }
+  if (roll < .45) return genJoker();
+  if (roll < .65) { const id = rand(SPECIALS); return { kind: 'piece', id, cost: /** @type {any} */ (PIECES)[id].cost, sold: false }; }
+  if (roll < .8) return { kind: 'tile', id: rand(Object.keys(TILES)), cost: 4, sold: false };
   const ids = Object.keys(ITEMS);
   const chalks = ids.filter(i => ITEMS[i].kind === 'chalk'), tools = ids.filter(i => ITEMS[i].kind === 'tool');
   return { kind: 'item', id: Math.random() < .6 ? rand(chalks) : rand(tools), cost: 3, sold: false };
 }
 function makeShop() {
-  S.shop = { items: [], tile: { kind: 'tile', id: rand(Object.keys(TILES)), cost: 4, sold: false }, voucher: null, vSold: false, reroll: S.vouchers.includes('coupon') ? 2 : 5, trimmed: false };
-  for (let i = 0; i < 3; i++) S.shop.items.push(genItem());
+  S.shop = { items: [], voucher: null, vSold: false, reroll: S.vouchers.includes('coupon') ? 2 : 5, trimmed: false, packs: [] };
+  for (let i = 0; i < CARD_SLOTS; i++) S.shop.items.push(genItem());
   const kinds = shuffle(Object.keys(PACKS));
-  S.shop.packs = kinds.slice(0, 2).map(type => ({ type, cost: PACKS[type].cost, sold: false }));
-  const vs = Object.keys(VOUCHERS).filter(v => !S.vouchers.includes(v) && (!VOUCHERS[v].req || VOUCHERS[v].req()));
-  if (vs.length && S.lastVoucherAnte !== S.ante) S.shop.voucher = rand(vs);
+  S.shop.packs = kinds.slice(0, PACK_SLOTS).map(type => ({ type, cost: PACKS[type].cost, sold: false }));
+  // One voucher per ante: rolled the first time the ante opens a shop, then it waits
+  // in every shop of that ante until it is bought (it is never re-rolled), and once
+  // bought there is none until the next ante.
+  if (!S.anteVoucher || S.anteVoucher.ante !== S.ante) {
+    const vs = Object.keys(VOUCHERS).filter(v => !S.vouchers.includes(v) && (!VOUCHERS[v].req || VOUCHERS[v].req()));
+    S.anteVoucher = { ante: S.ante, id: vs.length ? rand(vs) : null, bought: false };
+  }
+  S.shop.voucher = S.anteVoucher.id; S.shop.vSold = S.anteVoucher.bought;
 }
 function buy(/** @type {string} */ key) {
   const sh = S.shop;
   if (S.phase !== 'shop' || !sh || S.mode || S.pack) return;
   if (key === 'v') {
-    if (!sh.voucher || sh.vSold) return;
+    const av = S.anteVoucher;
+    if (!av || !av.id || av.bought) return;
     if (S.money < 10) { ui.toast(t('toast.noMoney')); return; }
-    S.money -= 10; sh.vSold = true; S.vouchers.push(sh.voucher); VOUCHERS[sh.voucher].apply(); S.lastVoucherAnte = S.ante; sfx.win();
-    if (sh.voucher === 'board4' || sh.voucher === 'board5') ui.toast(t('toast.board', { n: S.N }));
+    S.money -= 10; av.bought = true; sh.vSold = true; S.vouchers.push(av.id); VOUCHERS[av.id].apply(); sfx.win();
+    if (av.id === 'board4' || av.id === 'board5') ui.toast(t('toast.board', { n: S.N }));
     settle(); return;
   }
-  const it = key === 't' ? sh.tile : sh.items[+key.slice(1)];
+  const it = sh.items[+key.slice(1)];
   if (!it || it.sold) return;
   if (S.money < it.cost) { ui.toast(t('toast.noMoney')); return; }
   if (it.kind === 'joker') {
@@ -413,7 +425,7 @@ function buy(/** @type {string} */ key) {
   } else if (it.kind === 'piece') {
     S.bag.push(newPiece(it.id)); ui.toast(t('toast.pieceAdded', { name: tr(/** @type {any} */ (PIECES)[it.id].name) }));
   } else if (it.kind === 'tile') {
-    S.mode = 'tile'; S.pending = it.id;
+    S.mode = 'tile'; S.pending = it.id; sh.tileFrom = key;   // remembered so Cancel can refund this card
   } else {
     if (S.items.length >= S.itemSlots) { ui.toast(t('toast.itemsFull')); return; }
     S.items.push({ uid: nid(), id: it.id });
@@ -427,13 +439,17 @@ function applyTile(/** @type {string} */ arg) {
   const sq = S.squares[key] || (S.squares[key] = {});
   sq[S.pending] = (sq[S.pending] || 0) + 1;
   ui.toast(t('toast.tileApplied', { name: tr(/** @type {any} */ (TILES)[S.pending].name) }));
-  S.mode = null; S.pending = null; S.shop.tileFromPack = false; sfx.win(); settle();
+  S.mode = null; S.pending = null; S.shop.tileFromPack = false; S.shop.tileFrom = null; sfx.win(); settle();
 }
 function cancelTile() {
   if (S.mode !== 'tile') return;
-  // A tile from the shop slot is refunded; one picked from a pack is simply dropped.
+  // A tile bought as a shop card is refunded; one picked from a pack is simply dropped.
   if (S.shop.tileFromPack) S.shop.tileFromPack = false;
-  else { S.money += S.shop.tile.cost; S.shop.tile.sold = false; }
+  else {
+    const it = S.shop.tileFrom && S.shop.items[+S.shop.tileFrom.slice(1)];
+    if (it) { S.money += it.cost; it.sold = false; }
+  }
+  S.shop.tileFrom = null;
   S.mode = null; S.pending = null; settle();
 }
 function trim() {
@@ -446,7 +462,7 @@ function reroll() {
   const sh = S.shop; if (!sh || S.mode || S.pack) return;
   if (S.money < sh.reroll) { ui.toast(t('toast.noMoney')); return; }
   S.money -= sh.reroll; sh.reroll++; sh.items = [];
-  for (let i = 0; i < 3; i++) sh.items.push(genItem());
+  for (let i = 0; i < CARD_SLOTS; i++) sh.items.push(genItem());
   sfx.click(); settle();
 }
 function nextRound() { if (S.phase !== 'shop' || S.mode || S.pack) return; sfx.click(); S.phase = 'blind'; S.shop = null; settle(); }
@@ -460,6 +476,7 @@ function packOptions(type) {
   if (type === 'piece') return shuffle([...SPECIALS]).slice(0, P.show).map(id => ({ kind: 'piece', id }));
   if (type === 'chalk') return shuffle(Object.keys(ITEMS).filter(i => ITEMS[i].kind === 'chalk')).slice(0, P.show).map(id => ({ kind: 'item', id }));
   if (type === 'builder') return shuffle(Object.keys(TILES)).slice(0, P.show).map(id => ({ kind: 'tile', id }));
+  if (type === 'forge') return Object.keys(EDITS).map(id => ({ kind: 'edit', id }));
   return shuffle(Object.keys(ITEMS).filter(i => ITEMS[i].kind === 'tool')).slice(0, P.show).map(id => ({ kind: 'item', id }));
 }
 function buyPack(/** @type {string} */ arg) {
@@ -467,12 +484,41 @@ function buyPack(/** @type {string} */ arg) {
   if (S.phase !== 'shop' || S.mode || S.pack || !pk || pk.sold) return;
   if (S.money < pk.cost) { ui.toast(t('toast.noMoney')); return; }
   S.money -= pk.cost; pk.sold = true; sfx.win();
-  S.pack = { type: pk.type, options: packOptions(pk.type), left: PACKS[pk.type].choose };
+  const P = PACKS[pk.type];
+  // A pack that edits your X shows a random handful of them (by uid, so a reload keeps the same ones).
+  const targets = P.targets ? shuffle(S.bag.map((/** @type {any} */ p) => p.uid)).slice(0, P.targets) : null;
+  S.pack = { type: pk.type, options: packOptions(pk.type), left: P.choose, targets, armed: null };
+  settle();
+}
+/** Forge Pack: tap an edit to ready it (tap again to put it back), then tap the X it should change. */
+function armPack(/** @type {string} */ arg) {
+  const pk = S.pack; if (!pk || !pk.targets) return;
+  const o = pk.options[+arg]; if (!o || o.taken) return;
+  pk.armed = pk.armed === +arg ? null : +arg; sfx.click(); settle();
+}
+function editPiece(/** @type {string} */ arg) {
+  const pk = S.pack; if (!pk || !pk.targets || pk.armed === null || pk.armed === undefined) return;
+  const o = pk.options[pk.armed], p = S.bag.find((/** @type {any} */ x) => String(x.uid) === arg);
+  if (!o || o.taken || !p) return;
+  const P = /** @type {any} */ (PIECES);
+  if (o.id === 'smelt') {
+    p.type = rand(SPECIALS.filter(k => k !== p.type)); sfx.win();
+    ui.toast(t('toast.smelted', { name: tr(P[p.type].name) }));
+  } else if (o.id === 'twin') {
+    S.bag.push(newPiece(p.type)); sfx.win();
+    ui.toast(t('toast.twinned', { name: tr(P[p.type].name) }));
+  } else if (o.id === 'scrap') {
+    if (S.bag.length <= 5) { ui.toast(t('toast.bagMin')); return; }   // the bag never drops below 5, same as Trim
+    S.bag = S.bag.filter((/** @type {any} */ x) => x !== p); S.money += 3; sfx.money();
+    ui.toast(t('toast.scrapped'));
+  }
+  o.taken = true; pk.left--; pk.armed = null;
+  if (pk.left <= 0) S.pack = null;
   settle();
 }
 function takePack(/** @type {string} */ arg) {
   const pk = S.pack; if (!pk) return;
-  const o = pk.options[+arg]; if (!o || o.taken) return;
+  const o = pk.options[+arg]; if (!o || o.taken || o.kind === 'edit') return;
   if (o.kind === 'joker') {
     if (S.jokers.length >= S.jokerSlots) { ui.toast(t('toast.jokersFull')); return; }
     S.jokers.push({ uid: nid(), id: o.id, ed: o.ed || null, data: {} });
@@ -559,11 +605,13 @@ function abandon() { clearRun(); S.phase = 'title'; ui.render(); }
 function endless() { S.endless = true; S.phase = 'shop'; settle(); }
 function toggleSpeed() { SET.speed = SET.speed === 1 ? 2 : SET.speed === 2 ? 4 : 1; saveSettings(); ui.render(); ui.refreshModal(); }
 function toggleSound() { SET.sound = !SET.sound; saveSettings(); ui.render(); ui.refreshModal(); sfx.click(); }
+function toggleTips() { SET.tips = !SET.tips; saveSettings(); ui.render(); ui.refreshModal(); sfx.click(); }
+function replayTips() { ui.replayTips(); ui.render(); ui.refreshModal(); sfx.click(); ui.toast(t('toast.tipsReplay')); }
 function toggleCrt() { SET.crt = !SET.crt; saveSettings(); ui.applyCrt(); ui.render(); ui.refreshModal(); sfx.click(); }
 
 export const actions = {
   cell: onCell, selectPiece, discard, startBlind, skipBlind,
-  buy, reroll, trim, applyTile, cancelTile, nextRound, cashOut, buyPack, takePack, skipPack,
+  buy, reroll, trim, applyTile, cancelTile, nextRound, cashOut, buyPack, takePack, skipPack, armPack, editPiece,
   sellJoker, sellItem, useItem, itemBlocked, cancelMode,
-  newRun, continueRun, abandon, endless, toggleSpeed, toggleSound, toggleCrt,
+  newRun, continueRun, abandon, endless, toggleSpeed, toggleSound, toggleCrt, toggleTips, replayTips,
 };

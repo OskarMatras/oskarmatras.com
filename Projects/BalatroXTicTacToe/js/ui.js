@@ -15,7 +15,8 @@
  */
 import { S, SET, best, hasSavedRun } from './state.js';
 import { geo, squareOf } from './geometry.js';
-import { LINE_TYPES, LINE_ORDER, PIECES, TILES, RARITY, JOKERS, ITEMS, VOUCHERS, BOSSES, EDITIONS, PACKS, hasJ } from './data.js';
+import { LINE_TYPES, LINE_ORDER, PIECES, TILES, RARITY, JOKERS, ITEMS, VOUCHERS, BOSSES, EDITIONS, EDITS, PACKS, hasJ } from './data.js';
+import { sync as syncCoach } from './coach.js';
 import { punch } from './cardfx.js';
 import { blindInfo, lineValues, handMax } from './rules.js';
 import { t, tr, fmt, fmtM } from './strings.js';
@@ -45,7 +46,9 @@ export function render() {
   document.body.dataset.phase = S.phase;
   if (tipFor && !document.body.contains(tipFor)) hideTip();
   renderSide(); renderRack(); renderStage(); renderOverlay();
+  syncCoach();   // the tutorial reads the game state and shows, moves or retires a tip
 }
+export { replay as replayTips } from './coach.js';
 
 function renderSide() {
   const inPlay = S.phase === 'play' && S.round;
@@ -98,6 +101,9 @@ function renderRack() {
 
 function renderStage() {
   if (S.phase === 'play') return renderPlay();
+  // An open pack is its own scene: the shop steps out of the way, but the Joker and item
+  // trays above stay live, so you can sell something to make room for what you pick.
+  if (S.phase === 'shop' && S.pack) return renderPackScene();
   if (S.phase === 'shop' || S.phase === 'cashout' || S.phase === 'won') return renderShop();
   return renderBlinds();
 }
@@ -208,14 +214,17 @@ export function itemDesc(d) {
 function renderShop() {
   const sh = S.shop;
   if (!sh) { el.stage.innerHTML = ''; return; }
-  const all = [...sh.items.map((/** @type {any} */ it, /** @type {number} */ i) => ({ it, key: 'i' + i })), { it: sh.tile, key: 't' },
-    ...(sh.voucher ? [{ it: { kind: 'voucher', id: sh.voucher, cost: 10, sold: sh.vSold }, key: 'v' }] : [])];
-  const cards = all.map(({ it, key }) => {
+  /** One card. The whole card is the button: tapping it opens a menu with what you can do. @param {any} it @param {string} key */
+  const card = (it, key) => {
     const v = itemView(it);
-    return `<div class="sitem${it.sold ? ' sold' : ''}">${v.vis}<div class="nm2">${esc(v.name)}</div><div class="kind">${v.kind}</div>
-      <div class="ds">${v.desc}</div><div class="price">$${it.cost}</div>
-      <button class="btn gold" data-act="buy" data-arg="${key}" ${it.sold || S.mode ? 'disabled' : ''}>${it.sold ? t('btn.sold') : t('btn.buy')}</button></div>`;
-  }).join('');
+    return `<button type="button" class="sitem${it.sold ? ' sold' : ''}" data-act="inspectShop" data-arg="${key}" ${it.sold || S.mode ? 'disabled' : ''} aria-label="${esc(v.name)}, $${it.cost}">${v.vis}<span class="nm2">${esc(v.name)}</span><span class="kind">${v.kind}</span>
+      <span class="ds">${v.desc}</span><span class="price">${it.sold ? t('btn.sold') : '$' + it.cost}</span></button>`;
+  };
+  /** A labelled shelf of the shop. @param {string} cls @param {string} title @param {string} hint @param {string} body */
+  const shelf = (cls, title, hint, body) => `<section class="shopCat ${cls}"><h3>${title}</h3><p class="catHint">${hint}</p>${body ? `<div class="shopGrid">${body}</div>` : ''}</section>`;
+  const cards = sh.items.map((/** @type {any} */ it, /** @type {number} */ i) => card(it, 'i' + i)).join('');
+  const voucherHint = !sh.voucher ? t('shop.voucherNone') : sh.vSold ? t('shop.voucherSold') : t('shop.voucherHint');
+  const voucher = sh.voucher ? card({ kind: 'voucher', id: sh.voucher, cost: 10, sold: sh.vSold }, 'v') : '';
   const pick = S.mode === 'tile'
     ? `<div class="tilePick"><div class="hint">${t('tile.pick', { name: tr(/** @type {any} */ (TILES)[S.pending].name) })}</div>
         <div class="boardWrap tiling small">${boardHTML('tileBoard', Array(S.N * S.N).fill(null), 'applyTile')}</div>
@@ -224,17 +233,49 @@ function renderShop() {
   const plainN = S.bag.filter((/** @type {any} */ p) => p.type === 'plain').length;
   const packs = (sh.packs || []).map((/** @type {any} */ pk, /** @type {number} */ i) => {
     const P = PACKS[pk.type];
-    return `<div class="sitem pack${pk.sold ? ' sold' : ''}"><span class="packArt" style="--pk:${P.color}" data-tilt="pk${i}${pk.type}"><span class="gl">${P.gl}</span><span class="pkName">${tr(P.name)}</span></span>
-      <div class="nm2">${tr(P.name)}</div><div class="kind">${t('kind.pack')}</div><div class="ds">${tr(P.desc)}</div><div class="price">$${pk.cost}</div>
-      <button class="btn gold" data-act="buyPack" data-arg="${i}" ${pk.sold || S.mode ? 'disabled' : ''}>${pk.sold ? t('btn.sold') : t('btn.open')}</button></div>`;
+    return `<button type="button" class="sitem pack${pk.sold ? ' sold' : ''}" data-act="inspectShop" data-arg="p${i}" ${pk.sold || S.mode ? 'disabled' : ''} aria-label="${esc(tr(P.name))}, $${pk.cost}"><span class="packArt" style="--pk:${P.color}" data-tilt="pk${i}${pk.type}"><span class="gl">${P.gl}</span><span class="pkName">${tr(P.name)}</span></span>
+      <span class="nm2">${tr(P.name)}</span><span class="kind">${t('kind.pack')}</span><span class="ds">${tr(P.desc)}</span><span class="price">${pk.sold ? t('btn.sold') : '$' + pk.cost}</span></button>`;
   }).join('');
-  el.stage.innerHTML = `<div class="scrollPane"><div class="panelBox"><h2>${t('ui.shop')}</h2><div class="shopGrid">${cards}</div>
-    ${packs ? `<h3 class="sub">${t('ui.packs')}</h3><div class="shopGrid">${packs}</div>` : ''}${pick}
+  el.stage.innerHTML = `<div class="scrollPane"><div class="panelBox"><h2>${t('ui.shop')}</h2>
+    <div class="shopCats">${shelf('cards', t('shop.cards'), t('shop.cardsHint'), cards)}${shelf('voucher', t('shop.voucher'), voucherHint, voucher)}${packs ? shelf('packs', t('ui.packs'), t('shop.packsHint'), packs) : ''}</div>${pick}
     <div class="shopBar"><div class="row">
       <button class="btn green big" data-act="reroll" ${S.mode ? 'disabled' : ''}>${t('btn.reroll', { n: sh.reroll })}</button>
       <button class="btn big" data-act="trim" title="${esc(t('trim.title'))}" ${(S.mode || plainN === 0 || S.bag.length <= 5 || sh.trimmed) ? 'disabled' : ''}>${t('btn.trim')}</button></div>
       <button class="btn red big" data-act="nextRound" ${S.mode ? 'disabled' : ''}>${t('btn.nextRound')}</button></div></div></div>`;
   if (S.mode === 'tile') { const tp = el.stage.querySelector('.tilePick'); if (tp) tp.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
+}
+
+/** An opened booster pack. It is its own scene, so the Joker and item trays above stay clickable. */
+function renderPackScene() {
+  const pk = S.pack, P = PACKS[pk.type];
+  /** @param {any} o */
+  const view = o => {
+    if (o.kind !== 'edit') return itemView(o);
+    const E = EDITS[o.id];
+    return { vis: `<span class="cons" style="--cc:var(--tool)"><span class="gl">${E.gl}</span></span>`, name: tr(E.name), kind: t('kind.edit'), desc: tr(E.desc) };
+  };
+  const opts = pk.options.map((/** @type {any} */ o, /** @type {number} */ i) => {
+    const v = view(o), armed = pk.armed === i;
+    // Edits need an X to act on, so tapping one readies it; everything else opens its menu.
+    return `<button type="button" class="sitem${o.taken ? ' sold' : ''}${armed ? ' armed' : ''}" data-act="${o.kind === 'edit' ? 'armPack' : 'inspectPackOpt'}" data-arg="${i}" ${o.taken ? 'disabled' : ''}${o.kind === 'edit' ? ` aria-pressed="${armed}"` : ''} aria-label="${esc(v.name)}">${v.vis}<span class="nm2">${esc(v.name)}</span><span class="kind">${v.kind}</span><span class="ds">${v.desc}</span></button>`;
+  }).join('');
+  const open = pk.options.filter((/** @type {any} */ o) => !o.taken);
+  const hint = S.jokers.length >= S.jokerSlots && open.some((/** @type {any} */ o) => o.kind === 'joker') ? t('pack.sellJoker')
+    : S.items.length >= S.itemSlots && open.some((/** @type {any} */ o) => o.kind === 'item' && ITEMS[o.id].kind !== 'chalk') ? t('pack.sellItem') : '';
+  let targets = '';
+  if (pk.targets) {
+    const armedEdit = pk.armed === null || pk.armed === undefined ? null : EDITS[pk.options[pk.armed].id];
+    const tiles = pk.targets.map((/** @type {number} */ uid) => S.bag.find((/** @type {any} */ x) => x.uid === uid)).filter(Boolean).map((/** @type {any} */ p) => {
+      const nm = tr(/** @type {any} */ (PIECES)[p.type].name);
+      return `<button type="button" class="tgt" data-act="editPiece" data-arg="${p.uid}" ${armedEdit ? '' : 'disabled'} aria-label="${esc(nm)}"><span class="hpv">${pieceHTML(p)}</span><span class="tn">${esc(nm)}</span></button>`;
+    }).join('');
+    targets = `<section class="shopCat packTargets"><h3>${t('pack.targets', { n: pk.targets.length })}</h3>
+      <p class="catHint">${armedEdit ? t('pack.armedHint', { name: esc(tr(armedEdit.name)) }) : t('pack.pickEdit')}</p><div class="tgtRow">${tiles}</div></section>`;
+  }
+  el.stage.innerHTML = `<div class="scrollPane"><div class="panelBox packScene"><h2>${tr(P.name)}</h2>
+    <p class="packSub">${pk.left === 1 ? t('pack.left1') : t('pack.left', { n: pk.left })}</p>
+    <div class="shopGrid">${opts}</div>${hint ? `<p class="packHint">${hint}</p>` : ''}${targets}
+    <div class="shopBar packBar"><button class="btn big" data-act="skipPack">${t('btn.skipPack')}</button></div></div></div>`;
 }
 
 /* ---------------- overlays ---------------- */
@@ -244,7 +285,6 @@ export function showModal(kind) { modal = kind; abandonArmed = false; renderOver
 function renderOverlay() {
   let kind = modal;
   if (!kind) kind = ({ title: 'title', cashout: 'cashout', over: 'over', won: 'won' })[/** @type {'title'} */ (S.phase)] || null;
-  if (!kind && S.phase === 'shop' && S.pack) kind = 'pack';
   if (!kind) { el.overlay.hidden = true; el.overlay.innerHTML = ''; return; }
   el.overlay.hidden = false;
   let h = '';
@@ -253,7 +293,9 @@ function renderOverlay() {
     h = `<div class="modal wide" role="dialog" aria-modal="true" aria-labelledby="mt">
       <h1 class="title" id="mt"><span>BALATRO</span> <span class="x">X</span> <span>TICTACTOE</span></h1>
       <p class="subtitle">${t('title.sub')}${b.ante ? ' ' + t('title.best', { a: b.ante, s: fmt(b.score) }) : ''}</p>
-      <div class="howto"><div>${t('how.1')}</div><div>${t('how.2')}</div><div>${t('how.3')}</div><div>${t('how.4')}</div></div>
+      ${SET.tips && !(SET.seen && SET.seen.welcome)
+        ? `<p class="tipsLine">${t('title.tipsLine')}</p>`   // new players get taught as they play, not up front
+        : `<div class="howto"><div>${t('how.1')}</div><div>${t('how.2')}</div><div>${t('how.3')}</div><div>${t('how.4')}</div></div>`}
       <div class="btnRow">${hasSavedRun() ? `<button class="btn gold big" data-act="continueRun">${t('btn.continue')}</button>` : ''}
         <button class="btn ${hasSavedRun() ? '' : 'gold '}big" data-act="newRun">${t('btn.newRun')}</button></div></div>`;
   } else if (kind === 'cashout') {
@@ -273,16 +315,6 @@ function renderOverlay() {
   } else if (kind === 'won') {
     h = `<div class="modal" role="dialog" aria-modal="true"><h2 class="good">${t('won.title')}</h2><p>${t('won.text', { s: fmt(S.stats.bestLine) })}</p>
       <div class="btnRow"><button class="btn gold big" data-act="endless">${t('btn.endless')}</button><button class="btn big" data-act="newRun">${t('btn.newRun')}</button></div></div>`;
-  } else if (kind === 'pack') {
-    const pk = S.pack, P = PACKS[pk.type];
-    const opts = pk.options.map((/** @type {any} */ o, /** @type {number} */ i) => {
-      const v = itemView(o.kind === 'item' ? { ...o } : o);
-      return `<div class="sitem${o.taken ? ' sold' : ''}">${v.vis}<div class="nm2">${esc(v.name)}</div><div class="kind">${v.kind}</div><div class="ds">${v.desc}</div>
-        <button class="btn gold" data-act="takePack" data-arg="${i}" ${o.taken ? 'disabled' : ''}>${o.taken ? t('btn.taken') : t('btn.take')}</button></div>`;
-    }).join('');
-    h = `<div class="modal wide packModal" role="dialog" aria-modal="true"><h2>${tr(P.name)}</h2><p>${pk.left === 1 ? t('pack.left1') : t('pack.left', { n: pk.left })}</p>
-      <div class="shopGrid">${opts}</div>
-      <div class="btnRow"><button class="btn big" data-act="skipPack">${t('btn.skipPack')}</button></div></div>`;
   } else if (kind === 'info') {
     const rows = LINE_ORDER.map(k => { const v = lineValues(k); return `<tr><td>${tr(/** @type {any} */ (LINE_TYPES)[k].name)}</td><td>${S.levels[k]}</td><td><i>${v.chips}</i> &times; <em>${v.mult}</em></td><td>${S.played[k]}</td></tr>`; }).join('');
     const vs = S.vouchers.length ? S.vouchers.map((/** @type {string} */ v) => tr(VOUCHERS[v].name)).join(', ') : t('info.noneYet');
@@ -293,6 +325,8 @@ function renderOverlay() {
       <div class="btnRow"><button class="btn" data-act="toggleSpeed">${t('ui.speed', { n: SET.speed })}</button>
         <button class="btn" data-act="toggleSound" aria-pressed="${SET.sound}">${SET.sound ? t('ui.soundOn') : t('ui.soundOff')}</button>
         <button class="btn" data-act="toggleCrt" aria-pressed="${SET.crt}">${SET.crt ? t('ui.crtOn') : t('ui.crtOff')}</button></div>
+      <div class="btnRow"><button class="btn" data-act="toggleTips" aria-pressed="${SET.tips}">${SET.tips ? t('ui.tipsOn') : t('ui.tipsOff')}</button>
+        <button class="btn" data-act="replayTips">${t('ui.tipsReplay')}</button></div>
       <div class="btnRow"><button class="btn big" data-act="closeModal">${t('btn.close')}</button>
         <button class="btn red" data-act="abandon">${abandonArmed ? t('btn.abandonSure') : t('btn.abandon')}</button></div></div>`;
   } else if (kind === 'bag') {
@@ -317,6 +351,49 @@ function placeInsp(anchor) {
   const x = Math.max(12, Math.min(innerWidth - w - 12, r.left + r.width / 2 - w / 2));
   let y = r.bottom + 8; if (y + h > innerHeight - 12) y = Math.max(12, r.top - h - 8);
   p.style.left = x + 'px'; p.style.top = y + 'px';
+  // The action is the only button in the menu, so keyboard users land right on it.
+  const go = /** @type {HTMLElement|null} */ (p.querySelector('.btn:not(:disabled)'));
+  if (go) go.focus({ preventScroll: true });
+}
+/** Menu text under a card: the reason an action is unavailable, or nothing. @param {string} why */
+const whyLine = why => (why ? `<p class="why">${why}</p>` : '');
+/**
+ * Tap a shop card: a small menu with the one thing you can do with it.
+ * @param {string} key 'i0'/'i1' for a card, 'v' for the voucher, 'p0'/'p1' for a pack
+ * @param {HTMLElement} anchor
+ */
+function inspectShop(key, anchor) {
+  const sh = S.shop; if (!sh) return;
+  const isPack = key[0] === 'p';
+  const pk = isPack ? sh.packs[+key.slice(1)] : null;
+  const it = isPack ? null : key === 'v' ? { kind: 'voucher', id: sh.voucher, cost: 10, sold: sh.vSold } : sh.items[+key.slice(1)];
+  if (isPack ? !pk || pk.sold : !it || it.sold) return;
+  const cost = isPack ? pk.cost : it.cost;
+  let head;
+  if (isPack) { const P = PACKS[pk.type]; head = `<h4>${tr(P.name)}</h4><span class="tag" style="--tc:${P.color}">${t('kind.pack')}</span><p>${tr(P.desc)}</p>`; }
+  else { const v = itemView(it); head = `<h4>${esc(v.name)}</h4><span class="tag" style="--tc:var(--gold)">${v.kind}</span><p>${v.desc}</p>`; }
+  // A full tray is fixed by selling something in the tray, which a menu opened over it could
+  // cover (it flips upward when the card is low on screen). So say it in a toast, not a menu.
+  const full = it && it.kind === 'joker' && S.jokers.length >= S.jokerSlots ? t('toast.jokersFull')
+    : it && it.kind === 'item' && S.items.length >= S.itemSlots ? t('toast.itemsFull') : '';
+  if (full && S.money >= cost) { hideInsp(); toast(full); return; }
+  const why = S.money < cost ? t('why.need', { n: cost - S.money }) : '';
+  el.insp.innerHTML = `${head}${whyLine(why)}
+    <div class="row"><button class="btn gold" data-act="${isPack ? 'buyPack' : 'buy'}" data-arg="${isPack ? key.slice(1) : key}" ${why ? 'disabled' : ''}>${t(isPack ? 'btn.open' : 'btn.buy')} $${cost}</button></div>`;
+  placeInsp(anchor);
+}
+/** Tap something in an open pack: a menu with Take, or why you can't yet. @param {string} i @param {HTMLElement} anchor */
+function inspectPackOpt(i, anchor) {
+  const pk = S.pack, o = pk && pk.options[+i]; if (!o || o.taken) return;
+  const v = itemView(o);
+  // No room: the banner in the scene already explains, and the tray must stay reachable to sell
+  // from, so a toast, not a menu that could land on top of it.
+  const full = o.kind === 'joker' && S.jokers.length >= S.jokerSlots ? t('pack.sellJoker')
+    : o.kind === 'item' && ITEMS[o.id].kind !== 'chalk' && S.items.length >= S.itemSlots ? t('pack.sellItem') : '';
+  if (full) { hideInsp(); toast(full); return; }
+  el.insp.innerHTML = `<h4>${esc(v.name)}</h4><span class="tag" style="--tc:var(--gold)">${v.kind}</span><p>${v.desc}</p>
+    <div class="row"><button class="btn gold" data-act="takePack" data-arg="${i}">${t('btn.take')}</button></div>`;
+  placeInsp(anchor);
 }
 /** @param {string} uid @param {HTMLElement} anchor */
 function inspectJoker(uid, anchor) {
@@ -325,8 +402,7 @@ function inspectJoker(uid, anchor) {
   const sell = Math.max(1, Math.floor((d.cost + (ed ? ed.cost : 0)) / 2));
   el.insp.innerHTML = `<h4>${esc(d.name)}</h4><span class="tag" style="--tc:${RARITY[d.rar].color}">${t('kind.joker', { r: tr(RARITY[d.rar].name) })}</span>${ed ? ` <span class="tag ed-tag ed-${j.ed}">${tr(ed.name)}</span>` : ''}
     <p>${tr(d.desc(j))}${ed ? `<span class="edline ed-${j.ed}">${tr(ed.name)}: ${tr(ed.desc)}</span>` : ''}</p>
-    <div class="row"><button class="btn red" data-act="sellJoker" data-arg="${uid}" ${S.busy ? 'disabled' : ''}>${t('btn.sell', { n: sell })}</button>
-    <button class="btn" data-act="hideInsp">${t('btn.close')}</button></div>`;
+    <div class="row"><button class="btn red" data-act="sellJoker" data-arg="${uid}" ${S.busy ? 'disabled' : ''}>${t('btn.sell', { n: sell })}</button></div>`;
   placeInsp(anchor);
 }
 /** @param {string} uid @param {HTMLElement} anchor */
@@ -336,8 +412,7 @@ function inspectItem(uid, anchor) {
   el.insp.innerHTML = `<h4>${esc(tr(d.name))}</h4><span class="tag" style="--tc:${d.kind === 'chalk' ? 'var(--chalk)' : 'var(--tool)'}">${d.kind === 'chalk' ? t('tag.chalk') : t('tag.tool')}</span><p>${itemDesc(d)}</p>
     ${why ? `<p class="why">${why}</p>` : ''}
     <div class="row"><button class="btn gold" data-act="useItem" data-arg="${uid}" ${why ? 'disabled' : ''}>${t('btn.use')}</button>
-    <button class="btn red" data-act="sellItem" data-arg="${uid}" ${S.busy ? 'disabled' : ''}>${t('btn.sell', { n: 1 })}</button>
-    <button class="btn" data-act="hideInsp">${t('btn.close')}</button></div>`;
+    <button class="btn red" data-act="sellItem" data-arg="${uid}" ${S.busy ? 'disabled' : ''}>${t('btn.sell', { n: 1 })}</button></div>`;
   placeInsp(anchor);
 }
 
@@ -347,6 +422,8 @@ function inspectItem(uid, anchor) {
 const local = {
   inspectJoker: (a, el2) => inspectJoker(a, el2),
   inspectItem: (a, el2) => inspectItem(a, el2),
+  inspectShop: (a, el2) => inspectShop(a, el2),
+  inspectPackOpt: (a, el2) => inspectPackOpt(a, el2),
   hideInsp: () => hideInsp(),
   openInfo: () => showModal('info'),
   openBag: () => showModal('bag'),
@@ -389,7 +466,7 @@ function showTip(target) {
 /** @param {string} type @param {HTMLElement} anchor */
 function inspectPiece(type, anchor) {
   const P = /** @type {any} */ (PIECES)[type]; if (!P) return;
-  el.insp.innerHTML = `<h4>${esc(tr(P.name))}</h4><p>${tr(P.desc)}</p><div class="row"><button class="btn" data-act="hideInsp">${t('btn.close')}</button></div>`;
+  el.insp.innerHTML = `<h4>${esc(tr(P.name))}</h4><p>${tr(P.desc)}</p>`;   // information only: tap anywhere else to dismiss
   placeInsp(anchor);
 }
 
