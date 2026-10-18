@@ -28,6 +28,7 @@ import { actions } from './engine.js';
 
 loadSettings();
 freshRun();
+ui.applyCrt();
 S.phase = 'title';
 
 ui.bind(actions);

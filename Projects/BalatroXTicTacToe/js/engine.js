@@ -264,7 +264,9 @@ async function runScore(ctx, label) {
 
   const total = Math.floor(ctx.chips * ctx.mult);
   sfx.score(); ui.showTotal(total); ui.pop(ui.boardEl(), '+' + fmt(total), 'money');
-  if (total > S.round.target * 0.5) ui.shake();
+  // Half the blind's target is a nudge; the whole target (or more) is the full shake.
+  const hit = total / Math.max(1, S.round.target);
+  if (hit > 0.5) ui.shake((hit - 0.5) * 2);
   const from = S.round.score; S.round.score += total;
   for (let s = 1; s <= 14; s++) { ui.setRoundScore(from + total * s / 14); await sleep(28); }
 
@@ -557,10 +559,11 @@ function abandon() { clearRun(); S.phase = 'title'; ui.render(); }
 function endless() { S.endless = true; S.phase = 'shop'; settle(); }
 function toggleSpeed() { SET.speed = SET.speed === 1 ? 2 : SET.speed === 2 ? 4 : 1; saveSettings(); ui.render(); ui.refreshModal(); }
 function toggleSound() { SET.sound = !SET.sound; saveSettings(); ui.render(); ui.refreshModal(); sfx.click(); }
+function toggleCrt() { SET.crt = !SET.crt; saveSettings(); ui.applyCrt(); ui.render(); ui.refreshModal(); sfx.click(); }
 
 export const actions = {
   cell: onCell, selectPiece, discard, startBlind, skipBlind,
   buy, reroll, trim, applyTile, cancelTile, nextRound, cashOut, buyPack, takePack, skipPack,
   sellJoker, sellItem, useItem, itemBlocked, cancelMode,
-  newRun, continueRun, abandon, endless, toggleSpeed, toggleSound,
+  newRun, continueRun, abandon, endless, toggleSpeed, toggleSound, toggleCrt,
 };

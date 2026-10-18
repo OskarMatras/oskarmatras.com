@@ -212,8 +212,36 @@ b{font-weight:600}
 .pop{position:fixed;z-index:50;pointer-events:none;font-family:var(--f-num);font-size:19px;letter-spacing:.02em;padding:2px 8px;border-radius:6px;transform:translate(-50%,-50%);animation:floatUp .8s ease-out forwards;white-space:nowrap;box-shadow:0 3px 0 rgba(0,0,0,.35)}
 .pop.chips{background:var(--chips)} .pop.mult{background:var(--mult)} .pop.xmult{background:var(--mult-dk);border:2px solid var(--mult)} .pop.money{background:var(--gold);color:#2a1d00} .pop.dim{background:#555} .pop.info{background:var(--panel-3)}
 @keyframes floatUp{0%{transform:translate(-50%,-30%) scale(.6);opacity:0}20%{transform:translate(-50%,-70%) scale(1.15);opacity:1}100%{transform:translate(-50%,-160%) scale(1);opacity:0}}
-.shake{animation:shake .3s}
-@keyframes shake{25%{transform:translate(3px,-2px)}50%{transform:translate(-3px,2px)}75%{transform:translate(2px,1px)}}
+/* Screen shake. --sk is a unitless amount set from JS (2 for a nudge, 11 for the full thing),
+   so the same keyframes do both. Each swing is smaller than the last and the rotation is
+   a fraction of a degree, which is what makes it read as an impact instead of a wobble. */
+.shake{animation:shake .38s cubic-bezier(.2,.7,.3,1)}
+@keyframes shake{
+  0%  {transform:translate(calc(var(--sk,3)*.9px),  calc(var(--sk,3)*-.6px))  rotate(calc(var(--sk,3)*.10deg))}
+  20% {transform:translate(calc(var(--sk,3)*-.8px), calc(var(--sk,3)*.5px))   rotate(calc(var(--sk,3)*-.09deg))}
+  40% {transform:translate(calc(var(--sk,3)*.55px), calc(var(--sk,3)*.4px))   rotate(calc(var(--sk,3)*.05deg))}
+  60% {transform:translate(calc(var(--sk,3)*-.35px),calc(var(--sk,3)*-.25px))}
+  80% {transform:translate(calc(var(--sk,3)*.15px), calc(var(--sk,3)*.1px))}
+  100%{transform:translate(0,0) rotate(0)}
+}
+
+/* ---------- CRT ----------
+   Scanlines and a vignette over the whole viewport. It is a plain overlay, so it cannot bend
+   the picture the way a real CRT shader does; it only dims it. pointer-events:none keeps every
+   click going through to the game. The flicker is opacity only, which the browser runs on the
+   GPU, and it stops entirely for anyone who asked for reduced motion. */
+html.crt body::after{
+  content:'';position:fixed;inset:0;z-index:9999;pointer-events:none;
+  background:
+    radial-gradient(ellipse 125% 125% at 50% 50%, transparent 55%, rgba(0,0,0,.42) 100%),
+    repeating-linear-gradient(0deg, rgba(0,0,0,.2) 0 1px, transparent 1px 3px);
+  animation:crtFlicker 7s linear infinite;
+}
+@keyframes crtFlicker{0%,46%,50%,100%{opacity:1}47%{opacity:.9}48%{opacity:1}49%{opacity:.94}}
+@media (prefers-reduced-motion: reduce){
+  html.crt body::after{animation:none}
+  .shake{animation:none}
+}
 #toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom, 0px));transform:translateX(-50%);background:var(--panel);border:2px solid var(--line);padding:8px 14px;border-radius:10px;font-size:15px;z-index:60;opacity:0;transition:opacity .2s;pointer-events:none;max-width:calc(100% - 32px);text-align:center}
 #toast.on{opacity:1}
 

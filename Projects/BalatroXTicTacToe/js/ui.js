@@ -76,6 +76,7 @@ function renderSide() {
       <button class="btn" data-act="openBag">${t('ui.bag')}</button>
       <button class="btn opt" data-act="toggleSpeed">${t('ui.speed', { n: SET.speed })}</button>
       <button class="btn opt" data-act="toggleSound" aria-pressed="${SET.sound}">${SET.sound ? t('ui.soundOn') : t('ui.soundOff')}</button>
+      <button class="btn opt" data-act="toggleCrt" aria-pressed="${SET.crt}">${SET.crt ? t('ui.crtOn') : t('ui.crtOff')}</button>
     </div>`;
 }
 
@@ -290,7 +291,8 @@ function renderOverlay() {
       <div class="tblWrap"><table class="lv"><tr><th>${t('info.type')}</th><th>${t('info.level')}</th><th>${t('info.base')}</th><th>${t('info.scored')}</th></tr>${rows}</table></div>
       <p>${t('info.p1', { n: S.N })}</p><p>${t('info.boss', { name: tr(boss.name), desc: tr(boss.desc) })}</p><p>${t('info.vouchers', { list: vs })}</p>
       <div class="btnRow"><button class="btn" data-act="toggleSpeed">${t('ui.speed', { n: SET.speed })}</button>
-        <button class="btn" data-act="toggleSound" aria-pressed="${SET.sound}">${SET.sound ? t('ui.soundOn') : t('ui.soundOff')}</button></div>
+        <button class="btn" data-act="toggleSound" aria-pressed="${SET.sound}">${SET.sound ? t('ui.soundOn') : t('ui.soundOff')}</button>
+        <button class="btn" data-act="toggleCrt" aria-pressed="${SET.crt}">${SET.crt ? t('ui.crtOn') : t('ui.crtOff')}</button></div>
       <div class="btnRow"><button class="btn big" data-act="closeModal">${t('btn.close')}</button>
         <button class="btn red" data-act="abandon">${abandonArmed ? t('btn.abandonSure') : t('btn.abandon')}</button></div></div>`;
   } else if (kind === 'bag') {
@@ -459,7 +461,14 @@ export function pop(target, text, cls) {
 function retrigger(e, cls) { if (!e) return; e.classList.remove(cls); void e.offsetWidth; e.classList.add(cls); }
 export const bump = (/** @type {HTMLElement|null} */ e) => { retrigger(e, 'bump'); setTimeout(() => e && e.classList.remove('bump'), 90); };
 export const jig = (/** @type {HTMLElement|null} */ e) => { retrigger(e, 'jig'); if (e) punch(e); };
-export const shake = () => retrigger($('#app'), 'shake');
+/** Screen shake. `power` is 0..1: a nudge at 0, the full thing at 1. The CSS reads --sk as a unitless amount. @param {number} [power] */
+export const shake = (power = 1) => {
+  const app = $('#app');
+  if (app) app.style.setProperty('--sk', (2 + 9 * Math.min(1, Math.max(0, power))).toFixed(1));
+  retrigger(app, 'shake');
+};
+/** The CRT layer is pure CSS, switched by a class on <html>. */
+export const applyCrt = () => document.documentElement.classList.toggle('crt', !!SET.crt);
 /** @param {number} chips @param {number} mult @param {string} [name] */
 export function setCalc(chips, mult, name) {
   const c = $('#chips'), m = $('#mult'), h = $('#hname');
