@@ -144,6 +144,12 @@ export const sfx = {
   deal: (i = 0) => { noise(.07, .05, 3000 + i * 500, 1.5, 'bandpass', { sweep: .5 }); tone(hz(10 + i * 2), .03, 'triangle', .02, 1.4); },
   /** A pack opening: a rising sparkle. */
   sparkle: () => { [24, 29, 33, 36, 41].forEach((s, i) => tone(hz(s), .16, 'sine', .035, 1, { at: i * .05, verb: .6 })); },
+  /** A crowd cheering: a rising wash of noise with a few bright voices on top. */
+  cheer: () => { noise(.6, .07, 1800, .7, 'bandpass', { sweep: 3 }); [12, 16, 19, 24].forEach((s, i) => tone(hz(s), .3, 'triangle', .035, 1, { at: i * .05, verb: .5 })); },
+  /** A crowd booing: a low, falling groan. */
+  boo: () => { tone(hz(-5), .7, 'sawtooth', .05, .6, { fat: 14, lp: 800, verb: .5 }); tone(hz(-8), .8, 'sawtooth', .04, .5, { at: .05, lp: 700 }); noise(.5, .035, 400, 1, 'lowpass'); },
+  /** A crowd gasping: a short breath in. */
+  gasp: () => { noise(.28, .05, 2600, 1, 'bandpass', { sweep: 2.5 }); },
   /** A card flies to where it belongs. */
   whoosh: () => { noise(.22, .06, 600, 1, 'bandpass', { sweep: 7 }); },
 };

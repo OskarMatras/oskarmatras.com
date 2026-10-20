@@ -8,7 +8,7 @@ import { face, CROWD } from './faces.js';
 import { SCENES, WHO } from './story.js';
 import { TURFS } from './data.js';
 import { getLang, t } from './strings.js';
-import { sfx } from './audio.js';
+import { sfx, setMood } from './audio.js';
 
 /** @typedef {import('./story.js').Beat} Beat */
 
@@ -20,6 +20,8 @@ const SLOTS = /** @type {const} */ (['L', 'M', 'R']);
 let held = { L: '', M: '', R: '' };
 let crowdMode = 'off';
 let bgNow = '';
+/** The soundtrack under each backdrop: gentle in the yard, dark when the Sixth-Grader is around. */
+const BG_MOOD = /** @type {Record<string, 'calm'|'shop'|'boss'>} */ ({ gate: 'calm', yard: 'calm', tour: 'shop', sheds: 'boss', ambush: 'boss', finale: 'boss' });
 
 const reduce = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
@@ -85,9 +87,9 @@ function next() {
 /** @param {Beat} b */
 function show(b) {
   const r = /** @type {HTMLElement} */ (root);
-  if (b.bg && b.bg !== bgNow) { r.classList.remove('bg-' + bgNow); r.classList.add('bg-' + b.bg); bgNow = b.bg; }
+  if (b.bg && b.bg !== bgNow) { r.classList.remove('bg-' + bgNow); r.classList.add('bg-' + b.bg); bgNow = b.bg; setMood(/** @type {NonNullable<typeof cur>} */ (cur).id === 'finale_win' ? 'shop' : BG_MOOD[b.bg] || 'calm'); }
   for (const s of SLOTS) if (b[s] !== undefined) setFigure(s, b[s] || '');
-  if (b.crowd && b.crowd !== crowdMode) paintCrowd(b.crowd);
+  if (b.crowd && b.crowd !== crowdMode) { paintCrowd(b.crowd); if (b.crowd === 'cheer') sfx.cheer(); else if (b.crowd === 'boo') sfx.boo(); else if (b.crowd === 'gasp') sfx.gasp(); }
   const card = /** @type {HTMLElement} */ (r.querySelector('.stCard'));
   const box = /** @type {HTMLElement} */ (r.querySelector('.stBox'));
   card.hidden = !b.card; box.hidden = !!b.card;

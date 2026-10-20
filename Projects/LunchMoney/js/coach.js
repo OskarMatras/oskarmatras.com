@@ -227,7 +227,7 @@ function syncTutorial() {
     return;
   }
   hide();
-  show({ id: st.id, key: 'tut.' + st.id, tut: true, next: !!st.next, overDialog: !!st.overDialog, mood: st.mood, anchor: st.anchor, when: () => true });
+  show({ id: st.id, key: 'tut.' + st.id, vars: st.vars, tut: true, next: !!st.next, overDialog: !!st.overDialog, mood: st.mood, anchor: st.anchor, when: () => true });
 }
 
 /* ---------------- Pip's asides ----------------

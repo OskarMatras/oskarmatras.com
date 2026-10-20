@@ -107,7 +107,7 @@ export function render() {
 /** The scene at the front of the queue plays over everything else. */
 function syncStory() {
   const id = S.scene && S.scene.queue && S.scene.queue[0];
-  if (id && !(storyOpen() && storyId() === id)) showStory(id, () => { if (actions.storyDone) actions.storyDone(); });
+  if (id && !(storyOpen() && storyId() === id)) showStory(id, () => { setMood(moodFor()); if (actions.storyDone) actions.storyDone(); });
 }
 export { replay as replayTips } from './coach.js';
 /** The kids at the edges of a boss bout cheer, boo or gasp. @param {'cheer'|'boo'|'gasp'} kind @param {number} [ms] */

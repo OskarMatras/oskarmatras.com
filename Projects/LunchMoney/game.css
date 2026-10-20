@@ -1182,3 +1182,28 @@ body.inStory{overflow:hidden}
 .crowdSide{width:clamp(130px,13.5vw,230px)}
 .crowdSide .cf svg{width:clamp(52px,5.6vw,80px)}
 .crowd{bottom:-6px;top:auto;height:60%}
+
+/* crowd: lower stacks, and the text above the hand stays readable */
+.crowdSide .cf:nth-child(5n){translate:0 -30px}
+.crowdSide .cf:nth-child(3n){translate:0 -34px}
+.handMeta{position:relative;z-index:1}
+
+/* story backdrops, second pass: a proper skyline with windows, a fence, a bike shed and chalk on the ground */
+#story.bg-yard .stBack{background:
+  url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 600' preserveAspectRatio='xMidYMax slice'><defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='%2339404c'/><stop offset='1' stop-color='%232a2f38'/></linearGradient></defs><rect x='-20' y='150' width='440' height='290' fill='url(%23g)'/><path d='M-30 150 L200 100 L430 150Z' fill='%232a2e36'/><g fill='%23f4d98a' opacity='.85'><rect x='10' y='190' width='44' height='56'/><rect x='84' y='190' width='44' height='56'/><rect x='158' y='190' width='44' height='56'/><rect x='232' y='190' width='44' height='56'/><rect x='306' y='190' width='44' height='56'/><rect x='10' y='284' width='44' height='56'/><rect x='158' y='284' width='44' height='56'/><rect x='306' y='284' width='44' height='56'/></g><g fill='%231d2128'><rect x='84' y='284' width='44' height='56'/><rect x='232' y='284' width='44' height='56'/><rect x='170' y='370' width='60' height='70' rx='3'/></g><g><path d='M600 300 L1020 300 L1020 270 L640 270Z' fill='%23262a32'/><rect x='610' y='300' width='410' height='140' fill='%23323841'/><g stroke='%231b1612' stroke-width='5' fill='none'><circle cx='680' cy='400' r='30'/><circle cx='760' cy='400' r='30'/><path d='M680 400 L718 350 L760 400 M718 350 L706 332 M700 332 L730 332'/><circle cx='860' cy='400' r='30'/><circle cx='940' cy='400' r='30'/><path d='M860 400 L898 350 L940 400 M898 350 L886 332 M880 332 L910 332'/></g></g><g stroke='%2315171c' stroke-width='5'><path d='M0 438 H1000'/><path d='M0 400v38M40 400v38M80 400v38M120 400v38M160 400v38M200 400v38M240 400v38M280 400v38M320 400v38M360 400v38M400 400v38M440 400v38M480 400v38M520 400v38M560 400v38M600 400v38M640 400v38M680 400v38M720 400v38M760 400v38M800 400v38M840 400v38M880 400v38M920 400v38M960 400v38'/></g><path d='M470 440 v-190 h24' stroke='%2315171c' stroke-width='6' fill='none'/><circle cx='500' cy='250' r='14' fill='%23ffe9a8' opacity='.9'/><g stroke='white' stroke-width='4' fill='none' opacity='.3' stroke-linecap='round'><rect x='330' y='500' width='60' height='60'/><rect x='390' y='500' width='60' height='60'/><rect x='330' y='560' width='60' height='40'/><rect x='390' y='560' width='60' height='40'/><circle cx='700' cy='540' r='36'/><path d='M120 520l30 30M150 520l-30 30'/></g></svg>") center bottom/cover no-repeat,
+  linear-gradient(#e6a85c 0, #c8826a 22%, #7c5668 44%, #4d4c58 44%, #2a2c32 100%)}
+#story.bg-gate .stBack{background:
+  url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 600' preserveAspectRatio='xMidYMax slice'><circle cx='820' cy='120' r='46' fill='%23fff3c4' opacity='.8'/><g fill='%2339424d'><rect x='60' y='150' width='460' height='280'/><rect x='520' y='220' width='320' height='210'/></g><path d='M50 150 L290 96 L530 150Z' fill='%232d343d'/><g fill='%23e9d9a0' opacity='.75'><rect x='90' y='186' width='46' height='56'/><rect x='170' y='186' width='46' height='56'/><rect x='250' y='186' width='46' height='56'/><rect x='330' y='186' width='46' height='56'/><rect x='410' y='186' width='46' height='56'/><rect x='90' y='280' width='46' height='56'/><rect x='410' y='280' width='46' height='56'/><rect x='560' y='256' width='46' height='56'/><rect x='650' y='256' width='46' height='56'/><rect x='740' y='256' width='46' height='56'/></g><rect x='250' y='350' width='80' height='80' fill='%231d2228'/><path d='M0 430 H1000' stroke='%231b1612' stroke-width='6'/><g stroke='%231b1612' stroke-width='5'><path d='M20 340v90M80 340v90M140 340v90M200 340v90M260 340v90M320 340v90M380 340v90M440 340v90M500 340v90M560 340v90M620 340v90M680 340v90M740 340v90M800 340v90M860 340v90M920 340v90M980 340v90'/><path d='M0 356H1000'/></g></svg>") center bottom/cover no-repeat,
+  linear-gradient(#a6c2d6 0, #f3e0b4 48%, #5b636b 48%, #2f3338 100%)}
+
+/* the crowd, second pass: kids stand up the two sides like bleachers, behind the board */
+.crowd{inset:0;height:auto;bottom:0;z-index:-1}
+.crowdSide{display:block;top:0;bottom:0;width:clamp(150px,15vw,250px)}
+.crowdSide .cf{position:absolute;margin:0;translate:none !important}
+.crowdSide .cf svg{width:clamp(54px,5.8vw,86px)}
+.crowdSide.L .cf:nth-child(1){left:2%;bottom:0}   .crowdSide.L .cf:nth-child(2){left:46%;bottom:2%}
+.crowdSide.L .cf:nth-child(3){left:12%;bottom:17%} .crowdSide.L .cf:nth-child(4){left:52%;bottom:21%}
+.crowdSide.L .cf:nth-child(5){left:24%;bottom:36%}
+.crowdSide.R .cf:nth-child(1){right:2%;bottom:0}  .crowdSide.R .cf:nth-child(2){right:46%;bottom:2%}
+.crowdSide.R .cf:nth-child(3){right:12%;bottom:17%} .crowdSide.R .cf:nth-child(4){right:52%;bottom:21%}
+.crowdSide.R .cf:nth-child(5){right:24%;bottom:36%}

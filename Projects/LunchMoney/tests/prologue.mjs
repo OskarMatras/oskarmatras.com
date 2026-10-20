@@ -64,6 +64,7 @@ A.takePack('1');
 ok(!S.pack, 'the pack closes after two picks');
 A.nextRound(); await settle();
 ok(S.phase === 'play' && S.tut.bout === 2 && S.blindIdx === 1 && S.round.target === 150, 'bout 2 starts with a target of 150');
+ok(S.hand.some(p => p.type === 'red'), 'the Red-Pen X is in the first hand of bout 2');
 await playUntil(() => S.phase !== 'play');
 ok(S.phase === 'cashout', 'bout 2 is won with the build (phase ' + S.phase + ')');
 A.cashOut();
@@ -97,6 +98,13 @@ ok(S.phase === 'play' && S.boss.id === 'ollie', 'then the bout starts');
 S.jokers = [{ uid: 1, id: 'jester', ed: null, data: {} }, { uid: 2, id: 'center', ed: null, data: {} }, { uid: 3, id: 'corner', ed: null, data: {} }];
 ok(R.isMuzzled(S.jokers[0]) && R.isMuzzled(S.jokers[1]) && !R.isMuzzled(S.jokers[2]), 'the finale confiscates only the two leftmost Tricks');
 ok(!R.ambush(), 'and special X still score');
+
+// ... and after the win the scene comes before the victory screen
+S.phase = 'cashout'; S.cashout = { rows: [], notes: [], total: 0, finalWin: true }; S.round = { score: 1, target: 1, games: 1, discards: 0, gameNo: 1, reward: 0, name: 'x' };
+A.cashOut();
+ok(S.phase === 'won' && S.scene && S.scene.queue[0] === 'finale_win', 'the win scene plays over the victory screen');
+A.storyDone();
+ok(S.phase === 'won' && !S.scene, 'and then the victory screen is there');
 
 console.log(`prologue: ${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

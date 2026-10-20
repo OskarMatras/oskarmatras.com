@@ -15,6 +15,8 @@
  */
 import { S } from './state.js';
 import { winCells } from './rules.js';
+import { LINE_TYPES } from './data.js';
+import { tr, fmt } from './strings.js';
 
 /** Basics a player who has done the prologue already knows, so the light tips do not teach them again. */
 export const BASICS = ['welcome', 'place', 'hand', 'danger', 'score', 'games', 'shop', 'money', 'joker'];
@@ -28,6 +30,12 @@ const hasO = () => S.board.some((/** @type {any} */ c) => c && c.t === 'O');
 const inShop = () => S.phase === 'shop' && !S.pack && !S.mode;
 const packSold = (/** @type {number} */ i) => !!(S.shop && S.shop.packs && S.shop.packs[i] && S.shop.packs[i].sold);
 
+/** What the last line was and what it scored, for the cash-out lesson. */
+function lineVars() {
+  const k = S.stats && S.stats.bestType, L = k && /** @type {any} */ (LINE_TYPES)[k];
+  return { s: fmt((S.round && S.round.score) || 0), type: L ? tr(L.name).toLowerCase() : '' };
+}
+
 /** Where the run is, as one number the steps can be ordered by: bout * 10 + (play 1, cash-out 2, shop 3). */
 export function stage() {
   if (!tutOn()) return 0;
@@ -37,7 +45,7 @@ export function stage() {
 
 /**
  * @typedef {{ id: string, at: number, mood: string, anchor: string, when: () => boolean, done?: () => boolean,
- *   next?: boolean, optional?: boolean, overDialog?: boolean }} TutStep
+ *   next?: boolean, optional?: boolean, overDialog?: boolean, vars?: () => Record<string, any> }} TutStep
  * `at` is the stage the step belongs to: once the run is past it, the step is dropped. `next` steps wait for the
  * Next button; the others finish by themselves when `done()` says so.
  * @type {TutStep[]}
@@ -50,7 +58,7 @@ export const STEPS = [
   { id: 'toss', at: 11, mood: 'grin', anchor: '[data-act="discard"]', when: () => inPlay() && S.hand.length > 0, next: true },
   { id: 'danger', at: 11, mood: 'shock', anchor: '#bw', optional: true, when: () => inPlay() && winCells('O').size > 0, next: true },
   { id: 'line', at: 11, mood: 'happy', anchor: '#bw', when: () => inPlay(), done: () => S.stats.lines >= 1 || S.phase !== 'play' },
-  { id: 'cash1', at: 12, mood: 'cheer', anchor: '.modal', overDialog: true, when: () => S.phase === 'cashout', next: true },
+  { id: 'cash1', at: 12, mood: 'cheer', anchor: '.modal', overDialog: true, when: () => S.phase === 'cashout', next: true, vars: lineVars },
   // The shop, stocked on purpose.
   { id: 'shop_in', at: 13, mood: 'happy', anchor: '.shopCats', when: () => inShop(), next: true },
   { id: 'buy_trick', at: 13, mood: 'happy', anchor: '.sitem[data-arg="i0"]', when: () => inShop(), done: () => S.jokers.length >= 1 },
@@ -100,6 +108,7 @@ export function allows(action, arg = '') {
     case 'buy': return arg === 'i0' && S.jokers.length < 1;
     case 'buyPack': return arg === '0' && S.jokers.length >= 1 && !packSold(0);
     case 'takePack': return S.bag.some((/** @type {any} */ p) => p.type === 'red') || arg === '0';
+    case 'skipPack': return S.bag.some((/** @type {any} */ p) => p.type === 'red');
     case 'nextRound': return S.jokers.length >= 1 && packSold(0) && !S.pack;
     case 'reroll': case 'trim': case 'useItem': return false;
     default: return true;

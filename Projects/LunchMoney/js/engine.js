@@ -80,6 +80,10 @@ async function newGame() {
   }
   refill();
   if (S.ante === 1 && S.blindIdx === 0 && S.round.gameNo === 1 && !tutOn()) ui.toast(t('toast.first'));
+  if (tutOn() && S.tut.bout === 2 && S.round.gameNo === 1 && !S.hand.some((/** @type {any} */ p) => p.type === 'red')) {
+    const k = S.g.pile.findIndex((/** @type {any} */ p) => p.type === 'red');
+    if (k >= 0) { const [r] = S.g.pile.splice(k, 1); r.dealt = true; const out = S.hand.pop(); if (out) S.g.pile.push(out); S.hand.push(r); }
+  }
   const special = S.hand.findIndex((/** @type {any} */ p) => p.type !== 'plain');
   S.selIdx = special >= 0 ? special : 0;
   if (ambush() && S.round.gameNo === 1) ui.banner(t('banner.confiscated'), true);
@@ -712,7 +716,8 @@ function takePack(/** @type {string} */ arg) {
   if (pk.left <= 0) S.pack = null;
   settle();
 }
-function skipPack() { if (!S.pack) return; S.pack = null; sfx.click(); settle(); }
+function skipPack() { if (!S.pack) return;
+  if (!gate('skipPack')) return; S.pack = null; sfx.click(); settle(); }
 
 /* =================================================================
    Jokers and items in the rack

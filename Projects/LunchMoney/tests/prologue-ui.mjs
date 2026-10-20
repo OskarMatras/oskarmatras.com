@@ -42,9 +42,9 @@ while (guard++ < 400) {
   const ph = await phase();
   const S = await ev(`JSON.stringify({ ph: __S.phase, bout: __S.tut && __S.tut.bout, scene: !!__S.scene, jokers: __S.jokers.length, pack: !!__S.pack, packSold: !!(__S.shop && __S.shop.packs && __S.shop.packs[0].sold), busy: __S.busy, tut: !!__S.tut })`).then(JSON.parse);
   if (!S.tut) break;
-  if (await clickNext()) continue;
   const bb = await bubble();
-  if (bb) await once('bubble-' + bb.id.replace(/[^a-z]/gi, '').slice(0, 14));
+  if (bb) { await b.sleep(500); await once('bubble-' + bb.id.replace(/[^a-z]/gi, '').slice(0, 14)); }
+  if (await clickNext()) continue;
   if (S.busy) { await b.sleep(400); continue; }
   if (S.ph === 'play') {
     // a cell: the middle first, then the best open line

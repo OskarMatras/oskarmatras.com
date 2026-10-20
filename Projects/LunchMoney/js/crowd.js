@@ -9,6 +9,7 @@
  */
 import { S } from './state.js';
 import { face, CROWD } from './faces.js';
+import { sfx } from './audio.js';
 
 let arrived = false;
 let mood = '';
@@ -33,6 +34,7 @@ export function crowdHTML() {
 export function crowdReact(kind, ms = 1700) {
   if (!bouts()) return;
   mood = kind;
+  if (kind === 'boo') sfx.boo(); else if (kind === 'gasp') sfx.gasp();
   repaint();
   clearTimeout(timer);
   timer = setTimeout(() => { mood = ''; repaint(); }, ms);
