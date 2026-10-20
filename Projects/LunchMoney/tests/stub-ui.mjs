@@ -13,3 +13,4 @@ export const levelFx = () => {};
 export const flash = n, markEnter = n, flipRack = n, rackRects = () => new Map();
 export const face = () => '';
 export const crowd = () => {};
+export const explain = async () => {};

@@ -19,7 +19,25 @@ import { t, tr, fmt, fmtM } from './strings.js';
 import { sfx, resetStep, syncMusic } from './audio.js';
 import * as ui from './ui.js';
 
-const sleep = (/** @type {number} */ ms) => new Promise(r => setTimeout(r, ms / SET.speed));
+/** The prologue's first lines are scored slowly, so every number can be followed. */
+let slowScore = false;
+const sleep = (/** @type {number} */ ms) => new Promise(r => setTimeout(r, (ms * (slowScore ? 1.9 : 1)) / SET.speed));
+/**
+ * Prologue only: stop the scoring at a moment worth explaining, highlight what Pip is talking about and wait for Next.
+ * Each lesson is told once. @param {string} key @param {string} anchor CSS selector(s) to highlight @param {Record<string, any>} [vars]
+ */
+async function teach(key, anchor, vars = {}) {
+  if (!tutOn() || S.tut.guided === false) return;
+  S.tut.expl = S.tut.expl || {};
+  if (S.tut.expl[key]) return;
+  S.tut.expl[key] = 1;
+  await ui.explain('tut.sc_' + key.split(':')[0], anchor, vars);
+}
+/** The first time a Trick fires in the prologue, say what it does. @param {any} src a Joker */
+async function teachTrick(src) {
+  const d = JOKERS[src.id];
+  await teach('trick', '.tray.jokers .joker', { name: d.name, desc: tr(d.desc(src)) });
+}
 const jokerOf = (/** @type {string} */ id) => S.jokers.find((/** @type {any} */ j) => j.id === id);
 
 
@@ -315,6 +333,7 @@ async function scoreX(ctx, i, isFirst, isLast) {
   const squareTimes = hasJ('grandstand') ? 2 : 1;
   // A Sprout keeps its growth on the piece in the bag, so it carries over from game to game.
   const bagSelf = p.type === 'sprout' ? S.bag.find((/** @type {any} */ q) => q.uid === p.uid) : null;
+  if (p.type !== 'plain') await teach('piece:' + p.type, '.cell.scoring', { name: tr(P.name), desc: tr(P.desc) });
   for (let r = 0; r < reps; r++) {
     if (r > 0) { ui.pop(target, t('pop.again'), 'info'); await sleep(220); }
     if (P.chips) await apply(ctx, { chips: P.chips }, target);
@@ -337,7 +356,7 @@ async function scoreX(ctx, i, isFirst, isLast) {
     for (const j of S.jokers) {
       const src = scoringSource(j); if (!src) continue;
       const d = JOKERS[src.id];
-      if (d.x) { const e = d.x(ctx, i, p, src); if (e) await apply(ctx, e, ui.jokerEl(j.uid)); }
+      if (d.x) { const e = d.x(ctx, i, p, src); if (e) { await teachTrick(src); await apply(ctx, e, ui.jokerEl(j.uid)); } }
     }
   }
 }
@@ -347,7 +366,10 @@ async function runScore(ctx, label) {
   resetStep();
   ui.setCalc(ctx.chips, ctx.mult, label); sfx.line(); ui.bumpCalc('chips'); ui.bumpCalc('mult');
   ui.markCells(ctx.cells, 'scoring', true);
+  slowScore = tutOn() && S.tut.bout < 3;
   await sleep(480);
+  if (ctx.type !== 'draw') await teach('base', '.calc, .cell.scoring', { type: tr(/** @type {any} */ (LINE_TYPES)[ctx.type].name).toLowerCase(), c: ctx.chips, m: ctx.mult });
+  await teach('x', '.cell.scoring', {});
   for (let k = 0; k < ctx.cells.length; k++) await scoreX(ctx, ctx.cells[k], k === 0, k === ctx.cells.length - 1);
 
   const held = S.board.map((/** @type {any} */ c, /** @type {number} */ i) => (c && c.t === 'X' && c.p.type === 'steel' && !c.shattered && !ctx.cells.includes(i)) ? i : -1).filter((/** @type {number} */ i) => i >= 0);
@@ -360,12 +382,13 @@ async function runScore(ctx, label) {
     if (isMuzzled(j)) continue;
     const src = scoringSource(j);
     const d = src && JOKERS[src.id];
-    if (d && d.line) { const e = d.line(ctx, src); if (e) await apply(ctx, e, ui.jokerEl(j.uid)); }
+    if (d && d.line) { const e = d.line(ctx, src); if (e) { await teachTrick(src); await apply(ctx, e, ui.jokerEl(j.uid)); } }
     if (j.ed && EDITIONS[j.ed] && EDITIONS[j.ed].effect) await apply(ctx, EDITIONS[j.ed].effect, ui.jokerEl(j.uid));
   }
 
   if (S.g.amp) { S.g.amp = false; await apply(ctx, { xmult: 2 }, ui.boardEl()); }   // The Amplifier
   const total = Math.floor(ctx.chips * ctx.mult);
+  await teach(tutOn() && S.tut.bout === 2 ? 'total2' : 'total', '.calc, #rs', { chips: fmt(ctx.chips), mult: fmtM(ctx.mult), total: fmt(total) });
   sfx.score(); ui.showTotal(total); ui.pop(ui.boardEl(), '+' + fmt(total), 'money');
   // Half the blind's target is a nudge; the whole target (or more) is the full shake.
   const hit = total / Math.max(1, S.round.target);
@@ -388,6 +411,7 @@ async function runScore(ctx, label) {
   await sleep(420);
   ui.markCells(ctx.cells, 'scoring', false);
   ui.setCalc(0, 0, '');
+  slowScore = false;
 }
 
 /** @param {number} li @param {number} simult @param {number} threatsOpen */
@@ -635,7 +659,12 @@ function nextRound() {
   if (S.phase !== 'shop' || S.mode || S.pack) return;
   if (!gate('nextRound')) return;
   sfx.click(); S.phase = 'blind'; S.shop = null;
-  if (tutOn()) { S.tut.bout = 2; startBlind(); return; }   // no blind screen in the prologue: straight into the second bout
+  if (tutOn()) {   // no blind screen in the prologue: straight into the second bout, with the build the lesson needs
+    S.tut.bout = 2;
+    if (!S.jokers.some((/** @type {any} */ j) => j.id === 'jester') && S.jokers.length < jokerSlots()) { S.jokers.push({ uid: nid(), id: 'jester', ed: null, data: {} }); ui.toast(t('tut.giftClown')); }
+    if (!S.bag.some((/** @type {any} */ p) => p.type === 'red')) { S.bag.push(newPiece('red')); ui.toast(t('tut.giftRed')); }
+    startBlind(); return;
+  }
   settle();
 }
 

@@ -61,11 +61,11 @@ export const STEPS = [
   { id: 'cash1', at: 12, mood: 'cheer', anchor: '.modal', overDialog: true, when: () => S.phase === 'cashout', next: true, vars: lineVars },
   // The shop, stocked on purpose.
   { id: 'shop_in', at: 13, mood: 'happy', anchor: '.shopCats', when: () => inShop(), next: true },
-  { id: 'buy_trick', at: 13, mood: 'happy', anchor: '.sitem[data-arg="i0"]', when: () => inShop(), done: () => S.jokers.length >= 1 },
-  { id: 'trick_tray', at: 13, mood: 'grin', anchor: '.tray.jokers', when: () => inShop() && S.jokers.length >= 1, next: true },
-  { id: 'buy_pack', at: 13, mood: 'wink', anchor: '.sitem.pack[data-arg="p0"]', when: () => inShop() && S.jokers.length >= 1, done: () => packSold(0) },
-  { id: 'pack_pick', at: 13, mood: 'happy', anchor: '.packScene .shopGrid', when: () => S.phase === 'shop' && !!S.pack, done: () => !S.pack },
-  { id: 'go_on', at: 13, mood: 'cheer', anchor: '[data-act="nextRound"]', when: () => inShop() && packSold(0), done: () => S.phase !== 'shop' },
+  { id: 'buy_trick', at: 13, mood: 'happy', anchor: '.sitem[data-arg="i0"]', optional: true, when: () => inShop() && !S.jokers.some((/** @type {any} */ j) => j.id === 'jester'), done: () => S.jokers.length >= 1 },
+  { id: 'trick_tray', at: 13, mood: 'grin', anchor: '.tray.jokers', optional: true, when: () => inShop() && S.jokers.length >= 1, next: true },
+  { id: 'buy_pack', at: 13, mood: 'wink', anchor: '.sitem.pack[data-arg="p0"]', optional: true, when: () => inShop() && !packSold(0) && S.money >= 4, done: () => packSold(0) },
+  { id: 'pack_pick', at: 13, mood: 'happy', anchor: '.packScene .shopGrid', optional: true, when: () => S.phase === 'shop' && !!S.pack, done: () => !S.pack },
+  { id: 'go_on', at: 13, mood: 'cheer', anchor: '[data-act="nextRound"]', when: () => inShop(), done: () => S.phase !== 'shop' },
   // Bout 2: the build in action.
   { id: 'b2_start', at: 21, mood: 'grin', anchor: '.tray.jokers', when: () => inPlay(), next: true },
   { id: 'b2_red', at: 21, mood: 'happy', anchor: '#hand', optional: true, when: () => inPlay() && S.hand.some((/** @type {any} */ p) => p.type === 'red'), next: true },
@@ -95,22 +95,13 @@ export function current() {
 export function ack(id) { const tu = T(); if (tu) { tu.done = tu.done || {}; tu.done[id] = 1; } }
 
 /**
- * May a guided action go through right now? The first X goes in the middle; the shop only sells what the lesson
- * needs; the pack gives the Red-Pen X first; Next bout waits until the lesson's purchases are made.
+ * May a guided action go through right now? Only the very first X is guided (it goes in the middle). The shop is
+ * free: Pip explains it, and then the player buys what they like (see nextRound in engine.js for the gifts).
  * @param {string} action @param {string} [arg]
  */
 export function allows(action, arg = '') {
   const tu = T();
   if (!tu || !tu.on || tu.guided === false) return true;
   if (S.phase === 'play' && bout() === 1 && S.round && S.round.gameNo === 1 && action === 'cell' && !hasX() && S.hand.length) return arg === '4';
-  if (S.phase !== 'shop') return true;
-  switch (action) {
-    case 'buy': return arg === 'i0' && S.jokers.length < 1;
-    case 'buyPack': return arg === '0' && S.jokers.length >= 1 && !packSold(0);
-    case 'takePack': return S.bag.some((/** @type {any} */ p) => p.type === 'red') || arg === '0';
-    case 'skipPack': return S.bag.some((/** @type {any} */ p) => p.type === 'red');
-    case 'nextRound': return S.jokers.length >= 1 && packSold(0) && !S.pack;
-    case 'reroll': case 'trim': case 'useItem': return false;
-    default: return true;
-  }
+  return true;
 }

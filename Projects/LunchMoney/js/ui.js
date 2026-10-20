@@ -17,7 +17,7 @@ import { S, SET, best, hasSavedRun } from './state.js';
 import { geo, squareOf } from './geometry.js';
 import { LINE_TYPES, LINE_ORDER, PIECES, TILES, RARITY, JOKERS, ITEMS, VOUCHERS, BOSSES, EDITIONS, EDITS, PACKS, DECKS, hasJ, turfOf } from './data.js';
 import { face } from './faces.js';
-import { sync as syncCoach, pip, react as pipReact, onSkipTutorial } from './coach.js';
+import { sync as syncCoach, pip, react as pipReact, onSkipTutorial, explain as coachExplain } from './coach.js';
 import { showStory, storyOpen, storyId } from './storyui.js';
 import { tutOn } from './tutorial.js';
 import { crowdHTML, crowdReact } from './crowd.js';
@@ -110,6 +110,8 @@ function syncStory() {
   if (id && !(storyOpen() && storyId() === id)) showStory(id, () => { setMood(moodFor()); if (actions.storyDone) actions.storyDone(); });
 }
 export { replay as replayTips } from './coach.js';
+/** Pip stops the game to explain something, highlighting `anchor`; resolves when the player presses Next. @param {string} key @param {string} anchor @param {Record<string, any>} [vars] */
+export const explain = (key, anchor, vars) => coachExplain(key, anchor, vars);
 /** The kids at the edges of a boss bout cheer, boo or gasp. @param {'cheer'|'boo'|'gasp'} kind @param {number} [ms] */
 export const crowd = (kind, ms) => crowdReact(kind, ms);
 /** Pip reacts. @param {string} kind */
@@ -293,13 +295,13 @@ function itemView(it) {
   if (it.kind === 'joker') {
     const d = JOKERS[it.id];
     const ed = it.ed && EDITIONS[it.ed];
-    return { vis: `<span class="joker${ed ? ' ed-' + it.ed : ''}" style="--jc:${RARITY[d.rar].color}" data-tilt="s${it.id}"><span class="gl">${d.gl}</span></span>`, name: d.name,
+    return { vis: `<span class="joker${ed ? ' ed-' + it.ed : ''}" style="--jc:${RARITY[d.rar].color}"><span class="gl">${d.gl}</span></span>`, name: d.name,
       kind: t('kind.joker', { r: tr(RARITY[d.rar].name) }) + (ed ? ' · ' + tr(ed.name) : ''),
       desc: tr(d.desc({ data: {} })) + (ed ? `<span class="edline ed-${it.ed}">${tr(ed.name)}: ${tr(ed.desc)}</span>` : '') };
   }
   if (it.kind === 'piece') {
     const P = /** @type {any} */ (PIECES)[it.id];
-    return { vis: `<span class="hpv" data-tilt="sp${it.id}">${pieceHTML({ type: it.id })}</span>`, name: tr(P.name), kind: t('kind.piece'), desc: tr(P.desc) };
+    return { vis: `<span class="hpv">${pieceHTML({ type: it.id })}</span>`, name: tr(P.name), kind: t('kind.piece'), desc: tr(P.desc) };
   }
   if (it.kind === 'tile') {
     const T = /** @type {any} */ (TILES)[it.id];
@@ -342,7 +344,7 @@ function renderShop() {
   const plainN = S.bag.filter((/** @type {any} */ p) => p.type === 'plain').length;
   const packs = (sh.packs || []).map((/** @type {any} */ pk, /** @type {number} */ i) => {
     const P = PACKS[pk.type];
-    return `<button type="button" class="sitem pack${pk.sold ? ' sold' : ''}" data-act="inspectShop" data-arg="p${i}" ${pk.sold || S.mode ? 'disabled' : ''} aria-label="${esc(tr(P.name))}, $${pk.cost}"><span class="packArt" style="--pk:${P.color}" data-tilt="pk${i}${pk.type}"><span class="gl">${P.gl}</span><span class="pkName">${tr(P.name)}</span></span>
+    return `<button type="button" class="sitem pack${pk.sold ? ' sold' : ''}" data-act="inspectShop" data-arg="p${i}" ${pk.sold || S.mode ? 'disabled' : ''} aria-label="${esc(tr(P.name))}, $${pk.cost}"><span class="packArt" style="--pk:${P.color}"><span class="gl">${P.gl}</span><span class="pkName">${tr(P.name)}</span></span>
       <span class="nm2">${tr(P.name)}</span><span class="kind">${t('kind.pack')}</span><span class="ds">${tr(P.desc)}</span><span class="price">${pk.sold ? t('btn.sold') : '$' + pk.cost}</span></button>`;
   }).join('');
   el.stage.innerHTML = `<div class="scrollPane"><div class="panelBox"><h2>${t('ui.shop')}</h2>

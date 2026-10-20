@@ -45,24 +45,16 @@ ok(S.phase === 'cashout' && S.tut.bout === 1, 'bout 1 is won with one row (phase
 A.cashOut();
 ok(S.phase === 'shop', 'cash-out leads to the shop');
 ok(S.shop.items[0].id === 'jester' && S.shop.packs[0].type === 'piece', 'the tutorial shop is stocked with the lesson');
+// the shop is free: buy what you like, in any order, and leave
 const money0 = S.money;
-A.reroll(); A.trim(); A.buy('i1'); A.buyPack('0');
-ok(S.money === money0 && !S.pack && S.jokers.length === 0, 'guided: only the Class Clown can be bought first');
-A.nextRound();
-ok(S.phase === 'shop', 'guided: Next bout waits for the lesson purchases');
-A.buy('i0');
-ok(S.jokers.length === 1 && S.jokers[0].id === 'jester', 'the Class Clown is bought');
-A.buyPack('1');
-ok(!S.pack, 'guided: only the pencil pack can be opened');
-A.buyPack('0');
-ok(S.pack && S.pack.options.map(o => o.id).join() === 'red,blue,gold,lucky', 'the pencil pack holds the Red-Pen X');
-A.takePack('2');
-ok(S.pack.options[2].taken !== true && !S.bag.some(p => p.type === 'blue'), 'guided: the Red-Pen X has to be taken first');
-A.takePack('0');
-ok(S.bag.some(p => p.type === 'red'), 'the Red-Pen X is in the bag');
-A.takePack('1');
-ok(!S.pack, 'the pack closes after two picks');
+A.buy('i1'); ok(S.items.some(i => i.id === 'chalk_row'), 'the Row Chalk can be bought before the Class Clown');
+S.money += 10; const m1 = S.money; A.reroll(); ok(S.money < m1, 'the shop is free: a restock works');
+A.buyPack('1'); ok(S.pack && S.pack.type === 'chalk', 'the second pack can be opened');
+A.skipPack(); ok(!S.pack, 'and skipped');
+// leaving without the lesson purchases: Pip hands them over
+const bagBefore = S.bag.length;
 A.nextRound(); await settle();
+ok(S.jokers.some(j => j.id === 'jester') && S.bag.some(p => p.type === 'red') && S.bag.length === bagBefore + 1, 'without them, Pip gives a Class Clown and a Red-Pen X');
 ok(S.phase === 'play' && S.tut.bout === 2 && S.blindIdx === 1 && S.round.target === 150, 'bout 2 starts with a target of 150');
 ok(S.hand.some(p => p.type === 'red'), 'the Red-Pen X is in the first hand of bout 2');
 await playUntil(() => S.phase !== 'play');

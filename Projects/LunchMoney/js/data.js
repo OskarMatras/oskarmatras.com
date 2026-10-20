@@ -253,7 +253,7 @@ export const JOKERS = {
     desc:()=>({en:'Cursed X no longer give the rival an extra move', da:'Forbandede X giver ikke længere modstanderen et ekstra træk'}) },
 
   /* ---- money ---- */
-  taxman:   { name:'Dinner Lady', rar:1, cost:5, gl:'¤',
+  taxman:   { name:'Lunch Lady', rar:1, cost:5, gl:'¤',
     desc:()=>({en:'Earn <u>$1</u> the first time you score a line in each game', da:'Få <u>$1</u> første gang du scorer en linje i hvert spil'}),
     line:(/** @type {any} */ c)=>(c.type!=='draw' && S.g.lines===0)?{money:1}:null },
   piggy:    { name:'Piggy Bank', rar:2, cost:6, gl:'¢',
@@ -398,7 +398,7 @@ export const VOUCHERS = {
   coupon:   { name:{en:'Coupon', da:'Kupon'}, gl:'%', desc:{en:'Shop rerolls start at <u>$2</u>', da:'Nye varer i butikken starter ved <u>$2</u>'}, apply:()=>{} },
   overstock:{ name:{en:'Full Shelves', da:'Fulde hylder'}, gl:'+S', desc:{en:'<u>+1</u> card in every shop', da:'<u>+1</u> kort i hver butik'}, apply:()=>{ S.cardSlots = (S.cardSlots || 2) + 1; } },
   packrat:  { name:{en:'Goody Shelf', da:'Godtehylde'}, gl:'+P', desc:{en:'<u>+1</u> goody bag in every shop', da:'<u>+1</u> pakke i hver butik'}, apply:()=>{ S.packSlots = (S.packSlots || 2) + 1; }, req:()=>(S.packSlots || 2) < 3 },
-  compound: { name:{en:'Piggy Interest', da:'Sparegrisrente'}, gl:'+$', desc:{en:'Your interest cap is <u>$5</u> higher', da:'Dit renteloft er <u>$5</u> højere'}, apply:()=>{ S.interestCap = (S.interestCap || 5) + 5; } },
+  compound: { name:{en:'Lunch Lady’s Rate', da:'Kantinedamens rente'}, gl:'+$', desc:{en:'Your interest cap is <u>$5</u> higher', da:'Dit renteloft er <u>$5</u> højere'}, apply:()=>{ S.interestCap = (S.interestCap || 5) + 5; } },
   clearance:{ name:{en:'Squint Discount', da:'Squint-rabat'}, gl:'-$', desc:{en:'Everything in the shop costs <u>$1</u> less', da:'Alt i butikken koster <u>$1</u> mindre'}, apply:()=>{ S.discount = (S.discount || 0) + 1; }, req:()=>!S.discount },
   board4:   { name:{en:'Bigger Board', da:'Større bræt'}, gl:'4×4', desc:{en:'The board grows to <b>4×4</b>. Still three in a row, so many more lines', da:'Brættet vokser til <b>4×4</b>. Stadig tre på stribe, så mange flere linjer'}, apply:()=>{ growBoard(4); }, req:()=>S.N===3 && S.ante>=2 },   // an early way to 4×4; every run gets it at ante 4 anyway (see engine.js)
   board5:   { name:{en:'Huge Board', da:'Kæmpebræt'}, gl:'5×5', desc:{en:'The board grows to <b>5×5</b>', da:'Brættet vokser til <b>5×5</b>'}, apply:()=>{ growBoard(5); }, req:()=>S.N===4 && S.ante>=5 },   // not before ante 5: ante 4 is when the board first grows

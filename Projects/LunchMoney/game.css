@@ -1207,3 +1207,45 @@ body.inStory{overflow:hidden}
 .crowdSide.R .cf:nth-child(1){right:2%;bottom:0}  .crowdSide.R .cf:nth-child(2){right:46%;bottom:2%}
 .crowdSide.R .cf:nth-child(3){right:12%;bottom:17%} .crowdSide.R .cf:nth-child(4){right:52%;bottom:21%}
 .crowdSide.R .cf:nth-child(5){right:24%;bottom:36%}
+
+
+/* =====================================================================
+   CALM: nothing jumps. Panels and buttons stay put (they only lean a little toward the pointer); the things that
+   move are cards you handle, scoring effects, the crowd when it reacts and the people in the story.
+   ===================================================================== */
+[data-tilt].is-hover{scale:var(--hs,1.04);translate:0 var(--hy,-2px)}
+.hp[data-tilt].is-hover{scale:1.04}
+.hp.sel[data-tilt].is-hover{translate:0 -16px}
+/* no lifting or tilting cards on hover: the border and shadow say "this one" instead */
+@media (hover:hover){
+  .btn:not(:disabled):hover{rotate:none;filter:brightness(1.1)}
+  .sitem:not(:disabled):hover{translate:none;rotate:none;box-shadow:3px 5px 0 rgba(0,0,0,.4),0 0 0 3px #ffd84a}
+  .tgt:not(:disabled):hover{translate:none;box-shadow:2px 4px 0 rgba(0,0,0,.4),0 0 0 3px #ffd84a}
+  .packScene .sitem:not(:disabled):hover{translate:none}
+}
+.deckCard:not(:disabled):hover,.deckCard:not(:disabled):focus-visible{translate:none;rotate:none;box-shadow:3px 5px 0 rgba(0,0,0,.4),0 0 0 3px #ffd84a}
+.sitem.armed{translate:none}
+.bcard.cur{translate:none;scale:1}
+.packScene .shopGrid .sitem:nth-child(odd):not(:hover),.packScene .shopGrid .sitem:nth-child(even):not(:hover){rotate:none}
+/* screens and cards arrive with a fade, not a bounce */
+@keyframes phaseIn{from{opacity:0}}
+@keyframes cardRise{from{opacity:0}}
+@keyframes crowdInL{from{margin-left:-160px;opacity:0}}
+/* nothing bobs on its own */
+@media (prefers-reduced-motion:no-preference){
+  .bcard.cur .bchip{animation:none}
+  .shopGrid .sitem:not(.sold) > :first-child{animation:none}
+  .newBest{animation:none}
+  .tcBoss,.tcKids,.ollieSit{animation:none}
+  #coach .cAvatar{animation:ollieIn .35s ease-out}
+  .crowd:not(.m-cheer):not(.m-boo):not(.m-gasp) .cf svg{animation:none}
+  #story .stCrowd.on .kid{animation:none}
+}
+
+/* shop, blind and deck cards tilt as one piece, like the Tricks: lean, glare and a small grow under the pointer */
+.sitem[data-tilt],.bcard[data-tilt],.deckCard[data-tilt],.tgt[data-tilt]{position:relative}
+.sitem[data-tilt] .joker,.sitem[data-tilt] .hpv,.sitem[data-tilt] .packArt{box-shadow:var(--sx,0px) var(--sy,4px) 0 rgba(0,0,0,.4)}
+.sitem[data-tilt] .joker{box-shadow:var(--sx,0px) var(--sy,4px) 0 rgba(0,0,0,.45)}
+@media (hover:hover){
+  .sitem:not(:disabled):hover{box-shadow:var(--sx,3px) var(--sy,5px) 0 rgba(0,0,0,.4),0 0 0 3px #ffd84a}
+}

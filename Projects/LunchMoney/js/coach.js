@@ -71,6 +71,8 @@ let current = null;
 let quietUntil = 0, quietTimer = /** @type {any} */ (null);
 /** @type {HTMLElement|null} */
 let root = null;
+/** True while Pip has stopped the game to explain something (explain()): the prologue steps wait. */
+let explaining = false;
 /** What "Skip the tutorial" does: the interface registers it (the engine is not imported here). @type {(() => void)|null} */
 let skipHandler = null;
 /** @param {() => void} fn */
@@ -87,7 +89,12 @@ function ensure() {
     if (current && current.step.tut) { if (skipHandler) skipHandler(); return; }
     SET.tips = false; saveSettings(); hide();
   });
-  /** @type {HTMLElement} */ (r.querySelector('.cNext')).addEventListener('click', () => { if (current && current.step.tut) { tutAck(current.step.id); hide(); sync(); } });
+  /** @type {HTMLElement} */ (r.querySelector('.cNext')).addEventListener('click', () => {
+    if (!current || !current.step.tut) return;
+    const res = /** @type {any} */ (current).resolve;
+    tutAck(current.step.id); hide();
+    if (res) { explaining = false; res(); } else sync();
+  });
   document.body.appendChild(r);
   addEventListener('keydown', e => { if (e.key === 'Escape' && current && !r.hidden && !current.step.tut) finish(); });
   addEventListener('resize', () => { if (current) place(current.step); });
@@ -116,8 +123,7 @@ function clearHighlight() { document.querySelectorAll('.coach-hl').forEach(n => 
 /** @param {Step} step */
 function highlight(step) {
   clearHighlight();
-  const target = step.anchor ? document.querySelector(step.anchor) : null;
-  if (target) target.classList.add('coach-hl');
+  if (step.anchor) document.querySelectorAll(step.anchor).forEach(n => n.classList.add('coach-hl'));
 }
 
 /** Everything on screen the player might want to click, except Pip. @param {HTMLElement} r */
@@ -131,6 +137,8 @@ function busyRects(r) {
     if (cs.visibility === 'hidden' || cs.display === 'none') return;
     out.push(b);
   });
+  // what Pip is pointing at counts as busy too, so the bubble does not cover it
+  document.querySelectorAll('.coach-hl').forEach(e => { const b = e.getBoundingClientRect(); if (b.width > 4 && b.height > 4) out.push(b); });
   return out;
 }
 /** @param {DOMRect} a @param {DOMRect[]} rects */
@@ -216,8 +224,29 @@ export function sync() {
   if (next) show(next);
 }
 
+/**
+ * Stop the game and explain something: Pip talks, `anchor` (any number of elements) is highlighted, and the
+ * returned promise resolves when the player presses Next. The engine awaits it in the middle of scoring.
+ * @param {string} key a string key (tut.sc_...) @param {string} anchor @param {Record<string, any>} [vars]
+ * @returns {Promise<void>}
+ */
+export function explain(key, anchor, vars = {}) {
+  return new Promise(resolve => {
+    explaining = true; hide();
+    show({ id: 'x:' + key, key, vars: () => vars, tut: true, next: true, mood: 'happy', anchor, when: () => true, overDialog: true });
+    if (current) /** @type {any} */ (current).resolve = resolve;
+  });
+}
+
 /** The prologue's steps (tutorial.js): the bubble stays until the step is done, and may sit over a dialog. */
 function syncTutorial() {
+  if (explaining) {   // Pip has stopped the game: keep the bubble where it is, in the right language
+    if (current) {
+      if (current.lang !== getLang()) { fill(current.step); current.lang = getLang(); }
+      place(current.step);
+    }
+    return;
+  }
   const st = tutCurrent();
   if (!st) { if (current) hide(); return; }
   if (current && current.step.id === st.id) {
