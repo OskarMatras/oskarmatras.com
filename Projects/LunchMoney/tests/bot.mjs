@@ -200,10 +200,11 @@ export async function runOne(opt = {}) {
   const stats = { seed: opt.seed, ante: 0, blind: 0, stalls: 0, bought: [], packs: [], vouchers: [], cause: '', scoreFrac: 0, _dg: 0, wonRun: false, jokersAtEnd: [] };
   let loops = 0;
   while (loops++ < 300) {
+    if (S.scene) { A.storyDone(); continue; }   // story scenes just play out
     if (S.phase === 'blind' || S.phase === 'play') { const r = await playRound(stats, opt); if (r === 'stall') break; continue; }
     if (S.phase === 'cashout') { A.cashOut(); continue; }
     if (S.phase === 'shop') { shop(stats, opt); continue; }
-    if (S.phase === 'won') { stats.wonRun = true; break; }
+    if (S.phase === 'won') { if (S.scene) { A.storyDone(); } stats.wonRun = true; break; }
     break;
   }
   stats.ante = S.ante; stats.blind = S.blindIdx;

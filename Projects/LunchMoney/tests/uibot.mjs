@@ -19,7 +19,8 @@ const state = () => b.eval(`({ phase: __S.phase, busy: __S.busy, ante: __S.ante,
 
 const t0 = Date.now(); const log = []; const problems = [];
 let lastKey = '', lastChange = Date.now(), steps = 0;
-await click('[data-act=newRun]');
+await b.eval(`(async()=>{ const st = await import('/Projects/LunchMoney/js/state.js'); st.SET.prologueDone = true; st.SET.tips = false; })()`);
+await click('[data-act=play]');
 while (Date.now() - t0 < MAXMS) {
   const s = await state(); steps++;
   const key = JSON.stringify([s.phase, s.busy, s.ante, s.blind, s.hand, s.empties.length, s.money, s.pack, s.mode]);

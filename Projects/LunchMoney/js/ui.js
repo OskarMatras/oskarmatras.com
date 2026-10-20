@@ -17,10 +17,13 @@ import { S, SET, best, hasSavedRun } from './state.js';
 import { geo, squareOf } from './geometry.js';
 import { LINE_TYPES, LINE_ORDER, PIECES, TILES, RARITY, JOKERS, ITEMS, VOUCHERS, BOSSES, EDITIONS, EDITS, PACKS, DECKS, hasJ, turfOf } from './data.js';
 import { face } from './faces.js';
-import { sync as syncCoach, ollie, react as ollieReact } from './coach.js';
+import { sync as syncCoach, pip, react as pipReact, onSkipTutorial } from './coach.js';
+import { showStory, storyOpen, storyId } from './storyui.js';
+import { tutOn } from './tutorial.js';
+import { crowdHTML, crowdReact } from './crowd.js';
 import * as fx from './fx.js';
 import { punch } from './cardfx.js';
-import { blindInfo, lineValues, handMax, voucherCost, openPlay, winCells, jokerSlots } from './rules.js';
+import { blindInfo, lineValues, handMax, voucherCost, openPlay, winCells, jokerSlots, isMuzzled, ambush } from './rules.js';
 import { t, tr, fmt, fmtM, getLang } from './strings.js';
 import { sfx, setMood } from './audio.js';
 import { setBackdrop, pulseBackdrop } from './background.js';
@@ -28,7 +31,7 @@ import { setBackdrop, pulseBackdrop } from './background.js';
 /** @type {Record<string, (arg?: string) => any>} */
 let actions = {};
 /** @param {Record<string, (arg?: string) => any>} a */
-export function bind(a) { actions = a; }
+export function bind(a) { actions = a; onSkipTutorial(() => { if (actions.skipIntro) actions.skipIntro(); }); }
 
 const $ = (/** @type {string} */ s) => /** @type {HTMLElement|null} */ (document.querySelector(s));
 const el = {
@@ -65,6 +68,10 @@ function backdropFor() {
  * @param {number} idx 0 small, 1 big, 2 boss
  */
 function opponent(idx) {
+  if (tutOn()) {   // the prologue: Pip for two bouts, then the Sixth-Grader
+    if (idx === 2) { const bu = BOSSES.ollie; return { name: tr(bu.name), face: 'ollie', trait: tr(bu.desc), tag: t('ui.boss') }; }
+    return { name: 'Pip', face: 'pip', trait: t('tut.pipTrait'), tag: idx === 0 ? t('tut.tagWarm') : t('tut.tagBuild') };
+  }
   const tf = turfOf(S.ante);
   if (idx === 2) { const bu = BOSSES[S.boss.id]; return { name: tr(bu.name), face: S.boss.id, trait: tr(bu.desc), tag: t('ui.boss') }; }
   return { name: tf.kid, face: tf.id, trait: tr(tf.trait), tag: idx === 0 ? t('blind.small') : t('blind.big') };
@@ -80,7 +87,7 @@ export function render() {
   const entering = changed || enterNext; enterNext = false;
   if (changed) {
     lastPhase = S.phase; setBackdrop(backdropFor()); setMood(moodFor());
-    if (S.phase === 'blind' && S.blindIdx === 0 && S.ante !== lastAnte && !modal) { lastAnte = S.ante; anteBanner(S.ante); }
+    if (S.phase === 'blind' && S.blindIdx === 0 && S.ante !== lastAnte && !modal && !tutOn() && !S.scene) { lastAnte = S.ante; anteBanner(S.ante); }
   }
   if (tipFor && !document.body.contains(tipFor)) hideTip();
   // The whole screen is redrawn, which would drop keyboard focus: remember the control and find it again.
@@ -95,10 +102,18 @@ export function render() {
   // A new screen arrives with a bounce instead of just appearing.
   if (changed) for (const n of [el.stage, el.side]) { n.classList.remove('phaseIn'); void n.offsetWidth; n.classList.add('phaseIn'); }
   syncCoach();   // the tutorial reads the game state and shows, moves or retires a tip
+  syncStory();   // a story scene waits in S.scene: show it, and carry on when it ends
+}
+/** The scene at the front of the queue plays over everything else. */
+function syncStory() {
+  const id = S.scene && S.scene.queue && S.scene.queue[0];
+  if (id && !(storyOpen() && storyId() === id)) showStory(id, () => { if (actions.storyDone) actions.storyDone(); });
 }
 export { replay as replayTips } from './coach.js';
-/** Ollie heckles. @param {string} kind */
-export const react = kind => ollieReact(kind);
+/** The kids at the edges of a boss bout cheer, boo or gasp. @param {'cheer'|'boo'|'gasp'} kind @param {number} [ms] */
+export const crowd = (kind, ms) => crowdReact(kind, ms);
+/** Pip reacts. @param {string} kind */
+export const react = kind => pipReact(kind);
 
 function renderSide() {
   const inPlay = S.phase === 'play' && S.round;
@@ -138,7 +153,7 @@ function renderSide() {
 function renderRack() {
   const js = S.jokers.map((/** @type {any} */ j) => {
     const d = JOKERS[j.id];
-    return `<button class="joker${j.ed ? ' ed-' + j.ed : ''}" style="--jc:${RARITY[d.rar].color}" data-tilt="j${j.uid}" data-tip="joker:${j.uid}" data-act="inspectJoker" data-arg="${j.uid}" data-joker="${j.uid}" aria-label="${esc(d.name)}${j.ed ? ' (' + esc(tr(EDITIONS[j.ed].name)) + ')' : ''}">
+    return `<button class="joker${j.ed ? ' ed-' + j.ed : ''}${isMuzzled(j) ? ' confiscated' : ''}" style="--jc:${RARITY[d.rar].color}" data-tilt="j${j.uid}" data-tip="joker:${j.uid}" data-act="inspectJoker" data-arg="${j.uid}" data-joker="${j.uid}" aria-label="${esc(d.name)}${j.ed ? ' (' + esc(tr(EDITIONS[j.ed].name)) + ')' : ''}">
       <span class="gl">${d.gl}</span><span class="nm">${esc(d.name)}</span>${d.val ? `<span class="val">${d.val(j)}</span>` : ''}</button>`;
   }).join('');
   const its = S.items.map((/** @type {any} */ c) => {
@@ -164,7 +179,7 @@ function renderStage() {
 function pieceHTML(p, extra = '') {
   const P = /** @type {any} */ (PIECES)[p.type];
   const label = tr(P.short);
-  return `<span class="piece t-${p.type}${extra}" style="--pc:${P.pc}"><span class="xg">X</span>${label ? `<span class="pl">${label}</span>` : ''}</span>`;
+  return `<span class="piece t-${p.type}${extra}${ambush() && p.type !== 'plain' ? ' crumpled' : ''}" style="--pc:${P.pc}"><span class="xg">X</span>${label ? `<span class="pl">${label}</span>` : ''}</span>`;
 }
 /** @param {number} i */
 function tilesHTML(i) {
@@ -223,7 +238,7 @@ function renderPlay() {
       <span>${openPlay() ? t('meta.openPlay') : t('meta.firstLine')}</span><span>${t('meta.bag', { n: S.g.pile.length })}</span></div>
     <div class="handRow"><div id="hand">${hand}</div>
       <button class="btn red" data-act="discard" ${(!S.hand.length || !S.round.discards || S.busy || S.mode || noSpecials) ? 'disabled' : ''}>${t('btn.discard')}</button></div>
-  </div>`;
+  </div>${crowdHTML()}`;
   const placed = justPlaced; justPlaced = [];
   placed.forEach(p => impact(p.i, p.kind));
   if (S.growAnim) scheduleGrow();
@@ -419,14 +434,16 @@ function renderOverlay() {
   let h = '';
   if (kind === 'title') {
     const b = best();
-    h = `${floaters()}<div class="ollieSit" aria-hidden="true">${face('ollie', 150)}</div><div class="modal wide splash" role="dialog" aria-modal="true" aria-labelledby="mt">
+    const first = !SET.prologueDone;
+    h = `${floaters()}<div class="titleCast" aria-hidden="true"><span class="tcKids">${face('you', 96, 'worry')}${face('pip', 110, 'happy')}</span><span class="tcBoss">${face('ollie', 190, 'smug')}</span></div><div class="modal wide splash" role="dialog" aria-modal="true" aria-labelledby="mt">
       <h1 class="title" id="mt"><span class="w1">LUNCH</span><span class="w2">M<i class="coin">O</i>NEY</span></h1>
       <p class="subtitle">${t('title.sub')}${b.ante ? ' ' + t('title.best', { a: b.ante, s: fmt(b.score) }) : ''}</p>
-      ${SET.tips && !(SET.seen && SET.seen.welcome)
-        ? `<div class="titleOllie"><span class="tOllie">${ollie('wink')}</span><p>${t('title.tipsLine')}</p></div>`   // new players get taught as they play, not up front
+      ${first
+        ? `<div class="titleOllie"><span class="tOllie">${pip('grin')}</span><p>${t('title.pipLine')}</p></div>`   // a new player starts with the story, which is also the tutorial
         : `<div class="howto"><div>${t('how.1')}</div><div>${t('how.2')}</div><div>${t('how.3')}</div><div>${t('how.4')}</div></div>`}
       <div class="btnRow">${hasSavedRun() ? `<button class="btn gold big" data-act="continueRun">${t('btn.continue')}</button>` : ''}
-        <button class="btn ${hasSavedRun() ? '' : 'gold '}big" data-act="newRun">${t('btn.newRun')}</button></div></div>`;
+        <button class="btn ${hasSavedRun() ? '' : 'gold '}big" data-act="play">${first ? t('btn.begin') : t('btn.newRun')}</button></div>
+      <div class="btnRow">${first ? `<button class="btn small" data-act="skipIntro">${t('btn.skipStory')}</button>` : `<button class="btn small" data-act="replayStory">${t('btn.replayStory')}</button>`}</div></div>`;
   } else if (kind === 'cashout') {
     const c = S.cashout;
     const tally = !c.revealed;   // the sheet totals up line by line the first time only, not on every redraw

@@ -445,7 +445,7 @@ export const BOSSES = {
   needle: { name:{en:'The Bell', da:'Klokken'}, color:'#4c7a2e', desc:{en:'Break is almost over: only 2 games this round (lower target)', da:'Frikvarteret er næsten slut: kun 2 spil i denne runde (lavere mål)'} },
   drought:{ name:{en:'Hall Monitor Hank', da:'Gangvagt Hans'}, color:'#a0662a', desc:{en:'No tosses this round: he confiscates them', da:'Ingen smid i denne runde: han konfiskerer dem'} },
   echo:   { name:{en:'Cheater Chet', da:'Snyde-Sune'}, color:'#2e7a78', desc:{en:'The rival moves first every game', da:'Modstanderen starter i hvert spil'} },
-  ollie:  { name:{en:'Ollie, King of the Yard', da:'Ollie, skolegårdens konge'}, color:'#d9622b', desc:{en:'The real boss: he moves first, blocks far more and never misses a win', da:'Den rigtige boss: han starter, blokerer langt oftere og misser aldrig en sejr'} },
+  ollie:  { name:{en:'The Sixth-Grader', da:'Sjetteklassen'}, color:'#d9622b', desc:{en:'He cheats. He takes the middle first, plays an extra O after your first line, always blocks and never misses a win. Your two leftmost Tricks are confiscated', da:'Han snyder. Han tager midten først, spiller et ekstra O efter din første linje, blokerer altid og misser aldrig en sejr. Dine to venstre kneb bliver konfiskeret'} },
   muzzle: { name:{en:'Shush Sue', da:'Pssst-Pia'}, color:'#7a3b3b', desc:{en:'Your leftmost Trick does not score this round', da:'Dit venstre kneb scorer ikke i denne runde'} },
   clamp:  { name:{en:'Pickpocket Pete', da:'Lommetyv-Lars'}, color:'#55606b', desc:{en:'You hold one piece fewer in your hand this round', da:'Du har én brik mindre på hånden i denne runde'} },
   siege:  { name:{en:'The Pack', da:'Flokken'}, color:'#8a4a2a', desc:{en:'The rival starts every game with an O already on the board (two on bigger boards)', da:'Modstanderen starter hvert spil med et O på brættet (to på større bræt)'} },
@@ -454,7 +454,7 @@ export const BOSSES = {
 
 /* ---------------- turfs ----------------
  * Each ante is a part of the schoolyard with its own rival kid for the Pushover and the Regular (the bully you
- * face as the boss is picked at random, except on turf 8, where it is always Ollie). `mod` shifts how the rival
+ * face as the boss is picked at random, except on turf 8, where it is always the Sixth-Grader). `mod` shifts how the rival
  * plays: block/win are added to its chance of blocking your line or taking a win it sees, noise is the chance of
  * a random square instead of a smart one, centre takes the middle first, mirror answers opposite your last X. */
 /** @type {{ id:string, name:Text, kid:string, trait:Text, mod:{ block?:number, win?:number, noise?:number, centre?:boolean, mirror?:boolean }, color:string }[]} */

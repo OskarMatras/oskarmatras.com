@@ -4,7 +4,7 @@ const b = await launch({ width: 1280, height: 800, url: URL });
 await b.sleep(1500);
 const click = async sel => { const c = await b.eval(`(()=>{const e=document.querySelector(${JSON.stringify(sel)}); if(!e) return null; const r=e.getBoundingClientRect(); return {x:r.left+r.width/2,y:r.top+r.height/2}})()`); if (!c) return false; await b.click(c.x, c.y); await b.sleep(500); return true; };
 console.log('title shown:', await b.eval(`!!document.querySelector('.splash')`));
-console.log('new run:', await click('[data-act=newRun]'));
+console.log('new run:', await click('[data-act=play]'));
 console.log('start blind:', await click('[data-act=startBlind]'));
 await b.sleep(1800);
 console.log('cell click:', await click('[data-cell="4"]'));

@@ -21,7 +21,7 @@ export function shuffle(a) {
 export const newPiece = type => ({ uid: nid(), type });
 
 function pickBoss() {
-  // The last turf always ends with Ollie himself; everywhere else the bully of the day is picked at random.
+  // The last turf always ends with the Sixth-Grader himself; everywhere else the bully of the day is picked at random.
   if (S.ante === 8) return { id: 'ollie' };
   const used = S.usedBosses || [];
   const pool = Object.keys(BOSSES).filter(b => b !== 'ollie' && !used.includes(b));
@@ -48,9 +48,16 @@ export function freshRun(deck = 'plain') {
   if (DECKS[deck]) { S.deck = deck; DECKS[deck].apply(); }
 }
 
+/** The prologue's bout targets: one row wins the first, a good build the second, and the third cannot be reached. */
+export const TUT_TARGETS = [50, 150, 600];
+
 /** Target, reward and label for blind 0 (small), 1 (big) or 2 (boss) of the current ante. @param {number} idx */
 export function blindInfo(idx) {
   const a = S.ante;
+  if (S.tut && S.tut.on) {   // the prologue: Pip for two bouts, then the Sixth-Grader
+    if (idx === 2) { const b = BOSSES.ollie; return { name: tr(b.name), target: TUT_TARGETS[2], reward: 0, color: b.color, desc: tr(b.desc), boss: true }; }
+    return { name: 'Pip', target: TUT_TARGETS[idx], reward: idx === 0 ? 3 : 4, color: idx === 0 ? '#2f6f9f' : '#b8862a', desc: t('tut.pipTrait'), boss: false };
+  }
   const base = a <= 8 ? ANTE_BASE[a - 1] : Math.round(50000 * Math.pow(2, a - 8) / 100) * 100;
   if (idx === 2) {
     const b = BOSSES[S.boss.id];
@@ -88,6 +95,10 @@ export const voucherCost = () => Math.min(10, 4 + 2 * (S.ante || 1));
 export const interestCap = () => (S.interestCap || 5) + (hasJ('banker') ? 5 : 0);
 /** Boss effects only apply while the boss blind is being played. @param {string} id */
 export const isBoss = id => S.phase === 'play' && S.blindIdx === 2 && S.boss && S.boss.id === id;
+/** Shush Sue silences your leftmost Trick; the Sixth-Grader confiscates the two on the left (all of them in the prologue). @param {any} j */
+export const isMuzzled = j => (isBoss('muzzle') && S.jokers[0] === j) || (isBoss('ollie') && (!!(S.tut && S.tut.on) || S.jokers.indexOf(j) < 2));
+/** In the prologue's third bout the Sixth-Grader also turns every special X into a plain one. */
+export const ambush = () => isBoss('ollie') && !!(S.tut && S.tut.on);
 
 /* ---- board queries ---- */
 export const emptyCells = () => S.board.map((/** @type {any} */ c, /** @type {number} */ i) => (c ? -1 : i)).filter((/** @type {number} */ i) => i >= 0);

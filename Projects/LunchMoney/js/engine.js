@@ -12,8 +12,9 @@ import { geo, rc, squareOf, neighbours, isCenter, mirrorOf } from './geometry.js
 import { PIECES, SPECIALS, TILES, JOKERS, ITEMS, VOUCHERS, LINE_TYPES, EDITIONS, EDITS, PACKS, hasJ, turfOf } from './data.js';
 import {
   rand, shuffle, newPiece, freshRun, nextBoss, blindInfo, lineValues, handMax, isBoss, voucherCost, interestCap, openPlay, jokerSlots, unlockedDecks,
-  emptyCells, oWon, newXLines, viableLines, threats, oThreats,
+  emptyCells, oWon, newXLines, viableLines, threats, oThreats, isMuzzled, ambush,
 } from './rules.js';
+import { allows, tutOn, BASICS } from './tutorial.js';
 import { t, tr, fmt, fmtM } from './strings.js';
 import { sfx, resetStep, syncMusic } from './audio.js';
 import * as ui from './ui.js';
@@ -25,14 +26,26 @@ const jokerOf = (/** @type {string} */ id) => S.jokers.find((/** @type {any} */ 
 /** Re-render and save whenever the run is at rest. */
 function settle() { ui.render(); saveRun(); }
 
+/** Queue story scenes (story.js); `after` says what the game does when the last one ends. @param {string[]} queue @param {string} after */
+function startScene(queue, after) { S.scene = { queue: [...queue], after }; }
+/** In the prologue some actions are held back until the lesson gets to them. */
+function gate(/** @type {string} */ action, /** @type {string} */ arg = '') {
+  if (allows(action, arg)) return true;
+  ui.toast(t('tut.later'));
+  return false;
+}
+
 /* =================================================================
    Rounds and games
    ================================================================= */
 function startBlind() {
   if (S.phase !== 'blind') return;
   sfx.click();
+  // The real boss of turf 8 makes an entrance first.
+  if (S.blindIdx === 2 && S.boss.id === 'ollie' && !tutOn() && !S.finaleSeen) { S.finaleSeen = true; startScene(['finale_intro'], 'startBlind'); settle(); return; }
   const b = blindInfo(S.blindIdx);
   let games = S.maxGames, discards = S.maxDiscards;
+  if (tutOn() && S.tut.bout === 3) games = 2;
   if (S.blindIdx === 2 && S.boss.id === 'needle') games = 2;
   if (S.blindIdx === 2 && S.boss.id === 'drought') discards = 0;
   S.round = { score: 0, target: b.target, games, discards, gameNo: 0, reward: b.reward, name: b.name };
@@ -66,12 +79,17 @@ async function newGame() {
     }
   }
   refill();
-  if (S.ante === 1 && S.blindIdx === 0 && S.round.gameNo === 1) ui.toast(t('toast.first'));
+  if (S.ante === 1 && S.blindIdx === 0 && S.round.gameNo === 1 && !tutOn()) ui.toast(t('toast.first'));
   const special = S.hand.findIndex((/** @type {any} */ p) => p.type !== 'plain');
   S.selIdx = special >= 0 ? special : 0;
+  if (ambush() && S.round.gameNo === 1) ui.banner(t('banner.confiscated'), true);
   if (isBoss('echo') || isBoss('ollie')) {
     S.busy = true; ui.render();
-    await sleep(500); aiMove(); sfx.o();
+    await sleep(500);
+    // The Sixth-Grader always starts in the middle. Everyone else just moves first.
+    const mid = isBoss('ollie') ? emptyCells().filter(isCenter) : [];
+    if (mid.length) { S.board[rand(mid)] = { t: 'O', fresh: true }; S.g.aiMoves++; } else aiMove();
+    sfx.o();
     S.busy = false;
   }
   settle();
@@ -91,6 +109,7 @@ function discard() {
 async function onCell(/** @type {string} */ arg) {
   const i = +arg;
   if (S.busy || S.phase !== 'play' || !(i >= 0 && i < S.board.length)) return;
+  if (S.mode !== 'erase' && !gate('cell', arg)) return;
   const c = S.board[i];
   if (S.mode === 'erase') {
     if (c && c.t === 'O') {
@@ -146,7 +165,16 @@ async function placeX(i) {
     }
   }
 
-  const fresh = newXLines();
+  let fresh = newXLines();
+  if (fresh.length && ambush()) {
+    // In the prologue the Sixth-Grader cheats: the moment you finish a line he rubs one of its X out and says it never counted.
+    await sleep(320);
+    for (const li of fresh) {
+      const k = rand(geo().lines[li].cells.filter(c => c !== i));
+      S.board[k] = null; ui.pop(ui.cellEl(k), t('pop.cheat'), 'dim'); ui.render(); await sleep(260);
+    }
+    sfx.bad(); ui.react('cheat'); ui.crowd('boo'); fresh = [];
+  }
   if (fresh.length) {
     S.g.scored.push(...fresh); ui.render();
     await sleep(250);
@@ -161,13 +189,18 @@ async function placeX(i) {
   const live = emptyCells().length && viableLines().length;
   // A Cursed X buys the rival a second move (unless the Exorcist is in the tray), even when the placement itself was free.
   const curse = p.type === 'cursed' && !hasJ('exorcist') ? 1 : 0;
-  const answers = (free ? 0 : 1) + curse;
+  // The Sixth-Grader cheats with an extra move: every other turn in the prologue, and once a game (after your first line) in the real fight.
+  let sneak = 0;
+  if (ambush()) sneak = S.g.placements % 2 === 0 ? 1 : 0;
+  else if (isBoss('ollie') && !S.g.cheated && S.g.lines > 0) { S.g.cheated = true; sneak = 1; }
+  const answers = (free ? 0 : 1) + curse + sneak;
   if (free && live && !curse) ui.pop(ui.cellEl(i), t('pop.free'), 'info');
   if (answers && live) {
     for (let a = 0; a < answers && emptyCells().length; a++) {
       await sleep(380);
-      if (a > 0) { ui.pop(ui.cellEl(i), t('pop.cursed'), 'dim'); ui.react('cursed'); }
+      if (a > 0) { sneak && a === answers - 1 ? ui.pop(ui.cellEl(i), t('pop.cheat'), 'dim') : ui.pop(ui.cellEl(i), t('pop.cursed'), 'dim'); if (!sneak) ui.react('cursed'); else ui.react('cheat'); }
       const oi = aiMove(); sfx.o(); ui.render();
+      if (oThreats() && !oWon()) ui.crowd('gasp', 1300);
       if (oi !== null && squareOf(oi).trap) {
         await sleep(250); S.board[oi] = null; S.money += 2;
         ui.pop(ui.cellEl(oi), t('pop.trapped'), 'money'); sfx.money(); ui.setMoney(); ui.render(); ui.react('trap');
@@ -203,7 +236,7 @@ function aiMove() {
   S.g.aiMoves++;
   const a = Math.min(S.ante, 10), master = isBoss('master') || isBoss('ollie');
   // The kid who runs this turf plays the Pushover and the Regular his own way (see TURFS in data.js); a bully brings his own rule instead.
-  const mod = S.blindIdx < 2 ? turfOf(S.ante).mod : {};
+  const mod = tutOn() ? (S.blindIdx < 2 ? { block: -.3, win: -.5, noise: .3 } : {}) : S.blindIdx < 2 ? turfOf(S.ante).mod : {};
   let blockP = Math.min(.9, .3 + .08 * (a - 1)) + (master ? .35 : 0) - (hasJ('sleepy') ? .25 : 0) + (mod.block || 0);
   blockP = Math.max(0, Math.min(.97, blockP));
   const winP = master ? 1 : Math.max(.2, Math.min(1, .55 + .07 * (a - 1) + (mod.win || 0)));
@@ -260,8 +293,6 @@ async function apply(ctx, e, target) {
 }
 
 const countO = () => S.board.filter((/** @type {any} */ c) => c && c.t === 'O').length;
-/** The Muzzle boss silences the Joker on the far left for the whole round. @param {any} j */
-const isMuzzled = j => isBoss('muzzle') && S.jokers[0] === j;
 /** Whose scoring hooks a Joker runs: its own, or (for Copycat) those of the Joker to its right. @param {any} j */
 function scoringSource(j) {
   if (isMuzzled(j)) return null;
@@ -273,7 +304,7 @@ function scoringSource(j) {
 
 /** One X scoring, including its retriggers. @param {any} ctx @param {number} i @param {boolean} isFirst @param {boolean} isLast */
 async function scoreX(ctx, i, isFirst, isLast) {
-  const p = S.board[i].p, P = /** @type {any} */ (PIECES)[p.type], target = ui.cellEl(i), sq = squareOf(i);
+  const p = ambush() ? { ...S.board[i].p, type: 'plain' } : S.board[i].p, P = /** @type {any} */ (PIECES)[p.type], target = ui.cellEl(i), sq = squareOf(i);
   const thief = isBoss('thief');
   const reps = 1 + (P.retrig || 0) + (p.type === 'twin' && hasJ('twinpeaks') ? 1 : 0) + (sq.echo || 0)
     + (isFirst && hasJ('echoj') ? 1 : 0) + (isLast && hasJ('curtain') ? 1 : 0);
@@ -335,7 +366,7 @@ async function runScore(ctx, label) {
   // Half the blind's target is a nudge; the whole target (or more) is the full shake.
   const hit = total / Math.max(1, S.round.target);
   if (hit > 0.5) ui.shake((hit - 0.5) * 2);
-  ui.celebrate(hit);
+  ui.celebrate(hit); ui.crowd('cheer');
   if (hit >= 1) ui.react('bigscore');
   const from = S.round.score; S.round.score += total;
   for (let s = 1; s <= 14; s++) { ui.setRoundScore(from + total * s / 14); await sleep(28); }
@@ -380,7 +411,7 @@ async function endGame(reason) {
   gameEnded(reason, S.g.lines);
   if (reason === 'win') { S.stats.wins++; ui.banner(t('banner.win')); sfx.win(); }
   else if (reason === 'busted') {
-    ui.banner(t('banner.busted'), true); sfx.bad(); ui.react('bust');
+    ui.banner(t('banner.busted'), true); sfx.bad(); ui.react('bust'); ui.crowd('boo');
     const sl = jokerOf('soreloser');
     if (sl) { S.money += 3; ui.setMoney(); ui.pop(ui.jokerEl(sl.uid), '+$3', 'money'); sfx.money(); }
   } else if (S.g.lines === 0) {
@@ -397,7 +428,22 @@ async function endGame(reason) {
   await newGame();
 }
 
+/** The prologue cannot be failed: the first two bouts start again, and losing the third is the point of it. */
+function tutorialLoss() {
+  S.busy = false;
+  if (S.tut.bout < 3) { S.round.games = S.maxGames; S.round.score = 0; S.round.gameNo = 0; ui.toast(t('tut.retry')); return newGame(); }
+  S.money = 0; S.phase = 'blind'; S.round = null; S.g = null; S.hand = [];
+  sfx.bad(); startScene(['ambush_lose', 'tour'], 'finish'); settle();
+}
+/** The story is told: the real game begins with a fresh run, and the light tips skip the basics. */
+function finishPrologue() {
+  SET.prologueDone = true; SET.baselined = true; SET.seen = SET.seen || {};
+  BASICS.forEach(id => { SET.seen[id] = 1; });
+  saveSettings(); clearRun(); freshRun('plain'); settle();
+}
+
 function gameOver() {
+  if (tutOn()) return tutorialLoss();
   S.phase = 'over'; S.busy = false;
   const prev = best();
   S.stats.newBest = S.ante > (prev.ante || 0) || S.stats.bestLine > (prev.score || 0);   // shown on the game over screen
@@ -438,7 +484,10 @@ function cashOut() {
   if (S.phase !== 'cashout') return;
   S.money += S.cashout.total; sfx.money();
   const fin = S.cashout.finalWin;
-  S.cashout = null; S.phase = fin ? 'won' : 'shop';
+  S.cashout = null;
+  if (tutOn() && S.tut.bout === 2) { S.phase = 'blind'; S.shop = null; startScene(['ambush_intro'], 'bout3'); settle(); return; }
+  S.phase = fin ? 'won' : 'shop';
+  if (fin) startScene(['finale_win'], 'won');
   settle();
 }
 
@@ -504,10 +553,15 @@ function makeShop() {
     S.anteVoucher = { ante: S.ante, id: vs.length ? rand(vs) : null, bought: false };
   }
   S.shop.voucher = S.anteVoucher.id; S.shop.vSold = S.anteVoucher.bought;
+  if (tutOn()) {   // exactly what the lesson needs: a Trick that likes rows, and a pack with the Red-Pen X in it
+    S.shop.items = [{ kind: 'joker', id: 'jester', ed: null, cost: 3, sold: false }, { kind: 'item', id: 'chalk_row', cost: 3, sold: false }];
+    S.shop.packs = [{ type: 'piece', cost: 4, sold: false }, { type: 'chalk', cost: 4, sold: false }];
+  }
 }
 function buy(/** @type {string} */ key) {
   const sh = S.shop;
   if (S.phase !== 'shop' || !sh || S.mode || S.pack) return;
+  if (!gate('buy', key)) return;
   if (key === 'v') {
     const av = S.anteVoucher;
     if (!av || !av.id || av.bought) return;
@@ -561,17 +615,25 @@ function cancelTile() {
 }
 function trim() {
   const sh = S.shop; if (!sh || sh.trimmed) return;
+  if (!gate('trim')) return;
   if (S.money < 3) { ui.toast(t('toast.noMoney')); return; }
   const k = S.bag.findIndex((/** @type {any} */ p) => p.type === 'plain'); if (k < 0 || S.bag.length <= 5) return;
   S.bag.splice(k, 1); S.money -= 3; sh.trimmed = true; sfx.click(); ui.toast(t('toast.trimmed')); settle();
 }
 function reroll() {
   const sh = S.shop; if (!sh || S.mode || S.pack) return;
+  if (!gate('reroll')) return;
   if (S.money < sh.reroll) { ui.toast(t('toast.noMoney')); return; }
   S.money -= sh.reroll; sh.reroll++; sh.items = genCards();
   sfx.click(); ui.markEnter(); settle();
 }
-function nextRound() { if (S.phase !== 'shop' || S.mode || S.pack) return; sfx.click(); S.phase = 'blind'; S.shop = null; settle(); }
+function nextRound() {
+  if (S.phase !== 'shop' || S.mode || S.pack) return;
+  if (!gate('nextRound')) return;
+  sfx.click(); S.phase = 'blind'; S.shop = null;
+  if (tutOn()) { S.tut.bout = 2; startBlind(); return; }   // no blind screen in the prologue: straight into the second bout
+  settle();
+}
 
 
 /* ---------------- booster packs ---------------- */
@@ -579,6 +641,7 @@ function nextRound() { if (S.phase !== 'shop' || S.mode || S.pack) return; sfx.c
 function packOptions(type) {
   const P = PACKS[type];
   if (type === 'joker') { const out = []; for (let i = 0; i < P.show; i++) out.push(genJoker(2.5, out.map(o => o.id))); return out; }
+  if (type === 'piece' && tutOn()) return ['red', 'blue', 'gold', 'lucky'].map(id => ({ kind: 'piece', id }));
   if (type === 'piece') return shuffle([...SPECIALS]).slice(0, P.show).map(id => ({ kind: 'piece', id }));
   if (type === 'chalk') {
     const ids = shuffle(Object.keys(ITEMS).filter(i => ITEMS[i].kind === 'chalk' && !ITEMS[i].rare)).slice(0, P.show);
@@ -593,6 +656,7 @@ function packOptions(type) {
 function buyPack(/** @type {string} */ arg) {
   const sh = S.shop, pk = sh && sh.packs && sh.packs[+arg];
   if (S.phase !== 'shop' || S.mode || S.pack || !pk || pk.sold) return;
+  if (!gate('buyPack', arg)) return;
   if (S.money < pk.cost) { ui.toast(t('toast.noMoney')); return; }
   S.money -= pk.cost; pk.sold = true; sfx.win();
   const P = PACKS[pk.type];
@@ -629,6 +693,7 @@ function editPiece(/** @type {string} */ arg) {
 }
 function takePack(/** @type {string} */ arg) {
   const pk = S.pack; if (!pk) return;
+  if (!gate('takePack', arg)) return;
   const o = pk.options[+arg]; if (!o || o.taken || o.kind === 'edit') return;
   if (o.kind === 'joker') {
     if (S.jokers.length >= jokerSlots()) { ui.toast(t('toast.jokersFull')); return; }
@@ -734,12 +799,37 @@ function newRun(deck) {
   if (!deck && unlockedDecks().length > 1) { ui.showModal('deck'); return; }
   ui.showModal(null); clearRun(); freshRun(deck || 'plain'); settle();
 }
+/** The title's button: the story and tutorial the first time, a fresh run after that. */
+function play() {
+  sfx.click();
+  if (!SET.prologueDone) return startPrologue();
+  newRun();
+}
+/** The story, as a scripted run against Pip (see tutorial.js). */
+function startPrologue() {
+  ui.showModal(null); clearRun(); freshRun('plain');
+  S.tut = { on: true, guided: true, bout: 1, done: {} };
+  S.phase = 'blind'; startScene(['intro'], 'bout1'); settle();
+}
+function skipIntro() { SET.prologueDone = true; saveSettings(); newRun(); }
+/** A scene ended (or was skipped): the next one in the queue, or whatever the game does after them. */
+function storyDone() {
+  if (!S.scene) return;
+  S.scene.queue.shift();
+  if (S.scene.queue.length) { settle(); return; }
+  const after = S.scene.after; S.scene = null;
+  if (after === 'bout1') { S.tut.bout = 1; S.phase = 'blind'; S.blindIdx = 0; startBlind(); }
+  else if (after === 'bout3') { S.tut.bout = 3; S.blindIdx = 2; S.boss = { id: 'ollie' }; S.phase = 'blind'; startBlind(); }
+  else if (after === 'finish') finishPrologue();
+  else if (after === 'startBlind') startBlind();
+  else settle();
+}
 function continueRun() {
   sfx.click(); ui.showModal(null);
   if (!loadRun()) { freshRun(); }
   settle();
 }
-function abandon() { clearRun(); S.phase = 'title'; ui.render(); }
+function abandon() { clearRun(); S.scene = null; S.tut = null; S.phase = 'title'; ui.render(); }
 function endless() { S.endless = true; S.phase = 'shop'; settle(); }
 function toggleSpeed() { SET.speed = SET.speed === 1 ? 2 : SET.speed === 2 ? 4 : 1; saveSettings(); ui.render(); ui.refreshModal(); }
 function toggleSound() { SET.sound = !SET.sound; saveSettings(); syncMusic(); ui.render(); ui.refreshModal(); sfx.click(); }
@@ -748,9 +838,15 @@ function toggleTips() { SET.tips = !SET.tips; saveSettings(); ui.render(); ui.re
 function replayTips() { ui.replayTips(); ui.render(); ui.refreshModal(); sfx.click(); ui.toast(t('toast.tipsReplay')); }
 function toggleCrt() { SET.crt = !SET.crt; saveSettings(); ui.applyCrt(); ui.render(); ui.refreshModal(); sfx.click(); }
 
-export const actions = {
-  cell: onCell, selectPiece, discard, startBlind, skipBlind,
+const rawActions = {
+  play, skipIntro, storyDone, replayStory: startPrologue, cell: onCell, selectPiece, discard, startBlind, skipBlind,
   buy, reroll, trim, applyTile, cancelTile, nextRound, cashOut, buyPack, takePack, skipPack, armPack, editPiece,
   sellJoker, moveJoker, sellItem, useItem, itemBlocked, cancelMode,
   newRun, continueRun, abandon, endless, toggleSpeed, toggleSound, toggleMusic, toggleCrt, toggleTips, replayTips,
 };
+
+/** While a story scene is on screen the game waits: only the scene's own actions go through. */
+const SCENE_OK = ['storyDone', 'toggleSound', 'toggleMusic', 'toggleSpeed', 'abandon'];
+export const actions = /** @type {typeof rawActions} */ (Object.fromEntries(Object.entries(rawActions).map(([name, fn]) =>
+  [name, (/** @type {any[]} */ ...args) => (S.scene && !SCENE_OK.includes(name) ? undefined : /** @type {any} */ (fn)(...args))])));
+

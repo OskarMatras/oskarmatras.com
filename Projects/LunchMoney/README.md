@@ -2,7 +2,7 @@
 
 Tic-tac-toe behind the bike sheds. A schoolyard gambling roguelike: every bout is a bet, you win the
 pot by scoring lines, and Squint's stall sells the tricks that bend the rules. Eight turfs, a bully at the
-end of each, and Ollie, king of the yard, at the very end.
+end of each, and the Sixth-Grader, who cheats, at the very end.
 
 This is the second version of the game. The first one (Balatro X TicTacToe, kept in
 `Projects/BalatroXTicTacToe/` and tagged `balatro-x-tictactoe-v1`) is the checkpoint it was built from: the
@@ -16,7 +16,15 @@ Live at https://OskarMatras.com/Projects/LunchMoney/
   are Goody Bags, vouchers are Hall Passes. All names are in `js/data.js` and `js/strings.js`, English and Danish.
 * **Turfs** (`TURFS` in `js/data.js`): each turf has a kid who plays the Pushover and the Regular his own way
   (blocks more, loves the centre, mirrors your last move, plays at random...). The bully at the end brings a rule.
-* **Ollie** is the boss of turf 8: he moves first, blocks far more and never misses a win.
+* **The story**: you are the new kid. Pip, a kind kid, shows you round (a story scene, then a guided practice game),
+  and then the Sixth-Grader (formerly Ollie) walks in, counters the build the lessons set up, cheats and takes your
+  lunch money. A tour of the whole yard follows, and then the real game starts. Scenes are plain data in `js/story.js`
+  (English and Danish) and are played by `js/storyui.js`; the scripted tutorial is `js/tutorial.js`.
+* **The Sixth-Grader** is the boss of turf 8 and cheats, openly: he starts in the middle, plays an extra O after your
+  first line, always blocks, never misses a win and confiscates your two leftmost Tricks. In the prologue he is
+  unbeatable on purpose: your Tricks are locked, special X count as plain, and he rubs out an X whenever you finish a line.
+* **The crowd**: in every boss bout kids run in from both sides and cheer, gasp or boo (`js/crowd.js`).
+* **Tilt**: nearly every panel, button and counter leans with the pointer (`js/cardfx.js`, the `AUTO` table).
 * **Look**: asphalt at the back (WebGL), chalk markings, notebook paper and masking tape on top, marker for numbers.
   Parametric SVG faces for the whole cast live in `js/faces.js`. The theme is the `BLACKTOP` block at the end of
   `game.css`; paper surfaces redefine the colour variables so text stays readable.

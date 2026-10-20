@@ -21,7 +21,37 @@
  *
  * Any element with data-tilt="<stable key>" takes part. The key survives
  * re-renders, so a card keeps its motion when the DOM is rebuilt.
+ *
+ * Nearly everything in the game is a panel, so panels join in on their own: AUTO below lists the selectors that
+ * get tagged as they appear, each with a strength (1 = a card; a big panel only leans a degree or two), how much
+ * it grows under the pointer and whether it shows the glare.
  */
+
+/** [selector, strength, hover scale, hover lift in px, glare] */
+const AUTO = /** @type {[string, number, number, number, boolean][]} */ ([
+  ['#side', .16, 1, 0, false], ['.tray', .22, 1, 0, false], ['#bw', .2, 1, 0, false],
+  ['.bcard', .55, 1.035, -6, true], ['.sitem', .5, 1.04, -3, true], ['.deckCard', .6, 1.04, -3, true], ['.tgt', .6, 1.05, -3, true],
+  ['.shopCat', .12, 1, 0, false], ['.panelBox', .1, 1, 0, false], ['.modal', .12, 1, 0, false], ['.blindTag', .4, 1.02, 0, false],
+  ['.chipsBox', .55, 1.05, 0, false], ['.multBox', .55, 1.05, 0, false], ['.roundScore', .3, 1, 0, false], ['.moneyBox', .4, 1.03, 0, false], ['.stat', .3, 1, 0, false],
+  ['.btn', .5, 1.04, -1, false], ['#coach .cBubble', .4, 1, 0, false], ['#insp', .4, 1, 0, false], ['.howto div', .5, 1.02, 0, false],
+  ['.splash .title', .35, 1, 0, false], ['.rr', .25, 1, 0, false],
+]);
+const AUTO_SEL = AUTO.map(a => a[0]).join(',');
+/** Tag every panel that does not have a tilt yet. The key is the selector plus the place among its siblings, which survives a redraw. */
+function autoTag() {
+  document.querySelectorAll(AUTO_SEL + '').forEach(node => {
+    const el = /** @type {HTMLElement} */ (node);
+    if (el.dataset.tilt) return;
+    const a = AUTO.find(x => el.matches(x[0]));
+    if (!a) return;
+    const par = el.parentElement;
+    el.dataset.tilt = 'a' + a[0] + (par ? Array.prototype.indexOf.call(par.children, el) : 0);
+    el.dataset.tk = String(a[1]);
+    el.style.setProperty('--hs', String(a[2])); el.style.setProperty('--hy', a[3] + 'px');
+    if (!a[4]) el.dataset.flat = '1';
+    if (a[1] < .3) { el.style.setProperty('--pp', '1600px'); el.style.setProperty('--hz', 'auto'); }
+  });
+}
 
 /** @typedef {{rx:number, ry:number, hover:boolean, phase:number}} TiltState */
 
@@ -59,11 +89,13 @@ export function startCardFx() {
 
 /** @param {number} t @param {number} dt @param {boolean} finePointer */
 function tick(t, dt, finePointer) {
+  autoTag();
   const els = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('[data-tilt]'));
   const k = 1 - Math.exp(-EASE * dt);
   const seen = new Set();
   els.forEach(el => {
     const key = el.dataset.tilt || '';
+    const kk = +(el.dataset.tk || 1);   // strength: a card is 1, a big panel leans only a little
     seen.add(key);
     let s = states.get(key);
     if (!s) { s = { rx: 0, ry: 0, hover: false, phase: phaseOf(key) }; states.set(key, s); }
@@ -79,13 +111,13 @@ function tick(t, dt, finePointer) {
 
     // Target: idle sway, damped while hovered, plus the lean toward the pointer.
     const sway = inside ? 0.2 : 1;
-    let tx = Math.sin(t * 1.1 + s.phase) * IDLE_TILT * sway;
-    let ty = Math.cos(t * 0.9 + s.phase) * IDLE_TILT * sway;
+    let tx = Math.sin(t * 1.1 + s.phase) * IDLE_TILT * sway * kk;
+    let ty = Math.cos(t * 0.9 + s.phase) * IDLE_TILT * sway * kk;
     if (inside) {
       const nx = ((pointer.x - r.left) / r.width - 0.5) * 2;   // -1..1
       const ny = ((pointer.y - r.top) / r.height - 0.5) * 2;
-      tx += -ny * HOVER_TILT;
-      ty += nx * HOVER_TILT;
+      tx += -ny * HOVER_TILT * kk;
+      ty += nx * HOVER_TILT * kk;
     }
     s.rx += (tx - s.rx) * k;
     s.ry += (ty - s.ry) * k;
