@@ -36,6 +36,11 @@ export const CAST = {
   pip: { skin: '#b9794c', shirt: '#3fae7a', hair: '#2a1a12', hairKind: 'curls', eyes: 'bright', mouth: 'smile', extra: 'badge' },
   you: { skin: '#ecc19a', shirt: '#2fa7b8', hair: '#7a4a28', hairKind: 'tuft', eyes: 'wide', mouth: 'o', extra: 'straps' },
   ollie: { skin: '#d49a74', shirt: '#22222a', trim: '#d9622b', hair: '#1c1612', hairKind: 'snap', cap: '#d9622b', eyes: 'smug', mouth: 'smirk', extra: 'jacket medal gum', big: true },
+  // the grown-ups: the Lunch Lady, a teacher, the caretaker, and the conductor of the school orchestra
+  lady: { skin: '#e6b08a', shirt: '#f2efe6', hair: '#b4b4bc', hairKind: 'bun', eyes: 'smug', mouth: 'smirk', extra: 'net ladle' },
+  teacher: { skin: '#f0cfae', shirt: '#7a5a8a', hair: '#6a4a3a', hairKind: 'bun', eyes: 'dot', mouth: 'flat', extra: 'glasses lanyard' },
+  caretaker: { skin: '#d9a07a', shirt: '#3a5a7a', hair: '#555', hairKind: 'cap', cap: '#2f4f6f', eyes: 'dot', mouth: 'flat', extra: 'moustache' },
+  maestro: { skin: '#f3d2b4', shirt: '#1b1b22', hair: '#f2f0e6', hairKind: 'afro', eyes: 'wide', mouth: 'wow', extra: 'baton bowtie' },
   // the shopkeeper
   squint: { skin: '#e8b48a', shirt: '#6a5a44', hair: '#2a2020', hairKind: 'fedora', cap: '#3a3028', eyes: 'squint', mouth: 'smirk', extra: 'coat' },
 };
@@ -112,6 +117,16 @@ function extra(kind, f) {
     case 'straps': return `<path d="M16 54 L20 66 M48 54 L44 66" stroke="#8a5a2a" stroke-width="4" stroke-linecap="round"/><path d="M16 54 L20 66 M48 54 L44 66" stroke="${INK}" stroke-width="1.2"/>`;
     case 'jacket': return `<path d="M-4 66 Q-4 50 16 50 L22 52 L32 66 L42 52 L48 50 Q68 50 68 66Z" fill="${f.shirt}" stroke="${INK}" stroke-width="2.8" stroke-linejoin="round"/><path d="M-4 66 Q-4 52 8 50.4 L14 66Z M68 66 Q68 52 56 50.4 L50 66Z" fill="${f.trim || '#d9622b'}" stroke="${INK}" stroke-width="2.4" stroke-linejoin="round"/><text x="32" y="64" text-anchor="middle" font-family="Permanent Marker, Impact, sans-serif" font-size="13" fill="${f.trim || '#d9622b'}">6</text>`;
     case 'medal': return `<path d="M26 52 L32 60 L38 52" fill="none" stroke="#f6b92c" stroke-width="2.4"/><circle cx="32" cy="62" r="4.6" fill="none" stroke="#f6b92c" stroke-width="3"/><circle cx="32" cy="62" r="4.6" fill="none" stroke="${INK}" stroke-width=".8"/>`;
+    case 'net': return `<path d="M13 30 Q13 8 32 8 Q51 8 51 30" fill="none" stroke="#fff" stroke-width="1.8" stroke-dasharray="2.4 2.4" opacity=".9"/><path d="M20 12 L24 28 M32 8 L32 24 M44 12 L40 28" stroke="#fff" stroke-width="1.2" opacity=".6"/>`;
+    case 'ladle': return `<path d="M58 66 L68 28" stroke="#8a8a92" stroke-width="3.4" stroke-linecap="round"/><path d="M58 66 L68 28" stroke="${INK}" stroke-width=".8"/><ellipse cx="69.4" cy="23" rx="6.6" ry="5.2" fill="#9a9aa4" stroke="${INK}" stroke-width="2"/>`;
+    case 'lanyard': return `<path d="M24 52 L32 62 L40 52" fill="none" stroke="#d4332a" stroke-width="2.4"/><rect x="29" y="60" width="6.4" height="8" fill="#fff" stroke="${INK}" stroke-width="1.6"/>`;
+    case 'moustache': return `<path d="M22 45 Q27 40 32 44.5 Q37 40 42 45 Q37 49 32 46 Q27 49 22 45Z" fill="#3a2a22" stroke="${INK}" stroke-width="1.4" stroke-linejoin="round"/>`;
+    case 'baton': return `<path d="M56 62 L78 24" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/><path d="M56 62 L78 24" stroke="${INK}" stroke-width=".7"/><circle cx="55" cy="63" r="4.6" fill="${f.skin}" stroke="${INK}" stroke-width="2.2"/>`;
+    case 'bowtie': return `<path d="M26 55 L32 58.5 L26 62Z M38 55 L32 58.5 L38 62Z" fill="#d4332a" stroke="${INK}" stroke-width="1.8" stroke-linejoin="round"/>`;
+    case 'violin': return `<path d="M0 36 L36 60" stroke="#e8d9b0" stroke-width="1.8"/><g transform="rotate(-26 16 56)"><ellipse cx="16" cy="58" rx="7.6" ry="10.6" fill="#b5651d" stroke="${INK}" stroke-width="2.2"/><rect x="14.4" y="42" width="3.2" height="8" fill="#5a3410" stroke="${INK}" stroke-width="1"/><path d="M12.4 58 h7.2" stroke="${INK}" stroke-width="1.4"/></g>`;
+    case 'trombone': return `<path d="M30 58 L10 47 L10 75 L30 64Z" fill="#e0b92c" stroke="${INK}" stroke-width="2.2" stroke-linejoin="round"/><path d="M30 58 H80 M30 64 H80 M80 58 V64" fill="none" stroke="${INK}" stroke-width="6.4" stroke-linecap="round"/><path d="M30 58 H80 M30 64 H80 M80 58 V64" fill="none" stroke="#e0b92c" stroke-width="3" stroke-linecap="round"/>`;
+    case 'bass': return `<rect x="59.6" y="0" width="4.4" height="42" fill="#3a2410" stroke="${INK}" stroke-width="1.6"/><circle cx="62" cy="-1" r="3.2" fill="#3a2410" stroke="${INK}" stroke-width="1.6"/><ellipse cx="62" cy="53" rx="10" ry="12" fill="#8a4a1a" stroke="${INK}" stroke-width="2.4"/><ellipse cx="62" cy="70" rx="12.4" ry="14" fill="#8a4a1a" stroke="${INK}" stroke-width="2.4"/><path d="M58 70 q2 -5 4 0 q2 5 4 0" fill="none" stroke="${INK}" stroke-width="1.6"/>`;
+    case 'drum': return `<path d="M16 38 L28 54 M48 38 L36 54" stroke="#e8d9b0" stroke-width="2.8" stroke-linecap="round"/><rect x="10" y="56" width="44" height="14" rx="3" fill="#d4332a" stroke="${INK}" stroke-width="2.4"/><ellipse cx="32" cy="56" rx="22" ry="5" fill="#f2efe6" stroke="${INK}" stroke-width="2.4"/>`;
     case 'gum': return `<circle cx="45" cy="49" r="6" fill="#ff8fb8" stroke="${INK}" stroke-width="2"/><path d="M41.5 46 Q43 44 45.5 44.4" stroke="#fff" stroke-width="1.4" fill="none" stroke-linecap="round" opacity=".8"/>`;
     default: return '';
   }
@@ -146,12 +161,13 @@ function armsFront(kind, f) {
  * One character as an inline SVG sticker.
  * @param {string} id a key of CAST (anything else gets a plain face) @param {number} [px] size in CSS pixels
  * @param {string} [mood] cheer | boo | gasp | worry | grin | smug | shock: changes the eyes and mouth, and raises the arms
+ * @param {string} [add] extra pieces for this one use, e.g. 'violin' or 'trombone' (the school orchestra)
  */
-export function face(id, px = 64, mood = '') {
+export function face(id, px = 64, mood = '', add = '') {
   const base = CAST[id] || { skin: '#e8b48a', shirt: '#888', eyes: 'dot', mouth: 'smirk' };
   const m = MOODS[mood] || {};
   const f = { ...base, eyes: m.eyes || base.eyes, mouth: m.mouth || base.mouth };
-  const extras = (base.extra || '').split(' ').filter(Boolean);
+  const extras = ((base.extra || '') + ' ' + add).split(' ').filter(Boolean);
   const hairKind = f.hairKind || '';
   const behind = hairKind === 'pigtails' || hairKind === 'hood' || hairKind === 'bun' ? hair(hairKind, f.hair || '#333', f.cap) : '';
   const front = behind ? '' : hair(hairKind, f.hair || '#333', f.cap);

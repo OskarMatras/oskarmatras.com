@@ -25,18 +25,19 @@ const sleep = (/** @type {number} */ ms) => new Promise(r => setTimeout(r, (ms *
 /**
  * Prologue only: stop the scoring at a moment worth explaining, highlight what Pip is talking about and wait for Next.
  * Each lesson is told once. @param {string} key @param {string} anchor CSS selector(s) to highlight @param {Record<string, any>} [vars]
+ * @param {string} [point] what Pip walks over to and points at, one after the other
  */
-async function teach(key, anchor, vars = {}) {
+async function teach(key, anchor, vars = {}, point = '') {
   if (!tutOn() || S.tut.guided === false) return;
   S.tut.expl = S.tut.expl || {};
   if (S.tut.expl[key]) return;
   S.tut.expl[key] = 1;
-  await ui.explain('tut.sc_' + key.split(':')[0], anchor, vars);
+  await ui.explain('tut.sc_' + key.split(':')[0], anchor, vars, point);
 }
 /** The first time a Trick fires in the prologue, say what it does. @param {any} src a Joker */
 async function teachTrick(src) {
   const d = JOKERS[src.id];
-  await teach('trick', '.tray.jokers .joker', { name: d.name, desc: tr(d.desc(src)) });
+  await teach('trick', '.tray.jokers .joker', { name: d.name, desc: tr(d.desc(src)) }, '.tray.jokers .joker');
 }
 const jokerOf = (/** @type {string} */ id) => S.jokers.find((/** @type {any} */ j) => j.id === id);
 
@@ -195,7 +196,7 @@ async function placeX(i) {
       const k = rand(geo().lines[li].cells.filter(c => c !== i));
       S.board[k] = null; ui.pop(ui.cellEl(k), t('pop.cheat'), 'dim'); ui.render(); await sleep(260);
     }
-    sfx.bad(); ui.react('cheat'); ui.crowd('boo'); fresh = [];
+    sfx.hush(); ui.react('cheat'); ui.crowd('boo'); fresh = [];
   }
   if (fresh.length) {
     S.g.scored.push(...fresh); ui.render();
@@ -333,7 +334,7 @@ async function scoreX(ctx, i, isFirst, isLast) {
   const squareTimes = hasJ('grandstand') ? 2 : 1;
   // A Sprout keeps its growth on the piece in the bag, so it carries over from game to game.
   const bagSelf = p.type === 'sprout' ? S.bag.find((/** @type {any} */ q) => q.uid === p.uid) : null;
-  if (p.type !== 'plain') await teach('piece:' + p.type, '.cell.scoring', { name: tr(P.name), desc: tr(P.desc) });
+  if (p.type !== 'plain') await teach('piece:' + p.type, '.cell.scoring', { name: tr(P.name), desc: tr(P.desc) }, '.cell.scoring');
   for (let r = 0; r < reps; r++) {
     if (r > 0) { ui.pop(target, t('pop.again'), 'info'); await sleep(220); }
     if (P.chips) await apply(ctx, { chips: P.chips }, target);
@@ -368,8 +369,8 @@ async function runScore(ctx, label) {
   ui.markCells(ctx.cells, 'scoring', true);
   slowScore = tutOn() && S.tut.bout < 3;
   await sleep(480);
-  if (ctx.type !== 'draw') await teach('base', '.calc, .cell.scoring', { type: tr(/** @type {any} */ (LINE_TYPES)[ctx.type].name).toLowerCase(), c: ctx.chips, m: ctx.mult });
-  await teach('x', '.cell.scoring', {});
+  if (ctx.type !== 'draw') await teach('base', '.calc, .cell.scoring', { type: tr(/** @type {any} */ (LINE_TYPES)[ctx.type].name).toLowerCase(), c: ctx.chips, m: ctx.mult }, '.chipsBox, .multBox');
+  await teach('x', '.cell.scoring', {}, '.cell.scoring');
   for (let k = 0; k < ctx.cells.length; k++) await scoreX(ctx, ctx.cells[k], k === 0, k === ctx.cells.length - 1);
 
   const held = S.board.map((/** @type {any} */ c, /** @type {number} */ i) => (c && c.t === 'X' && c.p.type === 'steel' && !c.shattered && !ctx.cells.includes(i)) ? i : -1).filter((/** @type {number} */ i) => i >= 0);
@@ -388,12 +389,13 @@ async function runScore(ctx, label) {
 
   if (S.g.amp) { S.g.amp = false; await apply(ctx, { xmult: 2 }, ui.boardEl()); }   // The Amplifier
   const total = Math.floor(ctx.chips * ctx.mult);
-  await teach(tutOn() && S.tut.bout === 2 ? 'total2' : 'total', '.calc, #rs', { chips: fmt(ctx.chips), mult: fmtM(ctx.mult), total: fmt(total) });
+  await teach(tutOn() && S.tut.bout === 2 ? 'total2' : 'total', '.calc, #rs', { chips: fmt(ctx.chips), mult: fmtM(ctx.mult), total: fmt(total) }, '.chipsBox, .multBox, #rs');
   sfx.score(); ui.showTotal(total); ui.pop(ui.boardEl(), '+' + fmt(total), 'money');
   // Half the blind's target is a nudge; the whole target (or more) is the full shake.
   const hit = total / Math.max(1, S.round.target);
   if (hit > 0.5) ui.shake((hit - 0.5) * 2);
   ui.celebrate(hit); ui.crowd('cheer');
+  if (S.blindIdx === 2 && hit >= .25) sfx.stab();   // the orchestra punches the big lines
   if (hit >= 1) ui.react('bigscore');
   const from = S.round.score; S.round.score += total;
   for (let s = 1; s <= 14; s++) { ui.setRoundScore(from + total * s / 14); await sleep(28); }

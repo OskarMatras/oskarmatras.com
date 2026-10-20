@@ -45,35 +45,36 @@ export function stage() {
 
 /**
  * @typedef {{ id: string, at: number, mood: string, anchor: string, when: () => boolean, done?: () => boolean,
- *   next?: boolean, optional?: boolean, overDialog?: boolean, vars?: () => Record<string, any> }} TutStep
+ *   next?: boolean, optional?: boolean, overDialog?: boolean, vars?: () => Record<string, any>, point?: string }} TutStep
+ * `point` is what Pip walks over to and points at (one or more elements, visited in turn); it defaults to `anchor`.
  * `at` is the stage the step belongs to: once the run is past it, the step is dropped. `next` steps wait for the
  * Next button; the others finish by themselves when `done()` says so.
  * @type {TutStep[]}
  */
 export const STEPS = [
   // Bout 1: the basics, against Pip.
-  { id: 'place', at: 11, mood: 'happy', anchor: '#bw', when: () => inPlay() && !hasX(), done: () => hasX() },
-  { id: 'answer', at: 11, mood: 'grin', anchor: '#bw', when: () => inPlay() && hasO(), next: true },
-  { id: 'hand', at: 11, mood: 'happy', anchor: '#hand', when: () => inPlay() && S.hand.length > 0, next: true },
+  { id: 'place', at: 11, mood: 'happy', anchor: '#bw', point: '[data-cell="4"]', when: () => inPlay() && !hasX(), done: () => hasX() },
+  { id: 'answer', at: 11, mood: 'grin', anchor: '#bw', point: '#board .cell.o', when: () => inPlay() && hasO(), next: true },
+  { id: 'hand', at: 11, mood: 'happy', anchor: '#hand', point: '#hand .hp', when: () => inPlay() && S.hand.length > 0, next: true },
   { id: 'toss', at: 11, mood: 'grin', anchor: '[data-act="discard"]', when: () => inPlay() && S.hand.length > 0, next: true },
-  { id: 'danger', at: 11, mood: 'shock', anchor: '#bw', optional: true, when: () => inPlay() && winCells('O').size > 0, next: true },
-  { id: 'line', at: 11, mood: 'happy', anchor: '#bw', when: () => inPlay(), done: () => S.stats.lines >= 1 || S.phase !== 'play' },
-  { id: 'cash1', at: 12, mood: 'cheer', anchor: '.modal', overDialog: true, when: () => S.phase === 'cashout', next: true, vars: lineVars },
+  { id: 'danger', at: 11, mood: 'shock', anchor: '#bw', point: '#board .cell.danger', optional: true, when: () => inPlay() && winCells('O').size > 0, next: true },
+  { id: 'line', at: 11, mood: 'happy', anchor: '#bw', point: '[data-cell="0"],[data-cell="1"],[data-cell="2"]', when: () => inPlay(), done: () => S.stats.lines >= 1 || S.phase !== 'play' },
+  { id: 'cash1', at: 12, mood: 'cheer', anchor: '.modal', point: '.modal .rr, .modal [data-act="cashOut"]', overDialog: true, when: () => S.phase === 'cashout', next: true, vars: lineVars },
   // The shop, stocked on purpose.
-  { id: 'shop_in', at: 13, mood: 'happy', anchor: '.shopCats', when: () => inShop(), next: true },
+  { id: 'shop_in', at: 13, mood: 'happy', anchor: '.shopCats', point: '.shopCat', when: () => inShop(), next: true },
   { id: 'buy_trick', at: 13, mood: 'happy', anchor: '.sitem[data-arg="i0"]', optional: true, when: () => inShop() && !S.jokers.some((/** @type {any} */ j) => j.id === 'jester'), done: () => S.jokers.length >= 1 },
-  { id: 'trick_tray', at: 13, mood: 'grin', anchor: '.tray.jokers', optional: true, when: () => inShop() && S.jokers.length >= 1, next: true },
+  { id: 'trick_tray', at: 13, mood: 'grin', anchor: '.tray.jokers', point: '.tray.jokers .joker', optional: true, when: () => inShop() && S.jokers.length >= 1, next: true },
   { id: 'buy_pack', at: 13, mood: 'wink', anchor: '.sitem.pack[data-arg="p0"]', optional: true, when: () => inShop() && !packSold(0) && S.money >= 4, done: () => packSold(0) },
-  { id: 'pack_pick', at: 13, mood: 'happy', anchor: '.packScene .shopGrid', optional: true, when: () => S.phase === 'shop' && !!S.pack, done: () => !S.pack },
+  { id: 'pack_pick', at: 13, mood: 'happy', anchor: '.packScene .shopGrid', point: '.packScene .sitem', optional: true, when: () => S.phase === 'shop' && !!S.pack, done: () => !S.pack },
   { id: 'go_on', at: 13, mood: 'cheer', anchor: '[data-act="nextRound"]', when: () => inShop(), done: () => S.phase !== 'shop' },
   // Bout 2: the build in action.
-  { id: 'b2_start', at: 21, mood: 'grin', anchor: '.tray.jokers', when: () => inPlay(), next: true },
-  { id: 'b2_red', at: 21, mood: 'happy', anchor: '#hand', optional: true, when: () => inPlay() && S.hand.some((/** @type {any} */ p) => p.type === 'red'), next: true },
-  { id: 'b2_line', at: 21, mood: 'cheer', anchor: '#bw', when: () => inPlay(), done: () => S.stats.lines >= 2 || S.phase !== 'play' },
-  { id: 'cash2', at: 22, mood: 'cheer', anchor: '.modal', overDialog: true, when: () => S.phase === 'cashout', next: true },
+  { id: 'b2_start', at: 21, mood: 'grin', anchor: '.tray.jokers', point: '.tray.jokers .joker', when: () => inPlay(), next: true },
+  { id: 'b2_red', at: 21, mood: 'happy', anchor: '#hand', point: '#hand .hp:has(.t-red)', optional: true, when: () => inPlay() && S.hand.some((/** @type {any} */ p) => p.type === 'red'), next: true },
+  { id: 'b2_line', at: 21, mood: 'cheer', anchor: '#bw', point: '.tray.jokers .joker, .calc', when: () => inPlay(), done: () => S.stats.lines >= 2 || S.phase !== 'play' },
+  { id: 'cash2', at: 22, mood: 'cheer', anchor: '.modal', point: '.modal .rr', overDialog: true, when: () => S.phase === 'cashout', next: true },
   // Bout 3: the Sixth-Grader.
-  { id: 'amb', at: 31, mood: 'shock', anchor: '.tray.jokers', when: () => inPlay(), next: true },
-  { id: 'amb2', at: 31, mood: 'worry', anchor: '#bw', optional: true, when: () => inPlay() && S.round.gameNo >= 2, next: true },
+  { id: 'amb', at: 31, mood: 'shock', anchor: '.tray.jokers', point: '.tray.jokers .joker, #board .cell.o', when: () => inPlay(), next: true },
+  { id: 'amb2', at: 31, mood: 'worry', anchor: '#bw', point: '#board .cell.o', optional: true, when: () => inPlay() && S.round.gameNo >= 2, next: true },
 ];
 
 /** The step to show now, or null. Steps the run has moved past, or that finished on their own, are retired as they are found. @returns {TutStep|null} */

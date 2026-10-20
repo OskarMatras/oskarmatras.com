@@ -28,7 +28,7 @@ import { winCells } from './rules.js';
 import { face } from './faces.js';
 import { current as tutCurrent, ack as tutAck, tutOn, BASICS } from './tutorial.js';
 
-/** @typedef {{ id: string, mood: string, anchor: string, when: () => boolean, keep?: () => boolean, vars?: () => Record<string, any>, text?: string, react?: boolean, key?: string, tut?: boolean, next?: boolean, overDialog?: boolean }} Step */
+/** @typedef {{ id: string, mood: string, anchor: string, when: () => boolean, keep?: () => boolean, vars?: () => Record<string, any>, text?: string, react?: boolean, key?: string, tut?: boolean, next?: boolean, overDialog?: boolean, point?: string }} Step */
 
 const inPlay = () => S.phase === 'play' && !!S.round && !S.busy;
 const hasX = () => Array.isArray(S.board) && S.board.some((/** @type {any} */ c) => c && c.t === 'X');
@@ -102,6 +102,71 @@ function ensure() {
   return r;
 }
 
+/* ---------------- Pip points ----------------
+ * In the prologue Pip does not just talk: Pip walks out of the corner to what the step is about, wobbles beside it and
+ * points. When there are several things (the squares of a row, the Marbles and Swagger boxes, each piece in the hand)
+ * Pip hops from one to the next. The corner avatar stays hidden while Pip is out, and the whole thing is click-through. */
+/** @type {HTMLElement|null} */
+let ptr = null;
+/** @type {{ els: Element[], i: number, timer: any, mood: string }} */
+const pt = { els: [], i: 0, timer: null, mood: '' };
+
+function ensurePointer() {
+  if (ptr) return ptr;
+  const p = document.createElement('div');
+  p.id = 'pipPoint'; p.hidden = true; p.setAttribute('aria-hidden', 'true');
+  p.innerHTML = '<span class="ppPip"></span><svg class="ppArrow" viewBox="0 0 60 36" width="60" height="36"><path d="M4 18 H40 M30 6 L50 18 L30 30" fill="none" stroke="#1b1612" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 18 H40 M30 6 L50 18 L30 30" fill="none" stroke="#ffd84a" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  document.body.appendChild(p);
+  ptr = p;
+  return p;
+}
+function hidePointer() {
+  clearInterval(pt.timer); pt.timer = null; pt.els = []; pt.i = 0;
+  if (ptr) ptr.hidden = true;
+  if (root) root.classList.remove('pointing');
+}
+/** Stand beside the element, on the side with room, and aim the arrow at it. @param {Element} el */
+function standBeside(el) {
+  const p = ensurePointer(), r = el.getBoundingClientRect();
+  const cx = r.left + r.width / 2, cy = r.top + r.height / 2, gap = 70;
+  /** @type {[number, number][]} */
+  const spots = [[r.left - gap, cy], [r.right + gap, cy], [cx, r.top - gap], [cx, r.bottom + gap]];
+  // never stand on another thing Pip is about to point at (the Swagger box beside the Marbles box)
+  const others = pt.els.filter(e => e !== el).map(e => e.getBoundingClientRect());
+  const clear = (/** @type {[number, number]} */ s) => !others.some(o => s[0] + 34 > o.left && s[0] - 34 < o.right && s[1] + 34 > o.top && s[1] - 34 < o.bottom);
+  const ok = (/** @type {[number, number]} */ s) => s[0] > 40 && s[0] < innerWidth - 40 && s[1] > 40 && s[1] < innerHeight - 40 && clear(s);
+  const [px, py] = spots.find(ok) || [Math.min(innerWidth - 50, r.right + 40), Math.min(innerHeight - 50, cy)];
+  // aim at the nearest point of the element, not its middle, so the arrow ends at the edge of what it points at
+  const tx = Math.max(r.left, Math.min(px, r.right)), ty = Math.max(r.top, Math.min(py, r.bottom));
+  const ang = Math.atan2(ty - py, tx - px);
+  p.style.left = (px - 32) + 'px'; p.style.top = (py - 32) + 'px';
+  const ar = /** @type {HTMLElement} */ (p.querySelector('.ppArrow'));
+  ar.style.left = (32 + Math.cos(ang) * 46 - 30) + 'px'; ar.style.top = (32 + Math.sin(ang) * 46 - 18) + 'px';
+  ar.style.rotate = ang + 'rad';
+}
+/** (Re)aim the pointer at what the step says. Called whenever the bubble is placed, which is after every redraw. @param {Step} step */
+function updatePointer(step) {
+  if (!step.tut || !root || root.hidden) { hidePointer(); return; }
+  const sel = step.point || step.anchor;
+  const els = sel ? [...document.querySelectorAll(sel)].filter(e => { const b = e.getBoundingClientRect(); return b.width > 4 && b.height > 4; }) : [];
+  if (!els.length) { hidePointer(); return; }
+  const p = ensurePointer();
+  const same = pt.els.length === els.length && pt.els[0] && els[0] && pt.els[0].isConnected && els[0].className === pt.els[0].className && pt.mood === step.mood && !p.hidden;
+  pt.els = els; if (pt.i >= els.length) pt.i = 0;
+  if (!same || p.hidden) {
+    p.querySelector('.ppPip').innerHTML = pip(step.mood); pt.mood = step.mood;
+    if (p.hidden) {   // walk out of the corner: start where the avatar sits, then move on the next frame
+      const av = /** @type {HTMLElement} */ (root.querySelector('.cAvatar')).getBoundingClientRect();
+      p.style.transition = 'none'; p.style.left = av.left + 'px'; p.style.top = av.top + 'px'; p.hidden = false;
+      void p.offsetWidth; p.style.transition = '';
+    }
+    root.classList.add('pointing');
+  }
+  standBeside(els[pt.i]);
+  if (els.length > 1 && !pt.timer) pt.timer = setInterval(() => { if (!pt.els.length) return; pt.i = (pt.i + 1) % pt.els.length; if (pt.els[pt.i].isConnected) standBeside(pt.els[pt.i]); }, 1500);
+  if (els.length < 2 && pt.timer) { clearInterval(pt.timer); pt.timer = null; }
+}
+
 /** Put the line (in the current language) and Pip's mood into the bubble. @param {Step} step */
 function fill(step) {
   const r = ensure();
@@ -169,6 +234,7 @@ function place(step) {
   }
   r.dataset.corner = /** @type {{ c: string }} */ (best).c;
   if (current) current.corner = /** @type {{ c: string }} */ (best).c;
+  updatePointer(step);
 }
 
 /** @param {Step} step */
@@ -182,7 +248,7 @@ function show(step) {
 
 function hide() {
   if (current && current.timer) clearTimeout(current.timer);
-  current = null; clearHighlight();
+  current = null; clearHighlight(); hidePointer();
   if (root) root.hidden = true;
 }
 
@@ -227,13 +293,13 @@ export function sync() {
 /**
  * Stop the game and explain something: Pip talks, `anchor` (any number of elements) is highlighted, and the
  * returned promise resolves when the player presses Next. The engine awaits it in the middle of scoring.
- * @param {string} key a string key (tut.sc_...) @param {string} anchor @param {Record<string, any>} [vars]
+ * @param {string} key a string key (tut.sc_...) @param {string} anchor @param {Record<string, any>} [vars] @param {string} [point] what Pip points at
  * @returns {Promise<void>}
  */
-export function explain(key, anchor, vars = {}) {
+export function explain(key, anchor, vars = {}, point = '') {
   return new Promise(resolve => {
     explaining = true; hide();
-    show({ id: 'x:' + key, key, vars: () => vars, tut: true, next: true, mood: 'happy', anchor, when: () => true, overDialog: true });
+    show({ id: 'x:' + key, key, vars: () => vars, tut: true, next: true, mood: 'happy', anchor, point, when: () => true, overDialog: true });
     if (current) /** @type {any} */ (current).resolve = resolve;
   });
 }
@@ -256,7 +322,7 @@ function syncTutorial() {
     return;
   }
   hide();
-  show({ id: st.id, key: 'tut.' + st.id, vars: st.vars, tut: true, next: !!st.next, overDialog: !!st.overDialog, mood: st.mood, anchor: st.anchor, when: () => true });
+  show({ id: st.id, key: 'tut.' + st.id, vars: st.vars, point: st.point, tut: true, next: !!st.next, overDialog: !!st.overDialog, mood: st.mood, anchor: st.anchor, when: () => true });
 }
 
 /* ---------------- Pip's asides ----------------

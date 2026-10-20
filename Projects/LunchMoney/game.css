@@ -1249,3 +1249,29 @@ body.inStory{overflow:hidden}
 @media (hover:hover){
   .sitem:not(:disabled):hover{box-shadow:var(--sx,3px) var(--sy,5px) 0 rgba(0,0,0,.4),0 0 0 3px #ffd84a}
 }
+
+
+/* Pip walks out of the corner and points at what the lesson is about */
+#pipPoint{position:fixed;z-index:76;pointer-events:none;width:64px;height:64px;
+  transition:left .75s cubic-bezier(.3,1.4,.5,1),top .75s cubic-bezier(.3,1.4,.5,1)}
+#pipPoint[hidden]{display:none}
+#pipPoint .ppPip{display:block;width:64px;height:64px;filter:drop-shadow(0 4px 0 rgba(0,0,0,.45));transform-origin:50% 90%}
+#pipPoint .ppPip svg{display:block;width:100%;height:100%;overflow:visible}
+#pipPoint .ppArrow{position:absolute;transform-origin:50% 50%;filter:drop-shadow(2px 3px 0 rgba(0,0,0,.4))}
+#coach.pointing .cAvatar{visibility:hidden}
+@keyframes ppWobble{0%{transform:rotate(-9deg) translateY(0)}50%{transform:rotate(0deg) translateY(-7px)}100%{transform:rotate(9deg) translateY(0)}}
+@keyframes ppNudge{from{translate:-4px 0}to{translate:7px 0}}
+@media (prefers-reduced-motion:no-preference){
+  #pipPoint .ppPip{animation:ppWobble .6s ease-in-out infinite}
+  #pipPoint .ppArrow{animation:ppNudge .45s ease-in-out infinite alternate}
+}
+@media (prefers-reduced-motion:reduce){ #pipPoint{transition:none} }
+
+/* readable chat text: Pip's bubbles are bigger, since there are fewer words in them now */
+#coach .cText{font-size:16.5px;line-height:1.35}
+#coach.tut .cBubble{width:min(400px,calc(100vw - 110px))}
+#coach.tut .cText{font-size:19px;line-height:1.32}
+#coach .cWho{font-size:15px}
+#coach .cNext{font-size:16px;padding:4px 14px}
+#coach .cSkip{font-size:13px}
+@media (max-width:480px){ #coach .cText{font-size:14.5px} #coach.tut .cText{font-size:16px} #coach.tut .cBubble{width:min(300px,calc(100vw - 82px))} }

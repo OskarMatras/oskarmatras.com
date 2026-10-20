@@ -110,8 +110,8 @@ function syncStory() {
   if (id && !(storyOpen() && storyId() === id)) showStory(id, () => { setMood(moodFor()); if (actions.storyDone) actions.storyDone(); });
 }
 export { replay as replayTips } from './coach.js';
-/** Pip stops the game to explain something, highlighting `anchor`; resolves when the player presses Next. @param {string} key @param {string} anchor @param {Record<string, any>} [vars] */
-export const explain = (key, anchor, vars) => coachExplain(key, anchor, vars);
+/** Pip stops the game to explain something, highlighting `anchor`; resolves when the player presses Next. @param {string} key @param {string} anchor @param {Record<string, any>} [vars] @param {string} [point] */
+export const explain = (key, anchor, vars, point) => coachExplain(key, anchor, vars, point);
 /** The kids at the edges of a boss bout cheer, boo or gasp. @param {'cheer'|'boo'|'gasp'} kind @param {number} [ms] */
 export const crowd = (kind, ms) => crowdReact(kind, ms);
 /** Pip reacts. @param {string} kind */

@@ -150,6 +150,20 @@ export const sfx = {
   boo: () => { tone(hz(-5), .7, 'sawtooth', .05, .6, { fat: 14, lp: 800, verb: .5 }); tone(hz(-8), .8, 'sawtooth', .04, .5, { at: .05, lp: 700 }); noise(.5, .035, 400, 1, 'lowpass'); },
   /** A crowd gasping: a short breath in. */
   gasp: () => { noise(.28, .05, 2600, 1, 'bandpass', { sweep: 2.5 }); },
+  /** Brass stab: the orchestra punches a big line. */
+  stab: () => { [0, 3, 7].forEach(s => tone(hz(s - 12), .5, 'sawtooth', .05, 1, { fat: 8, lp: 1700, verb: .4, attack: .02 })); noise(.5, .04, 5200, .6, 'highpass'); },
+  /** A cymbal crash. */
+  crash: () => { noise(1.1, .08, 5200, .6, 'highpass'); tone(hz(-24), .6, 'sine', .15, .6); },
+  /** The orchestra stops dead for a moment, then comes back with a crash: the Sixth-Grader has cheated. */
+  hush: () => {
+    if (!ac || !musBus || !live()) return;
+    const t = ac.currentTime;
+    musBus.gain.cancelScheduledValues(t); musBus.gain.setValueAtTime(0.3, t);
+    musBus.gain.linearRampToValueAtTime(0.02, t + .06);
+    musBus.gain.setValueAtTime(0.02, t + 1.3);
+    musBus.gain.linearRampToValueAtTime(musicWanted() ? 0.3 : 0, t + 1.5);
+    setTimeout(() => sfx.crash(), 1300);
+  },
   /** A card flies to where it belongs. */
   whoosh: () => { noise(.22, .06, 600, 1, 'bandpass', { sweep: 7 }); },
 };
@@ -157,7 +171,7 @@ export const sfx = {
 /* ======================================================================
    The soundtrack
    ====================================================================== */
-/** @typedef {{ bpm:number, root:number, chords:number[][], arp:number[], bassPattern:number[], kick:number[], snare:number[], hat:number, pad:number, arpVol:number, bassVol:number, drums:number }} Mood */
+/** @typedef {{ bpm:number, root:number, chords:number[][], arp:number[], bassPattern:number[], kick:number[], snare:number[], hat:number, pad:number, arpVol:number, bassVol:number, drums:number, orch?:boolean, steps?:number, triads?:number[][] }} Mood */
 // Chords are semitone offsets from `root` (A = 0): each bar holds one chord (root first).
 /** @type {Record<string, Mood>} */
 const MOODS = {
@@ -167,9 +181,11 @@ const MOODS = {
   // A round: a steady groove.
   play: { bpm: 94, root: -24, chords: [[0, 7, 12, 15, 19], [-4, 3, 8, 12, 15], [3, 7, 10, 14, 19], [-2, 5, 9, 14, 17]], arp: [0, 3, 2, 4, 3, 2, 1, 2, 0, 4, 3, 2, 4, 3, 2, 1],
     bassPattern: [1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0], kick: [0, 6, 8, 14], snare: [4, 12], hat: 2, pad: 1, arpVol: 0.8, bassVol: 1, drums: 1 },
-  // A boss: lower, faster and darker (a minor chord with a flat second).
-  boss: { bpm: 108, root: -26, chords: [[0, 7, 12, 15, 19], [1, 8, 13, 16, 20], [-4, 3, 8, 12, 15], [-2, 5, 8, 14, 17]], arp: [0, 2, 3, 2, 4, 3, 2, 3, 0, 3, 4, 2, 4, 3, 2, 1],
-    bassPattern: [1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1], kick: [0, 3, 6, 8, 11, 14], snare: [4, 12], hat: 1, pad: 1, arpVol: 0.9, bassVol: 1.1, drums: 1.2 },
+  // A boss: the school orchestra. An original swashbuckling theme in A minor, in 6/8 (twelve sixteenths to the bar):
+  // racing strings, a brass melody, a tuba and timpani underneath (see orchestra() below).
+  boss: { orch: true, steps: 12, bpm: 150, root: -24,
+    triads: [[0, 3, 7], [-2, 2, 5], [-4, 0, 3], [-5, -1, 2]],   // Am, G, F, E: down the stairs and back up
+    chords: [[0, 7, 12, 15, 19], [-2, 5, 10, 14, 17], [-4, 3, 8, 12, 15], [-5, 2, 7, 11, 14]], arp: [0], bassPattern: [0], kick: [], snare: [], hat: 0, pad: 1, arpVol: 0, bassVol: 1, drums: 0 },
   // The shop: jazzier chords, laid back.
   shop: { bpm: 84, root: -17, chords: [[0, 7, 10, 14, 17], [5, 9, 12, 16, 19], [-5, 4, 7, 11, 14], [-3, 4, 9, 12, 16]], arp: [0, 2, 4, 3, 1, 3, 4, 2],
     bassPattern: [1, 0, 0, 1, 0, 0, 1, 0], kick: [0, 10], snare: [8], hat: 4, pad: 1, arpVol: 0.65, bassVol: 0.9, drums: 0.6 },
@@ -193,6 +209,35 @@ export function syncMusic() {
   if (!want && timer) { clearInterval(timer); timer = 0; }
 }
 
+/**
+ * The school orchestra for one sixteenth of a bar: violins racing up and down the chord, a brass melody that takes four
+ * bars to tell, a tuba on the beat, timpani, and a cymbal crash every fourth bar. Written for the game (A minor, 6/8).
+ * @param {Mo} M @param {number} inBar @param {number} bar @param {number} tk @param {number} at @param {GainNode} bus @param {number} sx one sixteenth in seconds
+ */
+function orchestra(M, inBar, bar, tk, at, bus, sx) {
+  const tri = /** @type {number[][]} */ (M.triads)[bar], root = M.root;
+  // violins: an eighth-note ostinato up and down the triad
+  if (inBar % 2 === 0) {
+    const idx = [0, 1, 2, 1, 2, 1][inBar / 2];
+    tone(hz(root + 24 + tri[idx]), sx * 1.7, 'sawtooth', 0.034, 1, { at, bus, lp: 2800, verb: .35, fat: 7 });
+  }
+  // brass melody (semitones above A4): step, note, length in sixteenths
+  const MEL = [
+    [[0, 0, 3], [3, 3, 3], [6, 7, 3], [9, 5, 3]],
+    [[0, 2, 3], [3, 5, 3], [6, 10, 3], [9, 7, 3]],
+    [[0, 3, 3], [3, 8, 3], [6, 12, 3], [9, 8, 3]],
+    [[0, 7, 6], [6, 2, 3], [9, -1, 3]],
+  ][bar];
+  for (const [st, n, len] of MEL) if (st === inBar) tone(hz(n), sx * len * .95, 'sawtooth', 0.052, 1, { at, bus, lp: 1900, fat: 6, verb: .4, attack: .03 });
+  // tuba and bass on the two big beats
+  if (inBar === 0 || inBar === 6) tone(hz(root + tri[0]), sx * 4, 'triangle', 0.17, 1, { at, bus, lp: 420 });
+  // timpani: loud on the beats, soft in between
+  if (inBar % 3 === 0) tone(hz(-31 + (inBar % 6 === 0 ? 0 : 3)), .2, 'sine', inBar % 6 === 0 ? .22 : .1, .45, { at, bus });
+  // a snare roll into the next bar, and a crash when the phrase starts again
+  if (inBar >= 9) noise(.05, .03 + (inBar - 9) * .008, 2200, .8, 'bandpass', { at, bus });
+  if (inBar === 0 && bar === 0 && tk > 0) noise(.9, .045, 5200, .6, 'highpass', { at, bus });
+}
+
 function schedule() {
   if (!ac || !musBus) return;
   const bus = musBus;
@@ -200,12 +245,13 @@ function schedule() {
   if (nextTime < ac.currentTime - 0.3) nextTime = ac.currentTime + 0.05;
   while (nextTime < ac.currentTime + 0.25) {
     const M = MOODS[mood] || MOODS.calm, sixteenth = 60 / M.bpm / 4;
-    const inBar = tick % 16, bar = Math.floor(tick / 16) % M.chords.length, chord = M.chords[bar], at = nextTime - ac.currentTime;
+    const L = M.steps || 16, inBar = tick % L, bar = Math.floor(tick / L) % M.chords.length, chord = M.chords[bar], at = nextTime - ac.currentTime;
     if (inBar === 0) {
       if (nextMood !== mood && MOODS[nextMood]) { mood = nextMood; }
       // The pad: the whole chord, long and soft.
-      if (M.pad) for (const s of chord.slice(1, 4)) tone(hz(M.root + s + 12), sixteenth * 15, 'sawtooth', 0.018, 1, { at, bus, fat: 9, lp: 1300, attack: 0.5 });
+      if (M.pad) for (const s of chord.slice(1, 4)) tone(hz(M.root + s + 12), sixteenth * (L - 1), 'sawtooth', 0.018, 1, { at, bus, fat: 9, lp: 1300, attack: 0.5 });
     }
+    if (M.orch) { orchestra(M, inBar, bar, tick, at, bus, sixteenth); nextTime += sixteenth; tick++; continue; }
     if (M.bassPattern[inBar % M.bassPattern.length] && inBar % (M.bassPattern.length === 8 ? 2 : 1) === 0) {
       tone(hz(M.root + chord[0]), sixteenth * 1.8, 'triangle', 0.15 * M.bassVol, 1, { at, bus, lp: 500 });
     }

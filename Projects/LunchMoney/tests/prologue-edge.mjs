@@ -41,7 +41,7 @@ ok((await bubbleText()) !== null, 'Pip is back after Notes');
 // language switch mid-step
 await ev(`document.dispatchEvent(new CustomEvent('langchange', { detail: { lang: 'da' } }))`); await b.sleep(500);
 const da = await bubbleText();
-ok(da && /Svar|Pip|svar|felt|brik|hånd|midter|Det er mig|kridt/i.test(da) && !/Tap the/.test(da), 'the bubble switches to Danish (' + (da || '').slice(0, 40) + ')');
+ok(da && /Svar|Pip|svar|felt|brik|hånd|midter|Det O er mig|kridt|jeg|stribe/i.test(da) && !/Tap the/.test(da), 'the bubble switches to Danish (' + (da || '').slice(0, 40) + ')');
 await b.shot('shots/edge-da-bubble.png');
 await ev(`document.dispatchEvent(new CustomEvent('langchange', { detail: { lang: 'en' } }))`); await b.sleep(300);
 

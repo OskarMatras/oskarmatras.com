@@ -15,8 +15,10 @@ let arrived = false;
 let mood = '';
 /** @type {any} */ let timer = null;
 
-/** The kids for the left and right edges. Which twelve stand where is fixed, so a redraw never reshuffles them. */
-const LEFT = CROWD.slice(0, 5), RIGHT = CROWD.slice(5, 10);
+/** The kids for the left and right edges, and what each plays: the school orchestra comes to a boss bout, with the
+ * maestro conducting from the left. Which kid stands where is fixed, so a redraw never reshuffles them. */
+const LEFT = [['k0', 'violin'], ['k1', 'trombone'], ['k2', 'violin'], ['k3', 'violin'], ['maestro', '']];
+const RIGHT = [['k5', 'trombone'], ['k6', 'drum'], ['k7', 'violin'], ['k8', 'bass'], ['k9', 'trombone']];
 
 const bouts = () => S.phase === 'play' && S.blindIdx === 2;
 
@@ -24,9 +26,9 @@ const bouts = () => S.phase === 'play' && S.blindIdx === 2;
 export function crowdHTML() {
   if (!bouts()) { arrived = false; mood = ''; return ''; }
   const first = !arrived; arrived = true;
-  /** @param {string[]} ids @param {'L'|'R'} side */
-  const group = (ids, side) => `<div class="crowdSide ${side}${first ? ' arrive' : ''}">${ids.map((id, k) =>
-    `<span class="cf" style="--k:${k}" data-id="${id}">${face(id, 88, mood)}</span>`).join('')}</div>`;
+  /** @param {string[][]} kids @param {'L'|'R'} side */
+  const group = (kids, side) => `<div class="crowdSide ${side}${first ? ' arrive' : ''}">${kids.map(([id, inst], k) =>
+    `<span class="cf" style="--k:${k}" data-id="${id}" data-add="${inst}">${face(id, 88, mood, inst)}</span>`).join('')}</div>`;
   return `<div class="crowd${mood ? ' m-' + mood : ''}" aria-hidden="true">${group(LEFT, 'L')}${group(RIGHT, 'R')}</div>`;
 }
 
@@ -44,5 +46,5 @@ function repaint() {
   const root = document.querySelector('.crowd');
   if (!root) return;
   root.className = 'crowd' + (mood ? ' m-' + mood : '');
-  root.querySelectorAll('.cf').forEach(n => { const el = /** @type {HTMLElement} */ (n); el.innerHTML = face(el.dataset.id || 'k0', 88, mood); });
+  root.querySelectorAll('.cf').forEach(n => { const el = /** @type {HTMLElement} */ (n); el.innerHTML = face(el.dataset.id || 'k0', 88, mood, el.dataset.add || ''); });
 }
