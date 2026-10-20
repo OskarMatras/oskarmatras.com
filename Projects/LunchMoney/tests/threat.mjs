@@ -1,0 +1,11 @@
+import { launch } from './cdp.mjs';
+const b = await launch({ width: 1280, height: 720, url: 'http://localhost:8099/Projects/LunchMoney/' });
+await b.eval(`(async()=>{ const E = await import('/Projects/LunchMoney/js/engine.js'); const st = await import('/Projects/LunchMoney/js/state.js'); window.__E=E; window.__S=st.S; window.__st=st; E.actions.newRun(); })()`);
+await b.sleep(700);
+await b.eval(`(()=>{const S=__S; S.ante=4; __st.growBoard(4); S.board=Array(16).fill(null); S.growAnim=null; S.phase='blind'; __E.actions.startBlind();})()`);
+await b.sleep(2000);
+await b.eval(`(()=>{const S=__S; document.getElementById('coach')&&(document.getElementById('coach').style.display='none'); S.board[0]={t:'O'}; S.board[1]={t:'O'}; S.board[5]={t:'X',p:{uid:-1,type:'plain'}}; S.board[6]={t:'X',p:{uid:-2,type:'plain'}}; import('/Projects/LunchMoney/js/ui.js').then(u=>u.render());})()`);
+await b.sleep(900);
+await b.shot('shots/threat.png');
+console.log(b.errors());
+b.close();

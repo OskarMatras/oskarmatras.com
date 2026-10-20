@@ -1,0 +1,14 @@
+import { launch } from './cdp.mjs';
+const URL = 'http://localhost:8099/Projects/LunchMoney/';
+const b = await launch({ width: 1280, height: 800, url: URL });
+await b.eval(`localStorage.setItem('lm-best', JSON.stringify({ante:4,score:1234}))`);
+await b.goto(URL); await b.sleep(500);
+await b.eval(`(async()=>{ const st = await import('/Projects/LunchMoney/js/state.js'); st.SET.tips=false; })()`);
+const c = await b.eval(`(()=>{ const e=document.querySelector('[data-act=newRun]'); const r=e.getBoundingClientRect(); return {x:r.left+r.width/2,y:r.top+r.height/2}; })()`);
+await b.click(c.x, c.y); await b.sleep(700);
+await b.shot('shots/deck.png');
+const c2 = await b.eval(`(()=>{ const e=document.querySelector('.deckCard[data-arg=glass]'); const r=e.getBoundingClientRect(); return {x:r.left+r.width/2,y:r.top+r.height/2}; })()`);
+await b.click(c2.x, c2.y); await b.sleep(900);
+console.log(await b.eval(`import('/Projects/LunchMoney/js/state.js').then(m=>({deck:m.S.deck, bag:m.S.bag.map(p=>p.type).join(','), phase:m.S.phase}))`));
+console.log(b.errors());
+b.close();

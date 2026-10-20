@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" data-lang-key="lm-lang" data-lang-default="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Lunch Money · Oskar Matras</title>
+<meta name="description" content="Tic-tac-toe behind the bike sheds. A schoolyard gambling roguelike: win the bets, beat the bullies, keep the lunch money." data-da-content="Kryds og bolle bag cykelskurene. Et roguelike om væddemål på skolegården: vind indsatserne, slå bøllerne og behold madpengene." data-en-content="Tic-tac-toe behind the bike sheds. A schoolyard gambling roguelike: win the bets, beat the bullies, keep the lunch money.">
+<link rel="canonical" href="https://OskarMatras.com/Projects/LunchMoney/">
+<meta name="theme-color" content="#2a2e33">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="format-detection" content="telephone=no">
+<meta property="og:title" content="Lunch Money">
+<meta property="og:description" content="Tic-tac-toe behind the bike sheds. Winner keeps the lunch money.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Permanent+Marker&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/Projects/LunchMoney/game.css">
+<link rel="modulepreload" href="/Projects/LunchMoney/js/engine.js">
+<link rel="modulepreload" href="/Projects/LunchMoney/js/ui.js">
+<script src="/i18n.js" defer></script>
+<script type="module" src="/Projects/LunchMoney/js/main.js"></script>
+</head>
+<body data-phase="title">
+<canvas id="bg" aria-hidden="true"></canvas>
+<div id="chalkLines" aria-hidden="true"></div>
+
+<!-- Shared SVG filters: chalk and marker lines are never perfectly straight. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <filter id="rough" x="-8%" y="-8%" width="116%" height="116%"><feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="4.5"/></filter>
+    <filter id="roughSm" x="-8%" y="-8%" width="116%" height="116%"><feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="2" seed="9" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4"/></filter>
+    <filter id="chalkdust" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="2" result="t"/><feColorMatrix in="t" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1.4 -.62" result="m"/><feComposite in="SourceGraphic" in2="m" operator="in"/></filter>
+  </defs>
+</svg>
+
+<header class="bar">
+  <a href="/" class="home">Oskar Matras</a>
+  <span aria-hidden="true">/</span>
+  <a href="/Projects" data-da="Projekter" data-en="Projects">Projects</a>
+  <span aria-hidden="true">/</span>
+  <span class="crumb">Lunch Money</span>
+  <span class="bar-lang" data-lang-switch></span>
+</header>
+
+<div id="app">
+  <aside id="side" aria-label="Status"></aside>
+  <main id="main">
+    <section id="rack" aria-label="Tricks"></section>
+    <section id="stage"></section>
+  </main>
+</div>
+
+<div id="overlay" hidden></div>
+<div id="insp" hidden role="dialog"></div>
+<div id="tip" hidden role="tooltip"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<noscript>
+  <p style="padding:24px;font-family:system-ui,sans-serif;color:#f5efe0">
+    The game needs JavaScript. / Spillet kræver JavaScript.
+  </p>
+</noscript>
+</body>
+</html>
