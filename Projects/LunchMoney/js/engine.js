@@ -12,9 +12,11 @@ import { geo, rc, squareOf, neighbours, isCenter, mirrorOf } from './geometry.js
 import { PIECES, SPECIALS, TILES, JOKERS, ITEMS, VOUCHERS, LINE_TYPES, EDITIONS, EDITS, PACKS, hasJ, turfOf } from './data.js';
 import {
   rand, shuffle, newPiece, freshRun, nextBoss, blindInfo, lineValues, handMax, isBoss, voucherCost, interestCap, openPlay, jokerSlots, unlockedDecks,
-  emptyCells, oWon, newXLines, viableLines, threats, oThreats, isMuzzled, ambush,
+  emptyCells, oWon, newXLines, viableLines, threats, oThreats, isMuzzled, ambush, winCells,
+  pieceIds, tileIds, itemIds, jokerRarities, packTypes, finishesOpen, openSpecials, openTools,
 } from './rules.js';
 import { allows, tutOn, BASICS } from './tutorial.js';
+import { note as metaNote, trickOpen, rewardCount, itemOpen } from './meta.js';
 import { t, tr, fmt, fmtM } from './strings.js';
 import { sfx, resetStep, syncMusic } from './audio.js';
 import * as ui from './ui.js';
@@ -42,6 +44,13 @@ async function teachTrick(src) {
 const jokerOf = (/** @type {string} */ id) => S.jokers.find((/** @type {any} */ j) => j.id === id);
 
 
+/** Tell the Yard Book what happened; announce anything it unlocks and remember it for the end-of-run sheet. @param {string} on @param {any} [e] */
+function book(on, e = {}) {
+  for (const m of metaNote(on, e)) {
+    (S.unlocked = S.unlocked || []).push(m.id);
+    ui.toast(t('book.unlocked', { name: tr(m.name), n: rewardCount(m) })); sfx.sparkle();
+  }
+}
 /** Re-render and save whenever the run is at rest. */
 function settle() { ui.render(); saveRun(); }
 
@@ -162,12 +171,14 @@ async function placeX(i) {
   if (!S.hand[S.selIdx]) return;   // nothing to place
   S.busy = true;
   const threatsBefore = threats().length;
+  const wasBlock = winCells('O').has(i);   // this square was where the rival would have won
   const p = S.hand.splice(S.selIdx, 1)[0];
   S.board[i] = { t: 'X', p, fresh: true };
   S.g.lastX = i;   // the Roof-Rat copies where you just played
   S.g.placements++;
   if (isBoss('toll') && S.money > 0) { S.money--; ui.setMoney(); ui.pop(ui.cellEl(i), '-$1', 'dim'); }
   sfx.place(); ui.render();
+  if (wasBlock) { (S.g.blocked = S.g.blocked || []).push(i); ui.pop(ui.cellEl(i), t('pop.block'), 'info'); sfx.line(); }
 
   if (p.type === 'bomb') {
     const targets = neighbours(i).filter(k => S.board[k] && S.board[k].t === 'O');
@@ -322,7 +333,7 @@ async function apply(ctx, e, target) {
   // It is pure decoration, so the sleeps below (the pacing of the sequence) are unchanged.
   if (e.chips) { ctx.chips += e.chips; ui.pop(target, '+' + fmt(e.chips), 'chips'); sfx.chips(); ui.setCalc(ctx.chips, ctx.mult); ui.hit(target, 'chips', e.chips); await sleep(e.mult || e.xmult || e.money ? 190 : 280); }
   if (e.mult) { ctx.mult += e.mult; ui.pop(target, t('pop.mult', { n: fmtM(e.mult) }), 'mult'); sfx.mult(); ui.setCalc(ctx.chips, ctx.mult); ui.hit(target, 'mult', e.mult); await sleep(e.xmult || e.money ? 190 : 280); }
-  if (e.xmult) { ctx.mult *= e.xmult; ui.pop(target, t('pop.xmult', { n: fmtM(e.xmult) }), 'xmult'); sfx.xmult(); ui.setCalc(ctx.chips, ctx.mult); ui.hit(target, 'xmult', ctx.mult); ui.shake(.1); if (e.xmult >= 2) ui.flash('#ffb04a', Math.min(1, e.xmult / 6)); await sleep(e.money ? 220 : 360); }
+  if (e.xmult) { ctx.mult *= e.xmult; ui.pop(target, e.label || t('pop.xmult', { n: fmtM(e.xmult) }), 'xmult'); sfx.xmult(); ui.setCalc(ctx.chips, ctx.mult); ui.hit(target, 'xmult', ctx.mult); ui.shake(.1); if (e.xmult >= 2) ui.flash('#ffb04a', Math.min(1, e.xmult / 6)); await sleep(e.money ? 220 : 360); }
   if (e.money) { S.money += e.money; ui.pop(target, '+$' + e.money, 'money'); sfx.money(); ui.setMoney(); ui.hit(target, 'money', e.money); await sleep(260); }
 }
 
@@ -390,6 +401,21 @@ async function runScore(ctx, label) {
     await apply(ctx, { xmult: hasJ('ironclad') ? 2 : 1.5 }, ui.cellEl(i));
     ui.markCells([i], 'held', false);
   }
+  // Combos. An X that blocked the rival and then finished a line makes that line worth more, and so does finishing
+  // several lines with one X (a double, a triple...): each of them scores with x as many Swagger as there are lines.
+  if (ctx.type !== 'draw') {
+    const blocked = S.g.blocked || [], nb = ctx.cells.filter(i => blocked.includes(i)).length;
+    ctx.block = nb > 0;
+    if (nb) {
+      const x = 1 + .5 * nb;
+      await teach('block', '.cell.scoring', { x: fmtM(x) });
+      await apply(ctx, { xmult: x, label: t('pop.blockBonus', { n: fmtM(x) }) }, ui.cellEl(ctx.cells.find(i => blocked.includes(i)) ?? ctx.cells[0]));
+    }
+    if (ctx.simult >= 2) {
+      await teach('double', '.cell.scoring', { n: ctx.simult });
+      await apply(ctx, { xmult: ctx.simult, label: t('pop.combo', { n: ctx.simult }) }, ui.boardEl());
+    }
+  }
   for (const j of S.jokers) {
     if (isMuzzled(j)) continue;
     const src = scoringSource(j);
@@ -412,6 +438,7 @@ async function runScore(ctx, label) {
   for (let s = 1; s <= 14; s++) { ui.setRoundScore(from + total * s / 14); await sleep(28); }
 
   S.played[ctx.type]++; S.stats.lines++;
+  if (ctx.type !== 'draw') book('line', { total, block: !!ctx.block, double: ctx.simult >= 2 });
   if (total > S.stats.bestLine) { S.stats.bestLine = total; S.stats.bestType = ctx.type; }
   for (const i of ctx.cells) {
     const c = S.board[i];
@@ -493,12 +520,14 @@ function gameOver() {
 
 /**
  * Antes that open with a bigger board, whatever the player bought: { ante: board size }.
- * The game starts as plain 3×3 and picks up complexity quickly, so by ante 4 everyone has 4×4.
+ * Turf 1 is plain 3×3 (the first line ends the game). From turf 2 the board is 4×4, so a game can have several lines
+ * and one X can finish two at once; turf 5 makes it 5×5.
  */
-const BOARD_GROWS = { 4: 4 };
+const BOARD_GROWS = { 2: 4, 5: 5 };
 
 function winBlind() {
   gameEnded('win', Math.max(1, S.g.lines));
+  book('bout', { boss: S.blindIdx === 2, special: S.bag.filter((/** @type {any} */ p) => p.type !== 'plain').length, chalk: Math.max(...Object.values(S.levels).map(Number)) });
   sfx.win(); ui.celebrate(2.4); ui.flash('#fff3c4', .8);   // a big burst over the board, before the screen changes under it
   ui.react(S.blindIdx === 2 ? 'bosswon' : 'blindwon');
   const r = S.round, rows = [], notes = [];
@@ -513,7 +542,7 @@ function winBlind() {
   S.phase = 'cashout'; S.mode = null; S.busy = false;
   if (S.blindIdx === 2) {
     S.cashout.finalWin = S.ante === 8 && !S.endless;
-    S.ante++; S.blindIdx = 0; nextBoss();
+    S.ante++; S.blindIdx = 0; nextBoss(); book('ante', { ante: S.ante });
     // Before makeShop(), so the shop (and its voucher roll) already knows the new board size.
     const to = /** @type {Record<number, number>} */ (BOARD_GROWS)[S.ante];
     if (to) growBoard(to);
@@ -524,10 +553,13 @@ function winBlind() {
 function cashOut() {
   if (S.phase !== 'cashout') return;
   S.money += S.cashout.total; sfx.money();
+  book('cash', { money: S.money });
   const fin = S.cashout.finalWin;
+  if (fin) book('won');
   S.cashout = null;
   if (tutOn() && S.tut.bout === 2) { S.phase = 'blind'; S.shop = null; startScene(['ambush_intro'], 'bout3'); settle(); return; }
   S.phase = fin ? 'won' : 'shop';
+  if (S.newStock && !fin) { ui.toast(t('toast.stock' + S.newStock)); S.newStock = null; }
   if (fin) startScene(['finale_win'], 'won');
   settle();
 }
@@ -535,7 +567,7 @@ function cashOut() {
 function skipBlind() {
   if (S.phase !== 'blind' || S.blindIdx > 1) return;
   if (S.items.length >= S.itemSlots) { ui.toast(t('toast.itemsFull')); return; }
-  S.items.push({ uid: nid(), id: rand(Object.keys(ITEMS).filter(i => !ITEMS[i].rare)) });
+  S.items.push({ uid: nid(), id: rand(Object.keys(ITEMS).filter(i => !ITEMS[i].rare && (itemIds().includes(i) || (ITEMS[i].kind === 'chalk' && itemOpen(i))))) });
   sfx.line(); ui.toast(t('toast.skipped'));
   S.blindIdx++; settle();
 }
@@ -545,16 +577,20 @@ function skipBlind() {
    ================================================================= */
 /** A Joker the run can use right now (board-size Jokers wait for a bigger board). @param {number} [edBoost] */
 function genJoker(edBoost = 1, /** @type {string[]} */ avoid = []) {
-  const rr = Math.random(), rar = rr < .1 ? 3 : rr < .38 ? 2 : 1;
+  const allowed = jokerRarities();
+  const open = (/** @type {string} */ id) => trickOpen(id);
+  const rr = Math.random(), rarRoll = rr < .1 ? 3 : rr < .38 ? 2 : 1, rar = allowed.includes(rarRoll) ? rarRoll : 1;
   const ok = (/** @type {string} */ id) => !hasJ(id) && !avoid.includes(id) && (!JOKERS[id].req || JOKERS[id].req())
     && !(S.shop && S.shop.items.some((/** @type {any} */ it) => it.id === id));
-  let pool = Object.keys(JOKERS).filter(id => JOKERS[id].rar === rar && ok(id));
-  if (!pool.length) pool = Object.keys(JOKERS).filter(ok);
+  let pool = Object.keys(JOKERS).filter(id => open(id) && JOKERS[id].rar === rar && ok(id));
+  if (!pool.length) pool = Object.keys(JOKERS).filter(id => open(id) && allowed.includes(JOKERS[id].rar) && ok(id));
+  if (!pool.length) pool = Object.keys(JOKERS).filter(id => open(id) && ok(id));
+  if (!pool.length) pool = Object.keys(JOKERS).filter(id => open(id));
   if (!pool.length) pool = Object.keys(JOKERS);
   const id = rand(pool);
   // One roll decides the finish: 2.5% negative, 3% polychrome, 6% holographic, 10% foil (boosted in Joker Packs).
   let ed = null, edRoll = Math.random();
-  for (const k of ['negative', 'poly', 'holo', 'foil']) { const ch = EDITIONS[k].chance * edBoost; if (edRoll < ch) { ed = k; break; } edRoll -= ch; }
+  for (const k of ['negative', 'poly', 'holo', 'foil']) { const ch = EDITIONS[k].chance * (finishesOpen() ? edBoost : 0); if (edRoll < ch) { ed = k; break; } edRoll -= ch; }
   return { kind: 'joker', id, ed, cost: priced(JOKERS[id].cost + (ed ? EDITIONS[ed].cost : 0)), sold: false };
 }
 /** The shop offers this many random cards and packs (Overstock and Pack Rack add one each), plus one ante voucher. */
@@ -564,14 +600,18 @@ const priced = cost => Math.max(1, cost - (S.discount || 0));
 
 /** One random card: a Joker, a piece, a square upgrade, or a chalk/tool. */
 function genItem(/** @type {string[]} */ avoid = []) {
-  const roll = Math.random();
-  if (roll < .4) return genJoker(1, avoid);
-  if (roll < .56) { const id = rand(SPECIALS); return { kind: 'piece', id, cost: priced(/** @type {any} */ (PIECES)[id].cost), sold: false }; }
-  if (roll < .7) { const id = rand(Object.keys(TILES)); return { kind: 'tile', id, cost: priced(/** @type {any} */ (TILES)[id].cost || 4), sold: false }; }
+  // Only what Squint stocks this turf (see rules.js), in the usual proportions among the kinds that are open.
+  const tiles = tileIds(), items = itemIds();
+  const kinds = /** @type {[string, number][]} */ ([['joker', .4], ['piece', .16], ['tile', tiles.length ? .14 : 0], ['item', items.length ? .3 : 0]]);
+  let roll = Math.random() * kinds.reduce((a, k) => a + k[1], 0), kind = 'joker';
+  for (const [k, w] of kinds) { if (roll < w) { kind = k; break; } roll -= w; }
+  if (kind === 'joker') return genJoker(1, avoid);
+  if (kind === 'piece') { const id = rand(pieceIds()); return { kind: 'piece', id, cost: priced(/** @type {any} */ (PIECES)[id].cost), sold: false }; }
+  if (kind === 'tile') { const id = rand(tiles); return { kind: 'tile', id, cost: priced(/** @type {any} */ (TILES)[id].cost || 4), sold: false }; }
   // Chalk is what makes lines worth more, so it turns up more than tools do (about one card in five).
-  const ids = Object.keys(ITEMS).filter(i => !ITEMS[i].rare);
-  const chalks = ids.filter(i => ITEMS[i].kind === 'chalk'), tools = ids.filter(i => ITEMS[i].kind === 'tool');
-  return { kind: 'item', id: roll < .9 ? rand(chalks) : rand(tools), cost: priced(3), sold: false };
+  const chalks = items.filter(i => ITEMS[i].kind === 'chalk'), tools = items.filter(i => ITEMS[i].kind === 'tool');
+  const pool = tools.length && Math.random() >= .9 ? tools : (chalks.length ? chalks : tools);
+  return { kind: 'item', id: rand(pool), cost: priced(3), sold: false };
 }
 /** Fresh shop cards. Every shop shows at least one Joker: they are what a run is built around. */
 function genCards() {
@@ -584,7 +624,8 @@ function genCards() {
 function makeShop() {
   S.shop = { items: [], voucher: null, vSold: false, reroll: S.vouchers.includes('coupon') ? 2 : 5, trimmed: false, packs: [] };
   S.shop.items = genCards();
-  const kinds = shuffle(Object.keys(PACKS));
+  const kinds = shuffle(packTypes());
+  S.newStock = S.ante > 1 && S.ante <= 4 && S.stockSeen !== S.ante ? S.ante : null; S.stockSeen = S.ante;   // Squint's range grew: say so when the shop opens
   S.shop.packs = kinds.slice(0, packSlots()).map(type => ({ type, cost: priced(PACKS[type].cost), sold: false }));
   // One voucher per ante: rolled the first time the ante opens a shop, then it waits
   // in every shop of that ante until it is bought (it is never re-rolled), and once
@@ -612,7 +653,7 @@ function buy(/** @type {string} */ key) {
     if (av.id === 'board4' || av.id === 'board5') ui.toast(t('toast.board', { n: S.N }));
     // Vouchers that change the shelf do it to this shop too, not just the next one.
     if (av.id === 'overstock') sh.items.push(genItem());
-    if (av.id === 'packrat') { const used = sh.packs.map((/** @type {any} */ p) => p.type), type = rand(Object.keys(PACKS).filter(k => !used.includes(k))); sh.packs.push({ type, cost: priced(PACKS[type].cost), sold: false }); }
+    if (av.id === 'packrat') { const used = sh.packs.map((/** @type {any} */ p) => p.type), free = packTypes().filter(k => !used.includes(k)), type = rand(free.length ? free : packTypes()); sh.packs.push({ type, cost: priced(PACKS[type].cost), sold: false }); }
     if (av.id === 'clearance') { for (const it of sh.items) if (!it.sold) it.cost = priced(it.cost); for (const pk of sh.packs) if (!pk.sold) pk.cost = priced(pk.cost); }
     settle(); return;
   }
@@ -688,16 +729,16 @@ function packOptions(type) {
   const P = PACKS[type];
   if (type === 'joker') { const out = []; for (let i = 0; i < P.show; i++) out.push(genJoker(2.5, out.map(o => o.id))); return out; }
   if (type === 'piece' && tutOn()) return ['red', 'blue', 'gold', 'lucky'].map(id => ({ kind: 'piece', id }));
-  if (type === 'piece') return shuffle([...SPECIALS]).slice(0, P.show).map(id => ({ kind: 'piece', id }));
+  if (type === 'piece') return shuffle([...pieceIds()]).slice(0, P.show).map(id => ({ kind: 'piece', id }));
   if (type === 'chalk') {
     const ids = shuffle(Object.keys(ITEMS).filter(i => ITEMS[i].kind === 'chalk' && !ITEMS[i].rare)).slice(0, P.show);
     // One pack in four hides a Rainbow Chalk where the last plain chalk would be.
     if (Math.random() < .25) ids[ids.length - 1] = Object.keys(ITEMS).find(i => ITEMS[i].rare) || ids[ids.length - 1];
     return ids.map(id => ({ kind: 'item', id }));
   }
-  if (type === 'builder') return shuffle(Object.keys(TILES)).slice(0, P.show).map(id => ({ kind: 'tile', id }));
+  if (type === 'builder') return shuffle(tileIds().length ? tileIds() : Object.keys(TILES)).slice(0, P.show).map(id => ({ kind: 'tile', id }));
   if (type === 'forge') return Object.keys(EDITS).map(id => ({ kind: 'edit', id }));
-  return shuffle(Object.keys(ITEMS).filter(i => ITEMS[i].kind === 'tool')).slice(0, P.show).map(id => ({ kind: 'item', id }));
+  return shuffle(openTools()).slice(0, P.show).map(id => ({ kind: 'item', id }));
 }
 function buyPack(/** @type {string} */ arg) {
   const sh = S.shop, pk = sh && sh.packs && sh.packs[+arg];
@@ -723,7 +764,7 @@ function editPiece(/** @type {string} */ arg) {
   if (!o || o.taken || !p) return;
   const P = /** @type {any} */ (PIECES);
   if (o.id === 'smelt') {
-    p.type = rand(SPECIALS.filter(k => k !== p.type)); sfx.win();
+    p.type = rand(openSpecials().filter(k => k !== p.type)); sfx.win();
     ui.toast(t('toast.smelted', { name: tr(P[p.type].name) }));
   } else if (o.id === 'twin') {
     S.bag.push(newPiece(p.type)); sfx.win();
@@ -823,7 +864,7 @@ function useItem(/** @type {string} */ uid) {
   } else if (c.id === 'forge') {
     const plains = S.bag.filter((/** @type {any} */ p) => p.type === 'plain');
     if (!plains.length) { ui.toast(t('toast.noPlain')); return; }
-    const p = rand(plains); p.type = rand(SPECIALS); drop(); sfx.win();
+    const p = rand(plains); p.type = rand(openSpecials()); drop(); sfx.win();
     ui.toast(t('toast.forged', { name: tr(/** @type {any} */ (PIECES)[p.type].name) }));
   } else if (c.id === 'eraser') {
     S.mode = 'erase'; S.pending = c.uid; ui.render(); return;

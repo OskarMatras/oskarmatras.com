@@ -29,6 +29,11 @@ Live at https://OskarMatras.com/Projects/LunchMoney/
   Parametric SVG faces for the whole cast live in `js/faces.js`. The theme is the `BLACKTOP` block at the end of
   `game.css`; paper surfaces redefine the colour variables so text stays readable.
 
+* **Combos**: an X that blocks the rival and finishes a line gives that line x1.5 Swagger (the board marks such squares BLOCK), and one X that finishes two or more lines is a double: every line scores with x that many Swagger (the board marks them with a pink badge).
+* **A shop that grows**: turf 1 sells only Common Tricks and three X pieces; chalk and Sneaky Tricks come on turf 2, tools and square upgrades on turf 3, everything on turf 4 (the lists are in `js/rules.js`). The board is 4x4 from turf 2 and 5x5 from turf 5.
+
+* **Achievements (the Yard Book)**: every run starts from nothing; what carries over is access. Squint starts with 12 simple Tricks, three X pieces, chalk and three squares; twelve milestones (`js/meta.js`) each open a themed group of Tricks, X pieces, tools and squares. Progress is saved under `lm-meta`.
+
 ## Stack
 
 Plain HTML, CSS and JavaScript ES modules. No framework and no build step, the

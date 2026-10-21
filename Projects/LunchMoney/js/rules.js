@@ -6,7 +6,8 @@
  */
 import { S, nid, best } from './state.js';
 import { geo } from './geometry.js';
-import { BOSSES, ANTE_BASE, LINE_TYPES, DECKS, hasJ } from './data.js';
+import { BOSSES, ANTE_BASE, LINE_TYPES, DECKS, hasJ, PIECES, TILES, ITEMS, SPECIALS } from './data.js';
+import { pieceOpen, itemOpen, tileOpen } from './meta.js';
 import { t, tr } from './strings.js';
 
 /** @template T @param {T[]} a @returns {T} */
@@ -28,6 +29,33 @@ function pickBoss() {
   return { id: rand(pool.length ? pool : Object.keys(BOSSES).filter(b => b !== 'ollie')) };
 }
 export function nextBoss() { S.boss = pickBoss(); S.usedBosses.push(S.boss.id); }
+
+/* ---------------- a shop that grows with the turfs ----------------
+ * The game starts simple and Squint's stock gets richer turf by turf, so there is always something new to find and a
+ * new player never faces everything at once:
+ *   turf 1  Common Tricks, red / blue / gold X, Trick Bags and Pencil Packs
+ *   turf 2  + chalk, Sneaky Tricks, lucky and stink-bomb X, Chalk Boxes          (the board grows to 4x4)
+ *   turf 3  + tools, square upgrades, more X, Graffiti Kits and Gear Bags, and Tricks start to come with finishes
+ *   turf 4  + Banned Tricks, every X, the rest of the squares and the Craft Table  (turf 5: the board grows to 5x5)
+ */
+const tier = () => Math.min(4, Math.max(1, S.ante || 1));
+const PIECE_TIERS = [['red', 'blue', 'gold'], ['lucky', 'bomb'], ['glass', 'steel', 'ghost'], ['mirror', 'twin', 'sprout', 'cursed', 'turncoat', 'hunter']];
+/** The special X pieces Squint stocks right now. */
+export const pieceIds = () => { const l = PIECE_TIERS.slice(0, tier()).flat().filter(id => id in PIECES && pieceOpen(id)); return l.length ? l : ['red']; };
+/** Every special X the player has found so far, whatever the turf (for random picks such as Smelt). */
+export const openSpecials = () => SPECIALS.filter(pieceOpen);
+/** The tools the player has found so far. */
+export const openTools = () => Object.keys(ITEMS).filter(i => ITEMS[i].kind === 'tool' && !ITEMS[i].rare && itemOpen(i));
+/** The square upgrades he stocks right now (none before turf 3). */
+export const tileIds = () => (tier() < 3 ? [] : (tier() === 3 ? ['hot', 'rich', 'gild', 'echo'] : Object.keys(TILES)).filter(tileOpen));
+/** Chalk from turf 2, tools from turf 3 (the rare Rainbow Chalk only comes out of Chalk Boxes). */
+export const itemIds = () => Object.keys(ITEMS).filter(i => !ITEMS[i].rare && itemOpen(i) && (ITEMS[i].kind === 'chalk' ? tier() >= 2 : tier() >= 3));
+/** Common Tricks at first, Sneaky ones from turf 2, Banned ones from turf 4. */
+export const jokerRarities = () => (tier() < 2 ? [1] : tier() < 4 ? [1, 2] : [1, 2, 3]);
+/** Which goody bags are on the shelf. */
+export const packTypes = () => ['joker', 'piece', ...(tier() >= 2 ? ['chalk'] : []), ...(tier() >= 3 && tileIds().length ? ['builder'] : []), ...(tier() >= 3 && openTools().length ? ['tool'] : []), ...(tier() >= 4 ? ['forge'] : [])];
+/** Whether Tricks come with a finish (Shiny, Holo Sticker...): not before turf 3. */
+export const finishesOpen = () => tier() >= 3;
 
 /** The starting sets you can pick now. */
 export const unlockedDecks = () => Object.keys(DECKS).filter(k => (best().ante || 0) >= DECKS[k].unlock);
@@ -120,6 +148,24 @@ export function winCells(who) {
     if (who === 'X' && S.g && S.g.scored.includes(li)) return;
     const cs = l.cells.map(i => S.board[i]);
     if (cs.filter(c => c && c.t === who).length === 2 && cs.filter(c => !c).length === 1) out.add(l.cells.find(i => !S.board[i]));
+  });
+  return out;
+}
+/**
+ * For every empty square: how many unscored lines an X placed there would finish. Two or more is a DOUBLE (every line
+ * finished by the same X scores with x that many Swagger), so the board can point them out.
+ * @returns {Map<number, number>}
+ */
+export function completeCounts() {
+  /** @type {Map<number, number>} */ const out = new Map();
+  if (!S.g) return out;
+  geo().lines.forEach((l, li) => {
+    if (S.g.scored.includes(li)) return;
+    const cs = l.cells.map(i => S.board[i]);
+    if (cs.filter(c => c && c.t === 'X').length === 2 && cs.filter(c => !c).length === 1) {
+      const e = /** @type {number} */ (l.cells.find(i => !S.board[i]));
+      out.set(e, (out.get(e) || 0) + 1);
+    }
   });
   return out;
 }

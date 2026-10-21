@@ -92,6 +92,9 @@ export const RARITY = {
   3:{ name:{en:'Banned', da:'Forbudt'}, color:'var(--rare)' },
 };
 
+/** Which Tricks can be found right now. meta.js (the Yard Book) replaces `open`; until then everything is open. */
+export const gate = { open: (/** @type {string} */ id) => true };
+
 /* ---------------- Jokers ----------------
  * x:    runs for every X that scores (ctx, cellIndex, piece, joker)
  * line: runs once per scored line, after the X's (ctx, joker)
@@ -426,7 +429,7 @@ export const DECKS = {
   joker:  { name:{en:'Class Clown', da:'Klassens klovn'}, gl:'J', unlock:5,
     desc:{en:'Start with a random <b>Common Trick</b>, but only 4 Trick slots', da:'Start med en tilfældig <b>almindeligt kneb</b>, men kun 4 kneb-pladser'},
     apply:()=>{
-      const pool = Object.keys(JOKERS).filter(k => JOKERS[k].rar === 1 && !JOKERS[k].req);
+      const pool = Object.keys(JOKERS).filter(k => JOKERS[k].rar === 1 && !JOKERS[k].req && gate.open(k));
       S.jokers.push({ uid: nid(), id: pool[Math.floor(Math.random() * pool.length)], ed: null, data: {} });
       S.jokerSlots = 4;
     } },
@@ -474,4 +477,4 @@ export const DETENTION = { id:'detention', name:{en:'Detention', da:'Eftersidnin
 export const turfOf = ante => TURFS[ante - 1] || DETENTION;
 
 /** Base target per ante; small blind ×1, big ×1.5, boss ×2. */
-export const ANTE_BASE = [100, 260, 700, 2000, 5000, 11000, 24000, 50000];
+export const ANTE_BASE = [100, 340, 950, 2300, 5200, 11000, 24000, 50000];

@@ -3,6 +3,7 @@ import './register.mjs';
 const G = new URL('../js/', import.meta.url).href;
 globalThis.localStorage = { _d: {}, getItem(k) { return this._d[k] ?? null; }, setItem(k, v) { this._d[k] = String(v); }, removeItem(k) { delete this._d[k]; } };
 globalThis.window = globalThis;
+globalThis.__lmUnlockAll = true;   // simulations play with every Trick open (combos.mjs / meta.mjs turn this off to test the locks)
 globalThis.setTimeout = (f) => { queueMicrotask(f); return 0; };
 const { S, SET } = await import(G + 'state.js');
 const E = await import(G + 'engine.js');

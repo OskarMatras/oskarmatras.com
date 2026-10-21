@@ -21,9 +21,10 @@ import { sync as syncCoach, pip, react as pipReact, onSkipTutorial, explain as c
 import { showStory, storyOpen, storyId } from './storyui.js';
 import { tutOn } from './tutorial.js';
 import { crowdHTML, crowdReact } from './crowd.js';
+import { MILESTONES, isDone, trickOpen, trickCount, START_TRICKS, START_PIECES, START_ITEMS, START_TILES } from './meta.js';
 import * as fx from './fx.js';
 import { punch } from './cardfx.js';
-import { blindInfo, lineValues, handMax, voucherCost, openPlay, winCells, jokerSlots, isMuzzled, ambush } from './rules.js';
+import { blindInfo, lineValues, handMax, voucherCost, openPlay, winCells, jokerSlots, isMuzzled, ambush, completeCounts } from './rules.js';
 import { t, tr, fmt, fmtM, getLang } from './strings.js';
 import { sfx, setMood } from './audio.js';
 import { setBackdrop, pulseBackdrop } from './background.js';
@@ -197,6 +198,7 @@ function boardHTML(id, board, act) {
   // Squares worth a glance: where the rival would win (red), and where you would score (gold).
   const live = id === 'board' && S.phase === 'play' && S.g;
   const danger = live ? winCells('O') : new Set(), chance = live ? winCells('X') : new Set();
+  const counts = live ? completeCounts() : new Map();   // how many lines an X on a square would finish
   const cells = board.map((c, i) => {
     let inner = '', cls = 'empty';
     if (c) {
@@ -209,7 +211,12 @@ function boardHTML(id, board, act) {
     const up = Object.keys(squareOf(i)).length ? ' up' : '';
     const tip = c && c.t === 'X' && act === 'cell' ? ` data-tip="piece:${c.p.type}"` : '';
     if (!c && danger.has(i)) cls += ' danger'; else if (!c && chance.has(i)) cls += ' chance';
-    return `<button class="cell ${cls}"${tip} data-act="${act}" data-arg="${i}" data-cell="${i}" aria-label="${t('aria.square', { n: i + 1 })}"><span class="slot${up}">${tilesHTML(i)}${inner}</span></button>`;
+    // Combos worth pointing at: one X finishing two or more lines (a double), or a block that also finishes a line.
+    const nLines = counts.get(i) || 0;
+    let badge = '';
+    if (!c && nLines >= 2) { cls += ' double'; badge = `<span class="cbadge dbl">&times;${nLines}</span>`; }
+    else if (!c && danger.has(i) && nLines >= 1) { cls += ' counter'; badge = `<span class="cbadge blk">${t('badge.block')}</span>`; }
+    return `<button class="cell ${cls}"${tip} data-act="${act}" data-arg="${i}" data-cell="${i}" aria-label="${t('aria.square', { n: i + 1 })}"><span class="slot${up}">${tilesHTML(i)}${inner}${badge}</span></button>`;
   }).join('');
   return `<div class="board" id="${id}" role="grid" aria-label="${t('aria.board')}" style="--n:${N}">${cells}</div>`;
 }
@@ -410,7 +417,8 @@ function summaryRows() {
     ${played && played[1] ? `<div class="rr"><span>${t('over.fav')}</span><b>${tr(/** @type {any} */ (LINE_TYPES)[played[0]].name)} &times;${played[1]}</b></div>` : ''}
     <div class="rr"><span>${t('over.deck')}</span><b class="plain">${tr(DECKS[S.deck || 'plain'].name)}</b></div>
     <div class="rr"><span>${t('over.bag')}</span><b class="plain">${t('over.bagVal', { n: S.bag.length, k: special })}</b></div></div>
-    <div class="miniJokers">${jokers || `<span class="dim">${t('none')}</span>`}</div>`;
+    <div class="miniJokers">${jokers || `<span class="dim">${t('none')}</span>`}</div>
+    ${(S.unlocked || []).length ? `<p class="newUnlock">${t('book.thisRun', { list: (S.unlocked || []).map((/** @type {string} */ id) => { const m = MILESTONES.find(x => x.id === id); return m ? tr(m.name) : ''; }).join(', ') })}</p>` : ''}`;
 }
 
 /* ---------------- overlays ---------------- */
@@ -445,7 +453,7 @@ function renderOverlay() {
         : `<div class="howto"><div>${t('how.1')}</div><div>${t('how.2')}</div><div>${t('how.3')}</div><div>${t('how.4')}</div></div>`}
       <div class="btnRow">${hasSavedRun() ? `<button class="btn gold big" data-act="continueRun">${t('btn.continue')}</button>` : ''}
         <button class="btn ${hasSavedRun() ? '' : 'gold '}big" data-act="play">${first ? t('btn.begin') : t('btn.newRun')}</button></div>
-      <div class="btnRow">${first ? `<button class="btn small" data-act="skipIntro">${t('btn.skipStory')}</button>` : `<button class="btn small" data-act="replayStory">${t('btn.replayStory')}</button>`}</div></div>`;
+      <div class="btnRow">${first ? `<button class="btn small" data-act="skipIntro">${t('btn.skipStory')}</button>` : `<button class="btn small" data-act="openBook">${t('btn.book')} ${trickCount().open}/${trickCount().all}</button><button class="btn small" data-act="replayStory">${t('btn.replayStory')}</button>`}</div></div>`;
   } else if (kind === 'cashout') {
     const c = S.cashout;
     const tally = !c.revealed;   // the sheet totals up line by line the first time only, not on every redraw
@@ -476,6 +484,22 @@ function renderOverlay() {
     }).join('');
     h = `<div class="modal wide" role="dialog" aria-modal="true"><h2>${t('deck.title')}</h2><p>${t('deck.sub')}</p>
       <div class="deckGrid">${cards}</div><div class="btnRow"><button class="btn" data-act="closeModal">${t('btn.close')}</button></div></div>`;
+  } else if (kind === 'book') {
+    const tc = trickCount();
+    const rows = MILESTONES.map(m => {
+      const done = isDone(m.id);
+      const cards = m.tricks.map(id => { const d = JOKERS[id]; return done
+        ? `<span class="joker mini" style="--jc:${RARITY[d.rar].color}" title="${esc(d.name)}"><span class="gl">${d.gl}</span></span>`
+        : `<span class="joker mini locked" title="?"><span class="gl">?</span></span>`; }).join('');
+      const chip = (/** @type {string} */ txt) => `<span class="chip${done ? '' : ' locked'}">${done ? esc(txt) : '?'}</span>`;
+      const extra = [...(m.pieces || []).map(id => chip(tr(/** @type {any} */ (PIECES)[id].name))), ...(m.items || []).map(id => chip(tr(ITEMS[id].name))), ...(m.tiles || []).map(id => chip(tr(/** @type {any} */ (TILES)[id].name)))].join('');
+      return `<div class="msRow${done ? ' done' : ''}"><div class="msTxt"><b>${done ? '\u2713 ' : ''}${esc(tr(m.name))}</b><span>${esc(tr(m.goal))}</span></div><div class="msCards">${cards}${extra}</div></div>`;
+    }).join('');
+    const starters = START_TRICKS.map(id => { const d = JOKERS[id]; return `<span class="joker mini" style="--jc:${RARITY[d.rar].color}" title="${esc(d.name)}"><span class="gl">${d.gl}</span></span>`; }).join('');
+    h = `<div class="modal wide book" role="dialog" aria-modal="true"><h2>${t('book.title')}</h2><p>${t('book.sub', { a: tc.open, b: tc.all })}</p>
+      <div class="msRow start"><div class="msTxt"><b>${t('book.start')}</b><span>${t('book.startSub')}</span></div><div class="msCards">${starters}${[...START_PIECES.map(id => tr(/** @type {any} */ (PIECES)[id].name)), ...START_ITEMS.filter(id => !ITEMS[id].rare).map(id => tr(ITEMS[id].name)), ...START_TILES.map(id => tr(/** @type {any} */ (TILES)[id].name))].map(x => `<span class="chip">${esc(x)}</span>`).join('')}</div></div>
+      <div class="msList">${rows}</div>
+      <div class="btnRow"><button class="btn big" data-act="closeModal">${t('btn.close')}</button></div></div>`;
   } else if (kind === 'info') {
     const rows = LINE_ORDER.map(k => { const v = lineValues(k); return `<tr><td>${tr(/** @type {any} */ (LINE_TYPES)[k].name)}</td><td>${S.levels[k]}</td><td><i>${v.chips}</i> &times; <em>${v.mult}</em></td><td>${S.played[k]}</td></tr>`; }).join('');
     const vs = S.vouchers.length ? S.vouchers.map((/** @type {string} */ v) => tr(VOUCHERS[v].name)).join(', ') : t('info.noneYet');
@@ -593,6 +617,7 @@ const local = {
   toggleLang: () => { const w = /** @type {any} */ (window); if (w.I18N) w.I18N.set(getLang() === 'da' ? 'en' : 'da'); },
   hideInsp: () => hideInsp(),
   openInfo: () => showModal('info'),
+  openBook: () => showModal('book'),
   openBag: () => showModal('bag'),
   closeModal: () => showModal(null),
   abandon: () => {
@@ -667,7 +692,7 @@ export function initInput() {
     if (local[act]) { local[act](arg, btn); return; }
     if (actions[act]) actions[act](arg);
   });
-  el.overlay.addEventListener('click', e => { if (e.target === el.overlay && (modal === 'info' || modal === 'bag' || modal === 'deck')) showModal(null); });
+  el.overlay.addEventListener('click', e => { if (e.target === el.overlay && (modal === 'info' || modal === 'bag' || modal === 'deck' || modal === 'book')) showModal(null); });
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
       hideInsp();
