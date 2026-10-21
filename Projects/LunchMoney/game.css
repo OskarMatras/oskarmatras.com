@@ -1275,3 +1275,10 @@ body.inStory{overflow:hidden}
 #coach .cNext{font-size:16px;padding:4px 14px}
 #coach .cSkip{font-size:13px}
 @media (max-width:480px){ #coach .cText{font-size:14.5px} #coach.tut .cText{font-size:16px} #coach.tut .cBubble{width:min(300px,calc(100vw - 82px))} }
+
+/* names on Tricks and items stay readable: above the glare and the edition shine, on a darker ribbon */
+.joker .nm,.cons .nm{z-index:4;color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.65),0 0 3px rgba(0,0,0,.5)}
+.joker .nm{background:color-mix(in srgb, var(--jc) 70%, #120e0a)}
+.cons .nm{background:color-mix(in srgb, var(--cc) 70%, #120e0a)}
+.joker .val{z-index:4}
+.piece .pl{z-index:4;text-shadow:0 1px 0 rgba(0,0,0,.6)}

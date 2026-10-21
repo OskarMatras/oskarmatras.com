@@ -65,11 +65,22 @@ function startBlind() {
   const b = blindInfo(S.blindIdx);
   let games = S.maxGames, discards = S.maxDiscards;
   if (tutOn() && S.tut.bout === 3) games = 2;
-  if (S.blindIdx === 2 && S.boss.id === 'needle') games = 2;
+  if (S.blindIdx === 2 && S.boss.id === 'needle') { games = 2; discards = Math.min(discards, 2); }   // tosses follow the games: four of each, unless a boss says otherwise
   if (S.blindIdx === 2 && S.boss.id === 'drought') discards = 0;
   S.round = { score: 0, target: b.target, games, discards, gameNo: 0, reward: b.reward, name: b.name };
   S.phase = 'play'; S.mode = null;
-  newGame();
+  newGame().catch(recover);
+}
+
+/**
+ * A turn that throws must never leave the board locked: log it, unlock, and carry on from whatever state the game is in.
+ * @param {any} e
+ */
+function recover(e) {
+  console.error('Lunch Money: a turn failed, carrying on.', e);
+  S.busy = false; S.mode = null;
+  try { if (S.phase === 'play' && S.round && S.g && !S.hand.length) refill(); } catch (e2) { /* the next render copes */ }
+  settle();
 }
 
 function refill() {
@@ -142,7 +153,7 @@ async function onCell(/** @type {string} */ arg) {
     return;
   }
   if (c || !S.hand.length) return;
-  await placeX(i);
+  try { await placeX(i); } catch (e) { recover(e); }
 }
 
 /** One full turn: your X, bombs, scoring, the rival's answer, end checks. @param {number} i */

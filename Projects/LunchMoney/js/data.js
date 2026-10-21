@@ -422,7 +422,7 @@ export const DECKS = {
     desc:{en:'Start with <b>3 Glass X</b>: <em>X2</em> Swagger each, but they may shatter', da:'Start med <b>3 Glas X</b>: <em>X2</em> swagger hver, men de kan splintres'}, apply:()=>swapPlain(3,'glass') },
   gilded: { name:{en:'Piggy Bank', da:'Sparegris'}, gl:'$', unlock:4,
     desc:{en:'Start with <u>$8</u> and a <b>Gold-Star X</b>, but two tosses fewer each round', da:'Start med <u>$8</u> og et <b>Guldstjerne-X</b>, men to smid mindre hver runde'},
-    apply:()=>{ swapPlain(1,'gold'); S.money = 8; S.maxDiscards = 1; } },
+    apply:()=>{ swapPlain(1,'gold'); S.money = 8; S.maxDiscards = 2; } },
   joker:  { name:{en:'Class Clown', da:'Klassens klovn'}, gl:'J', unlock:5,
     desc:{en:'Start with a random <b>Common Trick</b>, but only 4 Trick slots', da:'Start med en tilfældig <b>almindeligt kneb</b>, men kun 4 kneb-pladser'},
     apply:()=>{
